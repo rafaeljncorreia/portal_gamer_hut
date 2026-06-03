@@ -160,7 +160,7 @@ function CarouselBody({ s, tag, pageIndex }){
 
 /* Cover (carousel pg1 + reels share this) */
 function CoverBody({ s, tag, arrastar=false, safe=false, exporting=false }){
-  const hasImg = safe && !!s.image;            // reels supports an uploaded image bg
+  const hasImg = !!s.image;                    // carousel cover + reels both support an uploaded image bg
   const base = hasImg ? GH.bg : (s.fill ? tag.color : GH.bg);
   const auto = hasImg ? '#F4F1EC' : (s.fill ? readableOn(tag.color) : GH.white);
   const ink = resolveInk(s.ink, auto);
@@ -168,6 +168,8 @@ function CoverBody({ s, tag, arrastar=false, safe=false, exporting=false }){
   const logoCol = (s.ink && s.ink!=='auto') ? ink.logo : (hasImg ? 'white' : (s.fill?(readableOn(tag.color)==='#0B0B0A'?'black':'white'):'white'));
   const accent = hasImg ? tag.color : (s.fill ? (txt==='#0B0B0A'?'#0B0B0A':readableOn(tag.color)) : tag.color);
   const pad = safe ? '300px 76px' : '70px 76px';
+  const chipBg = hasImg ? tag.color : (s.fill?GH.ink:tag.color);
+  const chipTx = hasImg ? tag.ink   : (s.fill?tag.color:tag.ink);
   return (
     <div style={{ position:'absolute', inset:0, background:base, overflow:'hidden' }}>
       {hasImg
@@ -184,16 +186,18 @@ function CoverBody({ s, tag, arrastar=false, safe=false, exporting=false }){
         <div style={{ marginTop:'auto', display:'flex', flexDirection:'column', gap:34 }}>
           <Eyebrow text={s.eyebrow} color={accent}/>
           <h1 className="gh-display" style={{ margin:0, color:txt, fontSize:s.titleSize||136,
-            lineHeight:.9, letterSpacing:'-.025em', textWrap:'balance' }}>{s.title}</h1>
-          {s.subtitle && <div style={{ display:'flex' }}>
-            <span className="gh-display" style={{ background: s.fill?GH.ink:tag.color, color: s.fill?tag.color:tag.ink,
-              padding:'10px 22px', borderRadius:8, fontSize:46, lineHeight:1.05, whiteSpace:'nowrap' }}>{s.subtitle}</span>
+            lineHeight:.9, letterSpacing:'-.025em', textWrap:'balance', overflowWrap:'anywhere' }}>{s.title}</h1>
+          {s.subtitle && <div style={{ maxWidth:'100%' }}>
+            <span className="gh-display" style={{ background:chipBg, color:chipTx,
+              padding:'4px 18px', borderRadius:8, fontSize:46, lineHeight:1.42,
+              WebkitBoxDecorationBreak:'clone', boxDecorationBreak:'clone',
+              overflowWrap:'anywhere' }}>{s.subtitle}</span>
           </div>}
         </div>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end', marginTop:64 }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end', gap:24, marginTop:64 }}>
           {arrastar
             ? <span className="gh-display" style={{ background:txt, color:base, padding:'20px 34px',
-                fontSize:36, borderRadius:8, letterSpacing:'.01em', whiteSpace:'nowrap' }}>{s.cta||'ARRASTA PRO LADO'} →</span>
+                fontSize:36, borderRadius:8, letterSpacing:'.01em', whiteSpace:'nowrap', flex:'none' }}>{s.cta||'ARRASTA PRO LADO'} →</span>
             : <span/>}
           {s.footer && <span className="gh-mono" style={{ color:txt, opacity:.78, fontSize:26,
             fontWeight:700, letterSpacing:'.1em', textAlign:'right', lineHeight:1.4, textTransform:'uppercase' }}>{s.footer}</span>}
