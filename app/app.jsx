@@ -4,7 +4,7 @@
 const { useState, useEffect, useRef, useCallback } = React;
 
 const DEFAULT_STATE = {
-  template:'carousel', tagId:'lancamento', pattern:'8bit', fill:true, ink:'auto',
+  template:'carousel', tagId:'lancamento', pattern:'8bit', fill:true, ink:'auto', format:'feed',
   eyebrow:'DIRETO DA SONY',
   title:'A PRIMEIRA EXCLUSIVIDADE DA GAMER HUT',
   subtitle:'neste post', badge:'STATE OF PLAY', cta:'ARRASTA PRO LADO',
@@ -17,6 +17,22 @@ const DEFAULT_STATE = {
     { title:'', body:'', image:null },
   ],
   showSafe:true,
+  // QUIZ
+  quizMode:'pergunta',
+  question:'QUAL É O MELHOR JOGO DE 2024?',
+  quizOptions:['ELDEN RING: SOTE','ASTRO BOT','FINAL FANTASY VII REBIRTH','BLACK MYTH: WUKONG'],
+  answer:-1, hideOptions:false,
+  aLabel:'PLAYSTATION', bLabel:'XBOX', aImg:null, bImg:null, vsWord:'OU',
+  // RANKING
+  rankCount:5,
+  rankItems:[
+    { name:'ELDEN RING: SHADOW OF THE ERDTREE', note:'RPG' },
+    { name:'ASTRO BOT', note:'PLATAFORMA' },
+    { name:'FINAL FANTASY VII REBIRTH', note:'RPG' },
+    { name:'SILENT HILL 2', note:'TERROR' },
+    { name:'METAL GEAR SOLID Δ', note:'AÇÃO' },
+    { name:'', note:'' },
+  ],
 };
 
 const PRESETS = {
@@ -28,6 +44,10 @@ const PRESETS = {
   reels:    { template:'reels', tagId:'trailer', pattern:'8bit', fill:true, eyebrow:'NOVO TRAILER',
               title:'DRAGON QUEST XII', subtitle:'assiste já', badge:'BEYOND DREAMS', titleSize:128,
               footer:'GAMER HUT\nNEVER STOPS' },
+  quiz:     { template:'quiz', tagId:'quiz', pattern:'8bit', fill:false, ink:'auto', eyebrow:'RESPONDE AÍ',
+              quizMode:'pergunta', titleSize:80 },
+  ranking:  { template:'ranking', tagId:'review', pattern:'grid', fill:false, ink:'auto', eyebrow:'TOP DA SEMANA',
+              title:'OS 5 MAIS VENDIDOS', titleSize:96 },
 };
 
 function loadState(){
@@ -42,24 +62,34 @@ function App(){
   const [toast, setToast] = useState(null);
   const stageRef = useRef(null);
   const viewRef  = useRef(null);
+  const recStopRef = useRef(null);
 
   const set = useCallback((patch)=> setS(p=>({ ...p, ...patch })), []);
-  useEffect(()=>{ try{ localStorage.setItem('gh-studio', JSON.stringify(s)); }catch(e){} }, [s]);
+  useEffect(()=>{ try{
+    const safe = { ...s, pages: (s.pages||[]).map(p=>{ const { video, ...rest } = p; return rest; }) };
+    localStorage.setItem('gh-studio', JSON.stringify(safe));
+  }catch(e){} }, [s]);
 
   const tpl = TEMPLATES.find(t=>t.id===s.template);
   const tag = TAGS.find(t=>t.id===s.tagId) || TAGS[0];
+  const isCarousel = s.template==='carousel';
+  const onCover = !isCarousel || s.current===0;
+  const pageIdx = isCarousel ? s.current : 0;
+  const dims = stageDims(s, pageIdx);
+  const curPageObj = isCarousel && s.current>0 ? (s.pages[s.current-1]||null) : null;
+  const isVideoPage = !!(curPageObj && curPageObj.type==='video');
 
   // fit-to-view scaling
   useEffect(()=>{
     const fit = ()=>{
       const el = viewRef.current; if(!el) return;
       const availW = el.clientWidth - 96, availH = el.clientHeight - 120;
-      setScale(Math.min(availW/tpl.w, availH/tpl.h, 1));
+      setScale(Math.min(availW/dims.w, availH/dims.h, 1));
     };
     fit();
     const ro = new ResizeObserver(fit); if(viewRef.current) ro.observe(viewRef.current);
     return ()=>ro.disconnect();
-  }, [tpl.w, tpl.h]);
+  }, [dims.w, dims.h]);
 
   // switching template applies a tasteful preset (keeps tag/content where possible)
   const pickTemplate = (id)=>{
@@ -67,10 +97,6 @@ function App(){
     const p = PRESETS[id];
     if(p) set({ ...p, current:0 }); else set({ template:id, current:0 });
   };
-
-  const isCarousel = s.template==='carousel';
-  const onCover = !isCarousel || s.current===0;
-  const pageIdx = isCarousel ? s.current : 0;
 
   const flashToast = (msg)=>{ setToast(msg); setTimeout(()=>setToast(null), 2600); };
 
@@ -133,7 +159,7 @@ function App(){
       const tagName = tag.label.toLowerCase().replace(/[^a-z]/g,'');
       const suffix = isCarousel ? `-p${s.current+1}` : '';
       triggerDownload(url, `gamerhut-${s.template}-${tagName}${suffix}.png`);
-      flashToast('PNG exportado · '+tpl.w+'×'+tpl.h);
+      flashToast('PNG exportado · '+dims.w+'×'+dims.h);
     }catch(e){ flashToast('Falha ao exportar'); console.error(e); }
     setBusy(false);
   }
@@ -151,9 +177,76 @@ function App(){
     setBusy(false);
   }
 
+  // ---- VIDEO export (canvas compositor + MediaRecorder) --------------------
+  function exportVideo(){
+    const pageIndex = s.current;
+    const pg = (s.pages||[])[pageIndex-1];
+    if(!isVideoPage || !pg){ flashToast('Abra uma página de vídeo'); return; }
+    if(!pg.video){ flashToast('Envie o trailer no card primeiro'); return; }
+    if(typeof MediaRecorder==='undefined'){ flashToast('Navegador não suporta gravar vídeo'); return; }
+    const W=1080, H=1350;
+    const vtag = TAGS.find(t=>t.id===s.tagId) || TAGS[0];
+    const canvas = document.createElement('canvas'); canvas.width=W; canvas.height=H;
+    const ctx = canvas.getContext('2d');
+    const bgImg  = pg.image ? Object.assign(new Image(), { src:pg.image }) : null;
+    const logoImg = Object.assign(new Image(), { src:'assets/logo-white.png' });
+    const vid = document.createElement('video');
+    vid.src = pg.video; vid.playsInline = true; vid.loop = false; vid.preload = 'auto';
+
+    // audio routed through WebAudio so it's captured but NOT sent to speakers
+    let ac=null, dest=null;
+    try{
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if(AC){ ac = new AC(); const node = ac.createMediaElementSource(vid);
+        dest = ac.createMediaStreamDestination(); node.connect(dest);
+        if(ac.state==='suspended') ac.resume(); }
+    }catch(e){ console.warn('sem áudio na exportação', e); }
+
+    const stream = canvas.captureStream(30);
+    if(dest) dest.stream.getAudioTracks().forEach(t=>stream.addTrack(t));
+    const mime = ['video/mp4;codecs=h264,aac','video/mp4','video/webm;codecs=vp9,opus',
+      'video/webm;codecs=vp8,opus','video/webm']
+      .find(m=>{ try{ return MediaRecorder.isTypeSupported(m); }catch(e){ return false; } }) || '';
+    let rec;
+    try{ rec = new MediaRecorder(stream, mime?{ mimeType:mime, videoBitsPerSecond:9000000 }:undefined); }
+    catch(e){ rec = new MediaRecorder(stream); }
+    const chunks = []; rec.ondataavailable = e=>{ if(e.data && e.data.size) chunks.push(e.data); };
+    let raf=0, stopped=false, capTimer=0;
+    const finish = ()=>{ if(stopped) return; stopped=true; clearTimeout(capTimer);
+      cancelAnimationFrame(raf); try{ vid.pause(); }catch(e){} try{ rec.stop(); }catch(e){} };
+    recStopRef.current = finish;
+    rec.onstop = ()=>{
+      const ext = (mime||'').includes('mp4') ? 'mp4' : 'webm';
+      const blob = new Blob(chunks, { type: mime || 'video/webm' });
+      const url = URL.createObjectURL(blob);
+      triggerDownload(url, `gamerhut-trailer-p${pageIndex+1}.${ext}`);
+      setTimeout(()=>URL.revokeObjectURL(url), 5000);
+      try{ stream.getTracks().forEach(t=>t.stop()); }catch(e){}
+      try{ ac && ac.close(); }catch(e){}
+      recStopRef.current = null; setBusy(false);
+      flashToast('Vídeo exportado · '+ext.toUpperCase());
+    };
+    const drawFrame = ()=>{
+      drawVideoComposite(ctx, W, H, { s, pg, tag:vtag, pageIndex, vid, bgImg, logoImg });
+      raf = requestAnimationFrame(drawFrame);
+    };
+    setBusy('vídeo');
+    vid.onended = finish;
+    vid.play().then(()=>{
+      try{ rec.start(); }catch(e){ console.error(e); }
+      drawFrame();
+      capTimer = setTimeout(finish, 120000); // 2-min safety cap
+    }).catch(err=>{
+      console.error('play falhou', err);
+      recStopRef.current = null; setBusy(false);
+      flashToast('Não foi possível reproduzir o trailer');
+    });
+  }
+
   return (
     <div style={{ height:'100vh', display:'flex', flexDirection:'column', background:GH.bg2, overflow:'hidden' }}>
-      <TopBar s={s} tpl={tpl} tag={tag} busy={busy} onExport={exportCurrent} onExportAll={exportAll}/>
+      <TopBar s={s} dims={dims} tag={tag} busy={busy} isVideoPage={isVideoPage}
+        onExport={exportCurrent} onExportAll={exportAll} onExportVideo={exportVideo}/>
       <div style={{ flex:1, display:'flex', minHeight:0 }}>
         {/* LEFT RAIL */}
         <aside style={{ width:392, flex:'none', background:GH.panel, borderRight:`1px solid ${GH.lineSoft}`,
@@ -167,22 +260,35 @@ function App(){
           `radial-gradient(circle at 50% 30%, #1b1916 0%, ${GH.bg} 70%)` }}>
           <GridDots/>
           <div style={{ position:'relative', zIndex:1 }}>
-            <div style={{ width:tpl.w*scale, height:tpl.h*scale, position:'relative' }}>
+            <div style={{ width:dims.w*scale, height:dims.h*scale, position:'relative' }}>
               <div style={{ position:'absolute', top:0, left:0, transform:`scale(${scale})`,
                 transformOrigin:'top left', boxShadow:'0 40px 120px rgba(0,0,0,.6)' }}>
                 <PostStage s={s} pageIndex={pageIdx} stageRef={stageRef}/>
               </div>
             </div>
-            <PreviewBar s={s} tpl={tpl} setS={setS} isCarousel={isCarousel}/>
+            <PreviewBar s={s} dims={dims} setS={setS} isCarousel={isCarousel}/>
           </div>
         </main>
       </div>
       {toast && <div className="gh-mono" style={{ position:'fixed', bottom:24, left:'50%', transform:'translateX(-50%)',
         background:GH.orange, color:GH.ink, padding:'13px 22px', borderRadius:10, fontSize:13, fontWeight:700,
         letterSpacing:'.04em', zIndex:50, boxShadow:'0 12px 40px rgba(0,0,0,.5)' }}>{toast}</div>}
-      {busy && <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.55)', zIndex:60,
+      {busy && <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.62)', zIndex:60,
         display:'grid', placeItems:'center' }}>
-        <span className="gh-pixel" style={{ color:GH.orange, fontSize:16 }}>GERANDO…</span></div>}
+        {busy==='vídeo'
+          ? <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:18, textAlign:'center', padding:24 }}>
+              <span style={{ width:16, height:16, borderRadius:'50%', background:'#E23B2E',
+                boxShadow:'0 0 0 0 rgba(226,59,46,.6)', animation:'ghpulse 1.1s ease-out infinite' }}/>
+              <span className="gh-pixel" style={{ color:GH.orange, fontSize:16 }}>GRAVANDO VÍDEO…</span>
+              <span className="gh-mono" style={{ color:GH.mut, fontSize:12, maxWidth:340, lineHeight:1.6 }}>
+                Reproduzindo o trailer com o quadro da marca. Aguarde o fim ou pare quando quiser.</span>
+              <button onClick={()=>recStopRef.current && recStopRef.current()} className="gh-mono" style={{ cursor:'pointer',
+                background:GH.orange, color:GH.ink, border:'none', padding:'11px 20px', borderRadius:8,
+                fontSize:12, fontWeight:700, letterSpacing:'.04em' }}>■ PARAR E SALVAR</button>
+              <style>{`@keyframes ghpulse{0%{box-shadow:0 0 0 0 rgba(226,59,46,.55)}70%{box-shadow:0 0 0 16px rgba(226,59,46,0)}100%{box-shadow:0 0 0 0 rgba(226,59,46,0)}}`}</style>
+            </div>
+          : <span className="gh-pixel" style={{ color:GH.orange, fontSize:16 }}>GERANDO…</span>}
+      </div>}
     </div>
   );
 }
@@ -193,7 +299,7 @@ function GridDots(){
 }
 
 /* ---- top bar ---- */
-function TopBar({ s, tpl, tag, busy, onExport, onExportAll }){
+function TopBar({ s, dims, tag, busy, isVideoPage, onExport, onExportAll, onExportVideo }){
   return (
     <header style={{ height:64, flex:'none', display:'flex', alignItems:'center', justifyContent:'space-between',
       padding:'0 22px', background:GH.panel, borderBottom:`1px solid ${GH.lineSoft}` }}>
@@ -206,24 +312,35 @@ function TopBar({ s, tpl, tag, busy, onExport, onExportAll }){
       </div>
       <div style={{ display:'flex', alignItems:'center', gap:12 }}>
         <span className="gh-mono" style={{ color:GH.mut, fontSize:11, letterSpacing:'.08em' }}>
-          {tpl.w}×{tpl.h} · {tpl.ratio}</span>
+          {dims.w}×{dims.h} · {dims.ratio}</span>
         <span className="gh-mono" style={{ display:'inline-flex', alignItems:'center', gap:7, color:tag.color,
           fontSize:11, fontWeight:700, border:`1px solid ${tag.color}`, padding:'6px 11px', borderRadius:7 }}>
           <span style={{ width:9, height:9, borderRadius:'50%', background:tag.color }}/>{tag.label}</span>
-        {s.template==='carousel' &&
-          <button onClick={onExportAll} disabled={busy} className="gh-mono" style={{ cursor:'pointer',
-            background:'transparent', color:GH.white, border:`1px solid ${GH.lineSoft}`, padding:'9px 14px',
-            borderRadius:8, fontSize:12, fontWeight:700 }}>↓ TODAS</button>}
-        <button onClick={onExport} disabled={busy} className="gh-mono" style={{ cursor:'pointer',
-          background:GH.orange, color:GH.ink, border:'none', padding:'10px 18px', borderRadius:8,
-          fontSize:12, fontWeight:700, letterSpacing:'.04em' }}>↓ EXPORTAR PNG</button>
+        {isVideoPage
+          ? <>
+              <button onClick={onExport} disabled={busy} className="gh-mono" style={{ cursor:'pointer',
+                background:'transparent', color:GH.white, border:`1px solid ${GH.lineSoft}`, padding:'9px 14px',
+                borderRadius:8, fontSize:12, fontWeight:700 }}>↓ CAPA PNG</button>
+              <button onClick={onExportVideo} disabled={busy} className="gh-mono" style={{ cursor:'pointer',
+                background:GH.orange, color:GH.ink, border:'none', padding:'10px 18px', borderRadius:8,
+                fontSize:12, fontWeight:700, letterSpacing:'.04em' }}>● EXPORTAR VÍDEO</button>
+            </>
+          : <>
+              {s.template==='carousel' &&
+                <button onClick={onExportAll} disabled={busy} className="gh-mono" style={{ cursor:'pointer',
+                  background:'transparent', color:GH.white, border:`1px solid ${GH.lineSoft}`, padding:'9px 14px',
+                  borderRadius:8, fontSize:12, fontWeight:700 }}>↓ TODAS</button>}
+              <button onClick={onExport} disabled={busy} className="gh-mono" style={{ cursor:'pointer',
+                background:GH.orange, color:GH.ink, border:'none', padding:'10px 18px', borderRadius:8,
+                fontSize:12, fontWeight:700, letterSpacing:'.04em' }}>↓ EXPORTAR PNG</button>
+            </>}
       </div>
     </header>
   );
 }
 
 /* ---- preview footer: page nav + caption ---- */
-function PreviewBar({ s, tpl, setS, isCarousel }){
+function PreviewBar({ s, dims, setS, isCarousel }){
   return (
     <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:18, marginTop:18 }}>
       {isCarousel && <>
@@ -239,7 +356,7 @@ function PreviewBar({ s, tpl, setS, isCarousel }){
       </>}
       <span className="gh-mono" style={{ color:GH.mut, fontSize:11, letterSpacing:'.1em',
         marginLeft:isCarousel?8:0 }}>
-        {isCarousel ? (s.current===0?'CAPA':'PÁGINA '+(s.current+1)) : 'PREVIEW'} · {tpl.ratio}
+        {isCarousel ? (s.current===0?'CAPA':'PÁGINA '+(s.current+1)) : 'PREVIEW'} · {dims.ratio}
       </span>
     </div>
   );

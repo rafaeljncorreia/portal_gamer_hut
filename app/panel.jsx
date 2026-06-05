@@ -7,6 +7,8 @@ function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS }){
   const isImage    = s.template==='image';
   const isReels    = s.template==='reels';
   const isBlock    = s.template==='block';
+  const isQuiz     = s.template==='quiz';
+  const isRanking  = s.template==='ranking';
   const accent = s.fill ? readableOn(tag.color) : tag.color;
 
   const setPage = (patch)=> setS(p=>{
@@ -20,6 +22,14 @@ function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS }){
       <CtrlSection title="MODELO">
         <TemplatePicker value={s.template} onChange={pickTemplate}/>
       </CtrlSection>
+
+      {(isBlock||isQuiz||isRanking) &&
+        <CtrlSection title="FORMATO" right={
+          <span className="gh-mono" style={{ color:GH.mut, fontSize:9, letterSpacing:'.1em' }}>
+            {s.format==='stories'?'9:16 · 1080×1920':'4:5 · 1080×1350'}</span>}>
+          <Segmented value={s.format||'feed'} onChange={v=>set({ format:v })}
+            options={[ {id:'feed', label:'FEED 4:5'}, {id:'stories', label:'STORIES 9:16'} ]}/>
+        </CtrlSection>}
 
       <CtrlSection title="TAG DE CATEGORIA"
         right={<span className="gh-mono" style={{ color:GH.mut, fontSize:9, letterSpacing:'.1em' }}>DEFINE A COR</span>}>
@@ -52,16 +62,63 @@ function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS }){
       <CtrlSection title={isCarousel ? (onCover?'CONTEÚDO · CAPA':'CONTEÚDO · PÁGINA '+(pageIdx+1)) : 'CONTEÚDO'}>
         {/* carousel content page */}
         {isCarousel && !onCover ? <>
-          <Field label="Título da página">
-            <TextInput value={curPage.title||''} onChange={e=>setPage({title:e.target.value})}/>
-          </Field>
-          <Field label="Texto / informação">
-            <TextArea value={curPage.body||''} onChange={e=>setPage({body:e.target.value})}/>
-          </Field>
-          <Field label="Imagem do jogo (fundo)">
-            <ImageDrop value={curPage.image} onChange={v=>setPage({image:v})}/>
-          </Field>
-        </> : <>
+          <div style={{ marginBottom:18 }}>
+            <Segmented value={curPage.type==='video'?'video':'standard'} onChange={v=>{
+              if(v==='video') setPage({ type:'video',
+                eyebrow: curPage.eyebrow ?? 'VEM VER EM AÇÃO',
+                title:   curPage.title   || 'ASSISTA AO',
+                accent:  curPage.accent  ?? 'TRAILER',
+                footer:  curPage.footer  ?? 'PRÉ-VENDA aberta agora na Gamer Hut' });
+              else setPage({ type:'standard' });
+            }} options={[ {id:'standard', label:'PADRÃO'}, {id:'video', label:'VÍDEO'} ]}/>
+          </div>
+          {curPage.type==='video' ? <>
+            <Field label="Sobre-título (eyebrow)">
+              <TextInput value={curPage.eyebrow||''} placeholder="VEM VER EM AÇÃO"
+                onChange={e=>setPage({eyebrow:e.target.value})}/>
+            </Field>
+            <Field label="Título">
+              <TextInput value={curPage.title||''} placeholder="ASSISTA AO"
+                onChange={e=>setPage({title:e.target.value})}/>
+            </Field>
+            <Field label="Palavra em destaque (cor da tag)">
+              <TextInput value={curPage.accent||''} placeholder="TRAILER"
+                onChange={e=>setPage({accent:e.target.value})}/>
+            </Field>
+            <Field label="Trailer (vídeo)">
+              <VideoDrop value={curPage.video} name={curPage.videoName}
+                onChange={(url,name)=>setPage({video:url, videoName:name})}/>
+            </Field>
+            <Field label="Arte do jogo (fundo)">
+              <ImageDrop value={curPage.image} onChange={v=>setPage({image:v})} label="Arte de fundo"/>
+            </Field>
+            <Field label="Rodapé (chamada)">
+              <TextInput value={curPage.footer||''} placeholder="PRÉ-VENDA aberta agora na Gamer Hut"
+                onChange={e=>setPage({footer:e.target.value})}/>
+            </Field>
+            <div style={{ display:'flex', gap:10, alignItems:'flex-start', background:GH.bg,
+              border:`1px solid ${GH.lineSoft}`, borderRadius:9, padding:'12px 13px' }}>
+              <span style={{ color:GH.orange, fontSize:13, lineHeight:1.3 }}>●</span>
+              <p className="gh-mono" style={{ margin:0, color:GH.mut, fontSize:10, lineHeight:1.6, letterSpacing:'.03em' }}>
+                Página <span style={{ color:GH.white }}>4:5 · 1080×1350</span> com o trailer
+                <span style={{ color:GH.white }}> horizontal 16:9</span> dentro. Use <span style={{ color:GH.white }}>EXPORTAR
+                VÍDEO</span> (topo) para gerar o arquivo com o trailer tocando, ou <span style={{ color:GH.white }}>CAPA
+                PNG</span> para a thumbnail.</p>
+            </div>
+          </> : <>
+            <Field label="Título da página">
+              <TextInput value={curPage.title||''} onChange={e=>setPage({title:e.target.value})}/>
+            </Field>
+            <Field label="Texto / informação">
+              <TextArea value={curPage.body||''} onChange={e=>setPage({body:e.target.value})}/>
+            </Field>
+            <Field label="Imagem do jogo (fundo)">
+              <ImageDrop value={curPage.image} onChange={v=>setPage({image:v})}/>
+            </Field>
+          </>}
+        </> : isQuiz ? <QuizFields s={s} set={set}/>
+          : isRanking ? <RankingFields s={s} set={set} setS={setS}/>
+          : <>
           {!isImage && <Field label={isReels||isCarousel?'Badge (canto superior)':'Selo'}>
             <TextInput value={s.badge||''} placeholder="ex: STATE OF PLAY" onChange={e=>set({badge:e.target.value})}/>
           </Field>}
@@ -108,7 +165,7 @@ function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS }){
               <div style={{ marginBottom:14 }}>
                 <PatternPicker value={s.pattern} accent={accent} onChange={p=>set({pattern:p})}/>
               </div>
-              {(isBlock||isCarousel||isReels) &&
+              {(isBlock||isCarousel||isReels||isQuiz||isRanking) &&
                 <div style={{ marginTop:6 }}>
                   <Toggle label="Preencher com a cor da tag" checked={s.fill} onChange={v=>set({fill:v})}/>
                 </div>}
@@ -169,6 +226,132 @@ function Segmented({ value, onChange, options }){
         );
       })}
     </div>
+  );
+}
+
+/* ---- QUIZ fields ---- */
+function MiniBtn({ children, onClick, danger }){
+  return <button onClick={onClick} className="gh-mono" style={{ flex:'none', cursor:'pointer',
+    width:34, height:42, borderRadius:8, border:`1px solid ${GH.lineSoft}`, background:GH.bg,
+    color:danger?'#E23B2E':GH.mut, fontSize:13 }}>{children}</button>;
+}
+function ChoiceBtn({ on, onClick, children }){
+  return <button onClick={onClick} className="gh-mono" style={{ flex:1, cursor:'pointer', padding:'9px 0',
+    borderRadius:7, fontSize:11, fontWeight:700, letterSpacing:'.04em',
+    background:on?GH.orange:GH.bg, color:on?GH.ink:GH.white,
+    border:`1px solid ${on?GH.orange:GH.lineSoft}` }}>{children}</button>;
+}
+function QuizFields({ s, set }){
+  const esseou = s.quizMode==='esseou';
+  const opts = s.quizOptions||[];
+  const letters = ['A','B','C','D'];
+  const setOpt = (i,v)=>{ const a=opts.slice(); a[i]=v; set({ quizOptions:a }); };
+  const addOpt = ()=>{ if(opts.length<4) set({ quizOptions:[...opts,'NOVA OPÇÃO'] }); };
+  const delOpt = (i)=>{ const a=opts.slice(); a.splice(i,1);
+    let ans=s.answer; if(ans===i) ans=-1; else if(ans>i) ans=ans-1; set({ quizOptions:a, answer:ans }); };
+  return (
+    <>
+      <div style={{ marginBottom:18 }}>
+        <Segmented value={s.quizMode||'pergunta'} onChange={v=>set({ quizMode:v })}
+          options={[ {id:'pergunta', label:'PERGUNTA'}, {id:'esseou', label:'ESSE OU AQUELE'} ]}/>
+      </div>
+      <Field label="Sobre-título (eyebrow)">
+        <TextInput value={s.eyebrow||''} onChange={e=>set({ eyebrow:e.target.value })}/>
+      </Field>
+      {!esseou ? <>
+        <Field label="Pergunta">
+          <TextArea value={s.question||''} onChange={e=>set({ question:e.target.value })} style={{ minHeight:64 }}/>
+        </Field>
+        <Field label="Opções (até 4)">
+          <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+            {opts.map((o,i)=>(
+              <div key={i} style={{ display:'flex', gap:8, alignItems:'center' }}>
+                <span className="gh-pixel" style={{ flex:'none', width:24, textAlign:'center',
+                  color:GH.orange, fontSize:12 }}>{letters[i]}</span>
+                <TextInput value={o} onChange={e=>setOpt(i,e.target.value)} style={{ flex:1 }}/>
+                {opts.length>2 && <MiniBtn danger onClick={()=>delOpt(i)}>✕</MiniBtn>}
+              </div>
+            ))}
+            {opts.length<4 && <button onClick={addOpt} className="gh-mono" style={{ cursor:'pointer',
+              background:'transparent', border:`1px dashed ${GH.line}`, color:GH.mut, fontSize:11,
+              letterSpacing:'.06em', padding:'10px 0', borderRadius:8 }}>+ ADICIONAR OPÇÃO</button>}
+          </div>
+        </Field>
+        <Field label="Resposta certa (destaque opcional)">
+          <div style={{ display:'flex', gap:6 }}>
+            <ChoiceBtn on={s.answer==null||s.answer===-1} onClick={()=>set({ answer:-1 })}>—</ChoiceBtn>
+            {opts.map((o,i)=><ChoiceBtn key={i} on={s.answer===i} onClick={()=>set({ answer:i })}>{letters[i]}</ChoiceBtn>)}
+          </div>
+        </Field>
+        <div style={{ marginTop:2 }}>
+          <Toggle label="Esconder opções (usar enquete do Instagram)" checked={!!s.hideOptions}
+            onChange={v=>set({ hideOptions:v })}/>
+          <p className="gh-mono" style={{ color:GH.mut, fontSize:10, lineHeight:1.5, margin:'8px 0 0' }}>
+            Deixa só a pergunta no topo — espaço livre embaixo pra colar o sticker de
+            quiz/enquete do próprio Instagram.</p>
+        </div>
+      </> : <>
+        <Field label="Pergunta (opcional)">
+          <TextInput value={s.question||''} placeholder="VOCÊ PREFERE?" onChange={e=>set({ question:e.target.value })}/>
+        </Field>
+        <Field label="Opção A — texto">
+          <TextInput value={s.aLabel||''} onChange={e=>set({ aLabel:e.target.value })}/>
+        </Field>
+        <Field label="Opção A — imagem">
+          <ImageDrop value={s.aImg} onChange={v=>set({ aImg:v })} label="Imagem A"/>
+        </Field>
+        <Field label="Opção B — texto">
+          <TextInput value={s.bLabel||''} onChange={e=>set({ bLabel:e.target.value })}/>
+        </Field>
+        <Field label="Opção B — imagem">
+          <ImageDrop value={s.bImg} onChange={v=>set({ bImg:v })} label="Imagem B"/>
+        </Field>
+        <Field label="Divisor (centro)">
+          <TextInput value={s.vsWord||''} placeholder="OU" onChange={e=>set({ vsWord:e.target.value })}/>
+        </Field>
+      </>}
+    </>
+  );
+}
+
+/* ---- RANKING fields ---- */
+function RankingFields({ s, set, setS }){
+  const n = s.rankCount||5;
+  const items = s.rankItems||[];
+  const setItem = (i,patch)=> setS(p=>{ const a=(p.rankItems||[]).slice();
+    while(a.length<=i) a.push({ name:'', note:'' }); a[i]={ ...a[i], ...patch }; return { ...p, rankItems:a }; });
+  return (
+    <>
+      <Field label="Sobre-título (eyebrow)">
+        <TextInput value={s.eyebrow||''} onChange={e=>set({ eyebrow:e.target.value })}/>
+      </Field>
+      <Field label="Título">
+        <TextArea value={s.title||''} onChange={e=>set({ title:e.target.value })} style={{ minHeight:56 }}/>
+      </Field>
+      <Field label="Quantidade de itens">
+        <Stepper label="" value={n} min={3} max={6} onChange={v=>setS(p=>{
+          const a=(p.rankItems||[]).slice(); while(a.length<v) a.push({ name:'', note:'' });
+          return { ...p, rankCount:v, rankItems:a };
+        })}/>
+      </Field>
+      <Field label="Itens (nome + tag curta)">
+        <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+          {Array.from({length:n}).map((_,i)=>{
+            const it = items[i]||{};
+            return (
+              <div key={i} style={{ display:'flex', gap:8, alignItems:'center' }}>
+                <span className="gh-display" style={{ flex:'none', width:28, textAlign:'center',
+                  color:i===0?GH.orange:GH.mut, fontSize:16 }}>{String(i+1).padStart(2,'0')}</span>
+                <TextInput value={it.name||''} placeholder="Nome do jogo"
+                  onChange={e=>setItem(i,{ name:e.target.value })} style={{ flex:1 }}/>
+                <TextInput value={it.note||''} placeholder="tag"
+                  onChange={e=>setItem(i,{ note:e.target.value })} style={{ width:78, flex:'none' }}/>
+              </div>
+            );
+          })}
+        </div>
+      </Field>
+    </>
   );
 }
 

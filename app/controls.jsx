@@ -151,6 +151,40 @@ function ImageDrop({ value, onChange, label='Imagem do jogo' }){
   );
 }
 
+function VideoDrop({ value, name, onChange, label='Vídeo (trailer · MP4)' }){
+  const id = useMemo(()=>'vid-'+Math.random().toString(36).slice(2),[]);
+  const onFile = f => { if(!f) return; const url = URL.createObjectURL(f); onChange(url, f.name); };
+  return (
+    <div>
+      <label htmlFor={id} onDragOver={e=>{e.preventDefault();}} onDrop={e=>{e.preventDefault(); onFile(e.dataTransfer.files[0]);}}
+        style={{ display:'block', cursor:'pointer', borderRadius:10, border:`1.5px dashed ${GH.line}`,
+          overflow:'hidden', background:GH.bg }}>
+        {value
+          ? <div style={{ position:'relative' }}>
+              <video src={value} muted loop autoPlay playsInline
+                style={{ width:'100%', height:120, objectFit:'cover', display:'block' }}/>
+              <span className="gh-mono" style={{ position:'absolute', bottom:6, right:8, fontSize:10,
+                background:'rgba(0,0,0,.7)', color:GH.white, padding:'3px 7px', borderRadius:4 }}>TROCAR</span>
+            </div>
+          : <div style={{ height:84, display:'grid', placeItems:'center' }}>
+              <span className="gh-mono" style={{ color:GH.mut, fontSize:11, letterSpacing:'.1em' }}>↑ {label.toUpperCase()}</span>
+            </div>}
+      </label>
+      <input id={id} type="file" accept="video/*" style={{ display:'none' }}
+        onChange={e=>onFile(e.target.files[0])}/>
+      {value
+        ? <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginTop:6 }}>
+            <span className="gh-mono" style={{ color:GH.mut, fontSize:10, letterSpacing:'.06em',
+              whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', maxWidth:200 }}>{name||'vídeo carregado'}</span>
+            <button onClick={()=>onChange(null,null)} className="gh-mono" style={{ cursor:'pointer',
+              background:'transparent', border:'none', color:GH.mut, fontSize:10, letterSpacing:'.1em' }}>✕ REMOVER</button>
+          </div>
+        : <p className="gh-mono" style={{ color:GH.mut2, fontSize:9, lineHeight:1.5, margin:'7px 0 0',
+            letterSpacing:'.04em' }}>O vídeo toca no preview. Não fica salvo ao recarregar — reenvie se precisar.</p>}
+    </div>
+  );
+}
+
 function Stepper({ value, min, max, onChange, label }){
   return (
     <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
@@ -170,4 +204,4 @@ function StepBtn({ children, onClick, dis }){
 }
 
 Object.assign(window, { CtrlSection, Field, TextInput, TextArea, TemplatePicker, TagPicker,
-  PatternPicker, Toggle, ImageDrop, Stepper, inputBase });
+  PatternPicker, Toggle, ImageDrop, VideoDrop, Stepper, inputBase });
