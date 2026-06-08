@@ -125,7 +125,7 @@ function Toggle({ label, checked, onChange }){
   );
 }
 
-function ImageDrop({ value, onChange, label='Imagem do jogo' }){
+function ImageDrop({ value, onChange, label='Imagem do jogo', blur, onBlur }){
   const id = useMemo(()=>'img-'+Math.random().toString(36).slice(2),[]);
   const onFile = f => { if(!f) return; const r=new FileReader(); r.onload=()=>onChange(r.result); r.readAsDataURL(f); };
   return (
@@ -135,7 +135,8 @@ function ImageDrop({ value, onChange, label='Imagem do jogo' }){
           overflow:'hidden', background:GH.bg }}>
         {value
           ? <div style={{ position:'relative' }}>
-              <img src={value} alt="" style={{ width:'100%', height:120, objectFit:'cover', display:'block' }}/>
+              <img src={value} alt="" style={{ width:'100%', height:120, objectFit:'cover', display:'block',
+                filter: blur?`blur(${(blur*0.18).toFixed(1)}px)`:'none' }}/>
               <span className="gh-mono" style={{ position:'absolute', bottom:6, right:8, fontSize:10,
                 background:'rgba(0,0,0,.7)', color:GH.white, padding:'3px 7px', borderRadius:4 }}>TROCAR</span>
             </div>
@@ -145,8 +146,60 @@ function ImageDrop({ value, onChange, label='Imagem do jogo' }){
       </label>
       <input id={id} type="file" accept="image/*" style={{ display:'none' }}
         onChange={e=>onFile(e.target.files[0])}/>
-      {value && <button onClick={()=>onChange(null)} className="gh-mono" style={{ marginTop:6, cursor:'pointer',
-        background:'transparent', border:'none', color:GH.mut, fontSize:10, letterSpacing:'.1em' }}>✕ REMOVER</button>}
+      {value && <div style={{ display:'flex', alignItems:'center', gap:14, marginTop:6 }}>
+        <button onClick={()=>onChange(null)} className="gh-mono" style={{ cursor:'pointer',
+          background:'transparent', border:'none', color:GH.mut, fontSize:10, letterSpacing:'.1em' }}>✕ REMOVER</button>
+      </div>}
+      {value && onBlur && <BlurSlider value={blur||0} onChange={onBlur}/>}
+    </div>
+  );
+}
+
+/* desfoque do fundo — botão rápido (35%) + barra de intensidade */
+function BlurSlider({ value=0, onChange }){
+  const on = (+value||0) > 0;
+  return (
+    <div style={{ marginTop:10, background:GH.bg, border:`1px solid ${GH.lineSoft}`, borderRadius:9, padding:'11px 13px' }}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:on?10:0 }}>
+        <span className="gh-mono" style={{ color:GH.mut, fontSize:10, letterSpacing:'.14em' }}>DESFOQUE DO FUNDO</span>
+        <button onClick={()=>onChange(on?0:35)} className="gh-mono" style={{ cursor:'pointer',
+          padding:'5px 11px', borderRadius:6, fontSize:10, fontWeight:700, letterSpacing:'.06em',
+          background:on?GH.orange:'transparent', color:on?GH.ink:GH.mut,
+          border:`1px solid ${on?GH.orange:GH.lineSoft}` }}>{on?'DESFOCADO':'DESFOCAR'}</button>
+      </div>
+      {on && <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+        <input type="range" min={0} max={100} value={+value||0}
+          onChange={e=>onChange(+e.target.value)} style={{ flex:1, accentColor:GH.orange }}/>
+        <span className="gh-pixel" style={{ color:GH.orange, fontSize:11, minWidth:42, textAlign:'right' }}>{Math.round(+value||0)}%</span>
+      </div>}
+    </div>
+  );
+}
+
+/* color picker — curated swatches + native picker + reset to a fallback */
+function ColorField({ value, onChange, fallbackLabel='PADRÃO' }){
+  const swatches = useMemo(()=>{
+    const base = ['#0B0B0A','#1F1B18','#F4F1EC', ...TAGS.map(t=>t.color)];
+    return [...new Set(base)];
+  },[]);
+  return (
+    <div style={{ display:'flex', flexWrap:'wrap', gap:7, alignItems:'center' }}>
+      <button onClick={()=>onChange(null)} title={fallbackLabel} className="gh-mono" style={{ cursor:'pointer',
+        height:28, padding:'0 11px', borderRadius:7, fontSize:9, fontWeight:700, letterSpacing:'.08em',
+        background: value?GH.bg:GH.orange, color: value?GH.mut:GH.ink,
+        border:`1px solid ${value?GH.lineSoft:GH.orange}` }}>{fallbackLabel}</button>
+      {swatches.map(c=>(
+        <button key={c} onClick={()=>onChange(c)} title={c} style={{ cursor:'pointer', width:28, height:28,
+          borderRadius:7, background:c, border: value&&value.toLowerCase()===c.toLowerCase()
+            ? `2px solid ${GH.white}` : `1px solid ${GH.lineSoft}`,
+          boxShadow: value&&value.toLowerCase()===c.toLowerCase()?`0 0 0 2px ${GH.orange}`:'none' }}/>
+      ))}
+      <label title="Cor personalizada" style={{ position:'relative', width:28, height:28, borderRadius:7,
+        cursor:'pointer', overflow:'hidden', border:`1px solid ${GH.lineSoft}`,
+        background:'conic-gradient(from 0deg,#e23b2e,#e3b53e,#2e9d5b,#2bb1c4,#3e78cc,#7b3fe4,#d6286e,#e23b2e)' }}>
+        <input type="color" value={value||'#E8643C'} onChange={e=>onChange(e.target.value)}
+          style={{ position:'absolute', inset:0, opacity:0, cursor:'pointer', width:'100%', height:'100%' }}/>
+      </label>
     </div>
   );
 }
@@ -204,4 +257,4 @@ function StepBtn({ children, onClick, dis }){
 }
 
 Object.assign(window, { CtrlSection, Field, TextInput, TextArea, TemplatePicker, TagPicker,
-  PatternPicker, Toggle, ImageDrop, VideoDrop, Stepper, inputBase });
+  PatternPicker, Toggle, ImageDrop, BlurSlider, ColorField, VideoDrop, Stepper, inputBase });

@@ -51,14 +51,31 @@ function Scrim({ from='rgba(0,0,0,.92)', h='62%' }){
     background:`linear-gradient(0deg, ${from} 0%, rgba(0,0,0,.55) 38%, transparent 100%)` }}/>;
 }
 
+/* Full-frame fade for content-heavy templates (quiz/ranking) whose text spans
+   top→bottom over a background photo. Darkens the whole image evenly, a touch
+   heavier at the edges, so titles + rows + options all stay legible. */
+function FullScrim({ strength=0.62 }){
+  const a = strength, mid = Math.max(0, strength-0.18);
+  return <div style={{ position:'absolute', inset:0, pointerEvents:'none',
+    background:`linear-gradient(180deg, rgba(0,0,0,${a+0.16}) 0%, rgba(0,0,0,${mid}) 26%, rgba(0,0,0,${mid}) 60%, rgba(0,0,0,${a+0.22}) 100%)` }}/>;
+}
+
+/* blur % (0–100) → px radius. The slight scale hides the transparent halo the
+   CSS blur leaves at the image edges (container clips the overflow). */
+function blurPx(pct){ return Math.max(0, (+pct||0)) * 0.32; }
+
 function PatternLayer({ kind, accent, base }){
   if(kind==='solid') return null;
   return <div style={{ position:'absolute', inset:0, pointerEvents:'none', ...patternStyle(kind, accent, base) }}/>;
 }
 
-function ImageOrSlot({ src, label='ARRASTE A IMAGEM DO JOGO', style={} }){
-  if(src) return <img src={src} alt="" draggable="false"
-    style={{ width:'100%', height:'100%', objectFit:'cover', display:'block', ...style }}/>;
+function ImageOrSlot({ src, label='ARRASTE A IMAGEM DO JOGO', style={}, blur=0 }){
+  if(src){
+    const r = blurPx(blur);
+    const fx = r>0 ? { filter:`blur(${r.toFixed(1)}px)`, transform:`scale(${(1 + r/300).toFixed(3)})` } : {};
+    return <img src={src} alt="" draggable="false"
+      style={{ width:'100%', height:'100%', objectFit:'cover', display:'block', ...fx, ...style }}/>;
+  }
   return (
     <div style={{ width:'100%', height:'100%', display:'grid', placeItems:'center',
       background:`repeating-linear-gradient(135deg,#171513 0 22px,#1c1916 22px 44px)`, ...style }}>
@@ -71,28 +88,35 @@ function ImageOrSlot({ src, label='ARRASTE A IMAGEM DO JOGO', style={} }){
 /* ---------- A · BLOCK POST (4:5) ---------- */
 function BlockBody({ s, tag }){
   const fill = s.fill;
-  const base = fill ? tag.color : GH.bg;
-  const auto = fill ? readableOn(tag.color) : GH.white;
+  const customBg = s.blockBg || null;             // overrides tag/dark bg entirely
+  const base = customBg || (fill ? tag.color : GH.bg);
+  const auto = readableOn(base);
   const ink = resolveInk(s.ink, auto);
-  const txt = ink.text;
-  const accent = fill ? (txt==='#0B0B0A'?'#0B0B0A':readableOn(tag.color)) : tag.color;
+  const txt = s.blockInk || ink.text;             // custom text color wins
+  const patAccent = customBg ? readableOn(base) : (fill?readableOn(tag.color):tag.color);
+  const accent = s.blockInk || (customBg ? readableOn(base)
+    : (fill ? (ink.text==='#0B0B0A'?'#0B0B0A':readableOn(tag.color)) : tag.color));
+  const logoCol = (s.blockInk || (s.ink&&s.ink!=='auto')) ? (readableOn(base)==='#0B0B0A'?'black':'white')
+    : (customBg ? (readableOn(base)==='#0B0B0A'?'black':'white')
+      : (fill ? (readableOn(tag.color)==='#0B0B0A'?'black':'white') : 'orange'));
   return (
     <div style={{ position:'absolute', inset:0, background:base, overflow:'hidden' }}>
-      <PatternLayer kind={s.pattern} accent={fill?readableOn(tag.color):tag.color} base={base}/>
-      <div style={{ position:'absolute', inset:0, padding:'76px 76px 200px',
+      <PatternLayer kind={s.pattern} accent={patAccent} base={base}/>
+      <div style={{ position:'absolute', inset:0, padding:'76px 76px 150px',
         display:'flex', flexDirection:'column' }}>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
+        <div style={{ flex:'none', display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
           <Seal tag={tag}/>
-          <Mark color={s.ink&&s.ink!=='auto' ? ink.logo : (fill?(readableOn(tag.color)==='#0B0B0A'?'black':'white'):'orange')} h={56}/>
+          <Mark color={logoCol} h={56}/>
         </div>
-        <div style={{ marginTop:'auto', display:'flex', flexDirection:'column', gap:30 }}>
+        <div style={{ flex:1, minHeight:0, display:'flex', flexDirection:'column',
+          justifyContent:'center', gap:30 }}>
           <Eyebrow text={s.eyebrow} color={accent}/>
           <h1 className="gh-display" style={{ margin:0, color:txt, fontSize:s.titleSize||128,
             lineHeight:.92, letterSpacing:'-.02em', textWrap:'balance' }}>{s.title}</h1>
           {s.subtitle && <p className="gh-mono" style={{ margin:0, color:txt, opacity:.82,
             fontSize:30, lineHeight:1.45, maxWidth:760, letterSpacing:'.01em' }}>{s.subtitle}</p>}
         </div>
-        <LogoFooter colorOverride={s.ink&&s.ink!=='auto'?ink.logo:null} dark={readableOn(base)==='#0B0B0A'}/>
+        <LogoFooter colorOverride={logoCol} dark={readableOn(base)==='#0B0B0A'}/>
       </div>
     </div>
   );
@@ -105,7 +129,7 @@ function ImageBody({ s, tag }){
   const logoCol = (s.ink && s.ink!=='auto') ? ink.logo : 'white';
   return (
     <div style={{ position:'absolute', inset:0, background:GH.bg, overflow:'hidden' }}>
-      <div style={{ position:'absolute', inset:0 }}><ImageOrSlot src={s.image}/></div>
+      <div style={{ position:'absolute', inset:0 }}><ImageOrSlot src={s.image} blur={s.imageBlur}/></div>
       <Scrim from="rgba(0,0,0,.94)" h="66%"/>
       <div style={{ position:'absolute', top:0, left:0, right:0, padding:'64px 64px 0',
         display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
@@ -200,7 +224,7 @@ function VideoBody({ s, tag, pg, pageIndex, exporting }){
   return (
     <div style={{ position:'absolute', inset:0, background:GH.bg, overflow:'hidden' }}>
       <div style={{ position:'absolute', inset:0 }}>
-        <ImageOrSlot src={pg.image} label={`ARTE DO JOGO (FUNDO) · PÁG ${pageIndex+1}`}/></div>
+        <ImageOrSlot src={pg.image} blur={pg.imageBlur} label={`ARTE DO JOGO (FUNDO) · PÁG ${pageIndex+1}`}/></div>
       <div style={{ position:'absolute', inset:0,
         background:'linear-gradient(180deg, rgba(8,8,7,.66) 0%, rgba(8,8,7,.40) 34%, rgba(8,8,7,.42) 60%, rgba(8,8,7,.82) 100%)' }}/>
       <div style={{ position:'absolute', inset:0, padding:'66px 70px 58px', display:'flex', flexDirection:'column' }}>
@@ -245,7 +269,7 @@ function CarouselBody({ s, tag, pageIndex, exporting }){
   if(pg.type==='video') return <VideoBody s={s} tag={tag} pg={pg} pageIndex={pageIndex} exporting={exporting}/>;
   return (
     <div style={{ position:'absolute', inset:0, background:GH.bg, overflow:'hidden' }}>
-      <div style={{ position:'absolute', inset:0 }}><ImageOrSlot src={pg.image} label={`IMAGEM · PÁG ${pageIndex+1}`}/></div>
+      <div style={{ position:'absolute', inset:0 }}><ImageOrSlot src={pg.image} blur={pg.imageBlur} label={`IMAGEM · PÁG ${pageIndex+1}`}/></div>
       <Scrim from="rgba(0,0,0,.95)" h="70%"/>
       <div style={{ position:'absolute', top:0, left:0, right:0, padding:'60px 64px 0',
         display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
@@ -283,7 +307,7 @@ function CoverBody({ s, tag, arrastar=false, safe=false, exporting=false }){
   return (
     <div style={{ position:'absolute', inset:0, background:base, overflow:'hidden' }}>
       {hasImg
-        ? <><div style={{ position:'absolute', inset:0 }}><ImageOrSlot src={s.image}/></div><Scrim from="rgba(0,0,0,.92)" h="70%"/></>
+        ? <><div style={{ position:'absolute', inset:0 }}><ImageOrSlot src={s.image} blur={s.imageBlur}/></div><Scrim from="rgba(0,0,0,.92)" h="70%"/></>
         : <PatternLayer kind={s.pattern==='solid'?'8bit':s.pattern} accent={s.fill?readableOn(tag.color):tag.color} base={base}/>}
       {safe && s.showSafe && !exporting && <SafeGuide/>}
       <div style={{ position:'absolute', inset:0, padding:pad, display:'flex', flexDirection:'column' }}>
@@ -351,26 +375,30 @@ function solidLogoCol(s, tag, fill, ink){
 
 /* ---------- E · QUIZ (4:5) ---------- */
 function QuizBody({ s, tag }){
+  const hasImg = !!s.image;
   const fill = s.fill;
-  const base = fill ? tag.color : GH.bg;
-  const auto = fill ? readableOn(tag.color) : GH.white;
+  const base = hasImg ? GH.bg : (fill ? tag.color : GH.bg);
+  const auto = hasImg ? '#F4F1EC' : (fill ? readableOn(tag.color) : GH.white);
   const ink = resolveInk(s.ink, auto);
   const txt = ink.text;
-  const accent = fill ? (txt==='#0B0B0A'?'#0B0B0A':readableOn(tag.color)) : tag.color;
+  const accent = hasImg ? tag.color : (fill ? (txt==='#0B0B0A'?'#0B0B0A':readableOn(tag.color)) : tag.color);
+  const logoCol = (s.ink&&s.ink!=='auto') ? ink.logo : (hasImg ? 'white' : solidLogoCol(s, tag, fill, ink));
   const esseou = s.quizMode==='esseou';
   return (
     <div style={{ position:'absolute', inset:0, background:base, overflow:'hidden' }}>
-      <PatternLayer kind={s.pattern} accent={fill?readableOn(tag.color):tag.color} base={base}/>
+      {hasImg
+        ? <><div style={{ position:'absolute', inset:0 }}><ImageOrSlot src={s.image} blur={s.imageBlur}/></div><FullScrim/></>
+        : <PatternLayer kind={s.pattern} accent={fill?readableOn(tag.color):tag.color} base={base}/>}
       <div style={{ position:'absolute', inset:0, padding:'72px 70px 148px', display:'flex', flexDirection:'column' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
           <Seal tag={tag}/>
-          <Mark color={solidLogoCol(s, tag, fill, ink)} h={54}/>
+          <Mark color={logoCol} h={54}/>
         </div>
         {esseou
           ? <EsseOuAquele s={s} txt={txt} accent={accent}/>
           : <QuizPergunta s={s} txt={txt} accent={accent} stories={s.format==='stories'}/>}
       </div>
-      <LogoFooter colorOverride={s.ink&&s.ink!=='auto'?ink.logo:null} dark={readableOn(base)==='#0B0B0A'}/>
+      <LogoFooter colorOverride={(s.ink&&s.ink!=='auto')?ink.logo:(hasImg?'white':null)} dark={!hasImg&&readableOn(base)==='#0B0B0A'}/>
     </div>
   );
 }
@@ -417,8 +445,8 @@ function EsseOuAquele({ s, txt, accent }){
           lineHeight:.96, letterSpacing:'-.02em', textWrap:'balance' }}>{s.question}</h1>}
       </div>
       <div style={{ marginTop:24, flex:1, position:'relative', display:'flex', flexDirection:'column', gap:16, minHeight:0 }}>
-        <OptionPanel label={s.aLabel} img={s.aImg} accent={accent}/>
-        <OptionPanel label={s.bLabel} img={s.bImg} accent={accent}/>
+        <OptionPanel label={s.aLabel} img={s.aImg} blur={s.aImgBlur} accent={accent}/>
+        <OptionPanel label={s.bLabel} img={s.bImg} blur={s.bImgBlur} accent={accent}/>
         <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', zIndex:3 }}>
           <span className="gh-pixel" style={{ width:84, height:84, borderRadius:'50%', display:'grid',
             placeItems:'center', background:accent, color:readableOn(accent), fontSize:26,
@@ -428,11 +456,11 @@ function EsseOuAquele({ s, txt, accent }){
     </div>
   );
 }
-function OptionPanel({ label, img, accent }){
+function OptionPanel({ label, img, blur, accent }){
   return (
     <div style={{ flex:1, minHeight:0, position:'relative', borderRadius:18, overflow:'hidden',
       border:`2px solid ${hexA(accent,.5)}` }}>
-      <div style={{ position:'absolute', inset:0 }}><ImageOrSlot src={img} label="IMAGEM (OPCIONAL)"/></div>
+      <div style={{ position:'absolute', inset:0 }}><ImageOrSlot src={img} blur={blur} label="IMAGEM (OPCIONAL)"/></div>
       <Scrim from="rgba(0,0,0,.88)" h="78%"/>
       <div style={{ position:'absolute', left:0, right:0, bottom:0, padding:'0 34px 30px' }}>
         <span className="gh-display" style={{ color:'#F4F1EC', fontSize:54, lineHeight:1.02,
@@ -444,21 +472,25 @@ function OptionPanel({ label, img, accent }){
 
 /* ---------- F · TOP / RANKING (4:5) ---------- */
 function RankingBody({ s, tag }){
+  const hasImg = !!s.image;
   const fill = s.fill;
-  const base = fill ? tag.color : GH.bg;
-  const auto = fill ? readableOn(tag.color) : GH.white;
+  const base = hasImg ? GH.bg : (fill ? tag.color : GH.bg);
+  const auto = hasImg ? '#F4F1EC' : (fill ? readableOn(tag.color) : GH.white);
   const ink = resolveInk(s.ink, auto);
   const txt = ink.text;
-  const accent = fill ? (txt==='#0B0B0A'?'#0B0B0A':readableOn(tag.color)) : tag.color;
+  const accent = hasImg ? tag.color : (fill ? (txt==='#0B0B0A'?'#0B0B0A':readableOn(tag.color)) : tag.color);
+  const logoCol = (s.ink&&s.ink!=='auto') ? ink.logo : (hasImg ? 'white' : solidLogoCol(s, tag, fill, ink));
   const stories = s.format==='stories';
   const items = (s.rankItems||[]).slice(0, s.rankCount||5).filter(it=>it && (it.name||'').trim()!=='');
   return (
     <div style={{ position:'absolute', inset:0, background:base, overflow:'hidden' }}>
-      <PatternLayer kind={s.pattern} accent={fill?readableOn(tag.color):tag.color} base={base}/>
+      {hasImg
+        ? <><div style={{ position:'absolute', inset:0 }}><ImageOrSlot src={s.image} blur={s.imageBlur}/></div><FullScrim/></>
+        : <PatternLayer kind={s.pattern} accent={fill?readableOn(tag.color):tag.color} base={base}/>}
       <div style={{ position:'absolute', inset:0, padding:'72px 70px 148px', display:'flex', flexDirection:'column' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
           <Seal tag={tag}/>
-          <Mark color={solidLogoCol(s, tag, fill, ink)} h={54}/>
+          <Mark color={logoCol} h={54}/>
         </div>
         <div style={{ marginTop:30, flex:1, display:'flex', flexDirection:'column',
           justifyContent: stories?'center':'space-between', gap: stories?54:0 }}>
@@ -483,7 +515,7 @@ function RankingBody({ s, tag }){
           </div>
         </div>
       </div>
-      <LogoFooter colorOverride={s.ink&&s.ink!=='auto'?ink.logo:null} dark={readableOn(base)==='#0B0B0A'}/>
+      <LogoFooter colorOverride={(s.ink&&s.ink!=='auto')?ink.logo:(hasImg?'white':null)} dark={!hasImg&&readableOn(base)==='#0B0B0A'}/>
     </div>
   );
 }
