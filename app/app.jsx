@@ -239,10 +239,15 @@ function App(){
     try{ rec = new MediaRecorder(stream, mime?{ mimeType:mime, videoBitsPerSecond:9000000 }:undefined); }
     catch(e){ rec = new MediaRecorder(stream); }
     const chunks = []; rec.ondataavailable = e=>{ if(e.data && e.data.size) chunks.push(e.data); };
-    let raf=0, stopped=false, capTimer=0;
+    let stopped=false, capTimer=0, ticker=null, raf=0;
+    const stopTicker = ()=>{ if(ticker){ try{ ticker.postMessage('stop'); ticker.terminate(); }catch(e){} ticker=null; } cancelAnimationFrame(raf); };
+    const onVis = ()=>{ try{ if(ac && ac.state==='suspended') ac.resume(); }catch(e){}
+      try{ if(!stopped && vid.paused) vid.play().catch(()=>{}); }catch(e){} };
     const finish = ()=>{ if(stopped) return; stopped=true; clearTimeout(capTimer);
-      cancelAnimationFrame(raf); try{ vid.pause(); }catch(e){} try{ rec.stop(); }catch(e){} };
+      stopTicker(); document.removeEventListener('visibilitychange', onVis);
+      try{ vid.pause(); }catch(e){} try{ rec.stop(); }catch(e){} };
     recStopRef.current = finish;
+    document.addEventListener('visibilitychange', onVis);
     rec.onstop = ()=>{
       const ext = (mime||'').includes('mp4') ? 'mp4' : 'webm';
       const blob = new Blob(chunks, { type: mime || 'video/webm' });
@@ -257,20 +262,34 @@ function App(){
       else flashToast('WEBM (sem áudio) exportado');
     };
     const drawFrame = ()=>{
+      if(stopped) return;
       drawVideoComposite(ctx, W, H, { s, pg, tag:vtag, pageIndex, vid, bgImg, logoImg });
       if(vid.duration && isFinite(vid.duration)){
         const p = Math.min(100, Math.round((vid.currentTime/vid.duration)*100));
         const r = Math.max(0, Math.ceil(vid.duration - vid.currentTime));
         setVidProg(prev => prev.p===p ? prev : { p, r });
       }
-      raf = requestAnimationFrame(drawFrame);
+    };
+    // Background-proof clock: a Web Worker ticks ~30fps even when the tab is
+    // hidden (rAF + page timers throttle in background; Workers don't). Falls back to rAF.
+    const startTicker = ()=>{
+      try{
+        const code = 'let id;onmessage=function(e){if(e.data==="stop"){clearInterval(id);}else{clearInterval(id);id=setInterval(function(){postMessage(0);},e.data);}};';
+        ticker = new Worker(URL.createObjectURL(new Blob([code], { type:'application/javascript' })));
+        ticker.onmessage = drawFrame;
+        ticker.postMessage(1000/30);
+      }catch(e){
+        const loop = ()=>{ if(stopped) return; drawFrame(); raf = requestAnimationFrame(loop); };
+        loop();
+      }
     };
     setVidProg({ p:0, r:0 });
     setBusy('vídeo');
     vid.onended = finish;
     vid.play().then(()=>{
-      try{ rec.start(); }catch(e){ console.error(e); }
+      try{ rec.start(1000); }catch(e){ console.error(e); }
       drawFrame();
+      startTicker();
       capTimer = setTimeout(finish, 120000); // 2-min safety cap
     }).catch(err=>{
       console.error('play falhou', err);
@@ -317,7 +336,7 @@ function App(){
                 boxShadow:'0 0 0 0 rgba(226,59,46,.6)', animation:'ghpulse 1.1s ease-out infinite' }}/>
               <span className="gh-pixel" style={{ color:GH.orange, fontSize:16 }}>GRAVANDO VÍDEO…</span>
               <span className="gh-mono" style={{ color:GH.mut, fontSize:12, maxWidth:340, lineHeight:1.6 }}>
-                O vídeo é gravado em tempo real, com o trailer tocando dentro do quadro da marca.</span>
+                Gravado em tempo real com o trailer no quadro da marca. Pode trocar de aba ou minimizar — a gravação continua em segundo plano.</span>
               <div style={{ width:320, maxWidth:'78vw' }}>
                 <div style={{ height:9, borderRadius:99, background:'#2a2622', overflow:'hidden' }}>
                   <div style={{ height:'100%', width:vidProg.p+'%', minWidth:vidProg.p>0?6:0, background:GH.orange,
