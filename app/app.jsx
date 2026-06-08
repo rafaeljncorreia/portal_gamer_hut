@@ -320,7 +320,9 @@ function TopBar({ s, dims, tag, busy, isVideoPage, onExport, onExportAll, onExpo
     <header style={{ height:64, flex:'none', display:'flex', alignItems:'center', justifyContent:'space-between',
       padding:'0 22px', background:GH.panel, borderBottom:`1px solid ${GH.lineSoft}` }}>
       <div style={{ display:'flex', alignItems:'center', gap:14 }}>
-        <img src="assets/mark-orange.png" alt="" style={{ height:30 }}/>
+        <a href="index.html" title="Voltar ao Portal Gamer Hut" style={{ display:'inline-flex', alignItems:'center' }}>
+          <img src="assets/mark-orange.png" alt="Portal" style={{ height:30, cursor:'pointer' }}/>
+        </a>
         <div style={{ borderLeft:`1px solid ${GH.lineSoft}`, paddingLeft:14 }}>
           <div className="gh-pixel" style={{ color:GH.white, fontSize:12, letterSpacing:'.02em' }}>CREATIVE STUDIO</div>
           <div className="gh-mono" style={{ color:GH.mut, fontSize:10, letterSpacing:'.18em', marginTop:3 }}>AUTOMAÇÃO DE CRIATIVOS</div>
