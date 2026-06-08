@@ -9,6 +9,8 @@ function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS }){
   const isBlock    = s.template==='block';
   const isQuiz     = s.template==='quiz';
   const isRanking  = s.template==='ranking';
+  const isThumb    = s.template==='thumb';
+  const isArrivals = s.template==='arrivals';
   const accent = s.fill ? readableOn(tag.color) : tag.color;
 
   const setPage = (patch)=> setS(p=>{
@@ -23,7 +25,7 @@ function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS }){
         <TemplatePicker value={s.template} onChange={pickTemplate}/>
       </CtrlSection>
 
-      {(isBlock||isQuiz||isRanking) &&
+      {(isBlock||isQuiz||isRanking||isArrivals) &&
         <CtrlSection title="FORMATO" right={
           <span className="gh-mono" style={{ color:GH.mut, fontSize:9, letterSpacing:'.1em' }}>
             {s.format==='stories'?'9:16 · 1080×1920':'4:5 · 1080×1350'}</span>}>
@@ -120,6 +122,8 @@ function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS }){
           </>}
         </> : isQuiz ? <QuizFields s={s} set={set}/>
           : isRanking ? <RankingFields s={s} set={set} setS={setS}/>
+          : isThumb ? <ThumbFields s={s} set={set}/>
+          : isArrivals ? <ArrivalsFields s={s} set={set} setS={setS}/>
           : <>
           {!isImage && <Field label={isReels||isCarousel?'Badge (canto superior)':'Selo'}>
             <TextInput value={s.badge||''} placeholder="ex: STATE OF PLAY" onChange={e=>set({badge:e.target.value})}/>
@@ -163,14 +167,23 @@ function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS }){
       {onCover && !isImage &&
         <CtrlSection title="ESTILO DE FUNDO" right={
           <span className="gh-mono" style={{ color:GH.mut, fontSize:9, letterSpacing:'.1em' }}>{PATTERNS.length} PADRÕES</span>}>
-          {(isReels||isCarousel||isQuiz||isRanking) && s.image
+          {(isReels||isCarousel||isQuiz||isRanking||isThumb) && s.image
             ? <p className="gh-mono" style={{ color:GH.mut, fontSize:10, lineHeight:1.5, margin:0 }}>
                 Imagem de fundo ativa — remova-a acima para usar padrões ou cor sólida.</p>
             : <>
               <div style={{ marginBottom:14 }}>
                 <PatternPicker value={s.pattern} accent={accent} onChange={p=>set({pattern:p})}/>
               </div>
-              {(isBlock||isCarousel||isReels||isQuiz||isRanking) &&
+              {s.pattern!=='solid' &&
+                <div style={{ marginBottom:6 }}>
+                  <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:6 }}>
+                    <span className="gh-mono" style={{ color:GH.mut, fontSize:11, letterSpacing:'.14em' }}>OPACIDADE DO ESTILO</span>
+                    <span className="gh-pixel" style={{ color:GH.orange, fontSize:11 }}>{Math.round(s.patternOpacity??100)}%</span>
+                  </div>
+                  <input type="range" min={0} max={100} value={s.patternOpacity??100}
+                    onChange={e=>set({ patternOpacity:+e.target.value })} style={{ width:'100%', accentColor:GH.orange }}/>
+                </div>}
+              {(isBlock||isCarousel||isReels||isQuiz||isRanking||isThumb||isArrivals) &&
                 <div style={{ marginTop:6 }}>
                   <Toggle label="Preencher com a cor da tag" checked={s.fill} onChange={v=>set({fill:v})}/>
                 </div>}
@@ -381,6 +394,84 @@ function RankingFields({ s, set, setS }){
         <ImageDrop value={s.image} onChange={v=>set({ image:v })} label="Imagem de fundo"
           blur={s.imageBlur} onBlur={v=>set({ imageBlur:v })}/>
       </Field>
+    </>
+  );
+}
+
+/* ---- YOUTUBE THUMBNAIL fields ---- */
+function ThumbFields({ s, set }){
+  return (
+    <>
+      <Field label="Badge (canto superior)">
+        <TextInput value={s.badge||''} placeholder="ex: REVIEW" onChange={e=>set({ badge:e.target.value })}/>
+      </Field>
+      <Field label="Sobre-título (eyebrow)">
+        <TextInput value={s.eyebrow||''} placeholder="ANÁLISE COMPLETA" onChange={e=>set({ eyebrow:e.target.value })}/>
+      </Field>
+      <Field label="Título principal (curto e forte)">
+        <TextArea value={s.title||''} onChange={e=>set({ title:e.target.value })} style={{ minHeight:60 }}/>
+      </Field>
+      <Field label="Palavra em destaque (cor da tag)">
+        <TextInput value={s.accentWord||''} placeholder="ex: EM 2025" onChange={e=>set({ accentWord:e.target.value })}/>
+      </Field>
+      <Field label="Arte do jogo (fundo)">
+        <ImageDrop value={s.image} onChange={v=>set({ image:v })} label="Arte do jogo"
+          blur={s.imageBlur} onBlur={v=>set({ imageBlur:v })}/>
+      </Field>
+      <Field label="Etiqueta (canto inferior · opcional)">
+        <TextInput value={s.priceLabel||''} placeholder="ex: 12 MIN · 4K" onChange={e=>set({ priceLabel:e.target.value })}/>
+      </Field>
+      <div style={{ display:'flex', gap:10, alignItems:'flex-start', background:GH.bg,
+        border:`1px solid ${GH.lineSoft}`, borderRadius:9, padding:'12px 13px' }}>
+        <span style={{ color:GH.orange, fontSize:13, lineHeight:1.3 }}>●</span>
+        <p className="gh-mono" style={{ margin:0, color:GH.mut, fontSize:10, lineHeight:1.6, letterSpacing:'.03em' }}>
+          Tamanho <span style={{ color:GH.white }}>1280×720 · 16:9</span>, a capa de vídeo do YouTube.
+          Ajuste a fonte gigante em <span style={{ color:GH.white }}>TIPOGRAFIA</span> e a cor do texto em
+          <span style={{ color:GH.white }}> COR DO TEXTO / LOGO</span>.</p>
+      </div>
+    </>
+  );
+}
+
+/* ---- NOVIDADES DA SEMANA fields ---- */
+function ArrivalsFields({ s, set, setS }){
+  const n = s.arrivalCount||4;
+  const items = s.arrivals||[];
+  const setItem = (i,patch)=> setS(p=>{ const a=(p.arrivals||[]).slice();
+    while(a.length<=i) a.push({ name:'', price:'', image:null }); a[i]={ ...a[i], ...patch }; return { ...p, arrivals:a }; });
+  return (
+    <>
+      <Field label="Sobre-título (eyebrow)">
+        <TextInput value={s.eyebrow||''} placeholder="CHEGOU NA LOJA" onChange={e=>set({ eyebrow:e.target.value })}/>
+      </Field>
+      <Field label="Título">
+        <TextArea value={s.title||''} onChange={e=>set({ title:e.target.value })} style={{ minHeight:56 }}/>
+      </Field>
+      <Field label="Quantidade de itens">
+        <Stepper label="" value={n} min={2} max={6} onChange={v=>setS(p=>{
+          const a=(p.arrivals||[]).slice(); while(a.length<v) a.push({ name:'', console:'', image:null });
+          return { ...p, arrivalCount:v, arrivals:a };
+        })}/>
+      </Field>
+      <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+        {Array.from({length:n}).map((_,i)=>{
+          const it = items[i]||{};
+          return (
+            <div key={i} style={{ background:GH.bg, border:`1px solid ${GH.lineSoft}`, borderRadius:10, padding:'13px 13px' }}>
+              <div className="gh-pixel" style={{ color:GH.orange, fontSize:11, letterSpacing:'.04em', marginBottom:11 }}>
+                ITEM {String(i+1).padStart(2,'0')}</div>
+              <div style={{ display:'flex', gap:8, marginBottom:10 }}>
+                <TextInput value={it.name||''} placeholder="Nome do jogo"
+                  onChange={e=>setItem(i,{ name:e.target.value })} style={{ flex:1 }}/>
+                <TextInput value={it.console||''} placeholder="PS5"
+                  onChange={e=>setItem(i,{ console:e.target.value })} style={{ width:104, flex:'none' }}/>
+              </div>
+              <ImageDrop value={it.image} onChange={v=>setItem(i,{ image:v })} label="Capa do jogo"
+                blur={it.imageBlur} onBlur={v=>setItem(i,{ imageBlur:v })}/>
+            </div>
+          );
+        })}
+      </div>
     </>
   );
 }

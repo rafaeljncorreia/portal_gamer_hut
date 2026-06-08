@@ -64,9 +64,14 @@ function FullScrim({ strength=0.62 }){
    CSS blur leaves at the image edges (container clips the overflow). */
 function blurPx(pct){ return Math.max(0, (+pct||0)) * 0.32; }
 
-function PatternLayer({ kind, accent, base }){
+function PatternLayer({ kind, accent, base, opacity }){
   if(kind==='solid') return null;
-  return <div style={{ position:'absolute', inset:0, pointerEvents:'none', ...patternStyle(kind, accent, base) }}/>;
+  const st = patternStyle(kind, accent, base);
+  if(opacity!=null){
+    const baseOp = st.opacity!=null ? st.opacity : 1;
+    st.opacity = baseOp * (Math.max(0, Math.min(100, opacity))/100);
+  }
+  return <div style={{ position:'absolute', inset:0, pointerEvents:'none', ...st }}/>;
 }
 
 function ImageOrSlot({ src, label='ARRASTE A IMAGEM DO JOGO', style={}, blur=0 }){
@@ -101,7 +106,7 @@ function BlockBody({ s, tag }){
       : (fill ? (readableOn(tag.color)==='#0B0B0A'?'black':'white') : 'orange'));
   return (
     <div style={{ position:'absolute', inset:0, background:base, overflow:'hidden' }}>
-      <PatternLayer kind={s.pattern} accent={patAccent} base={base}/>
+      <PatternLayer kind={s.pattern} accent={patAccent} base={base} opacity={s.patternOpacity}/>
       <div style={{ position:'absolute', inset:0, padding:'76px 76px 150px',
         display:'flex', flexDirection:'column' }}>
         <div style={{ flex:'none', display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
@@ -308,7 +313,7 @@ function CoverBody({ s, tag, arrastar=false, safe=false, exporting=false }){
     <div style={{ position:'absolute', inset:0, background:base, overflow:'hidden' }}>
       {hasImg
         ? <><div style={{ position:'absolute', inset:0 }}><ImageOrSlot src={s.image} blur={s.imageBlur}/></div><Scrim from="rgba(0,0,0,.92)" h="70%"/></>
-        : <PatternLayer kind={s.pattern==='solid'?'8bit':s.pattern} accent={s.fill?readableOn(tag.color):tag.color} base={base}/>}
+        : <PatternLayer kind={s.pattern==='solid'?'8bit':s.pattern} accent={s.fill?readableOn(tag.color):tag.color} base={base} opacity={s.patternOpacity}/>}
       {safe && s.showSafe && !exporting && <SafeGuide/>}
       <div style={{ position:'absolute', inset:0, padding:pad, display:'flex', flexDirection:'column' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
@@ -345,6 +350,67 @@ function CoverBody({ s, tag, arrastar=false, safe=false, exporting=false }){
 /* ---------- D · REELS (9:16) ---------- */
 function ReelsBody({ s, tag, exporting }){
   return <CoverBody s={s} tag={tag} safe exporting={exporting}/>;
+}
+
+/* ---------- D2 · YOUTUBE THUMBNAIL (16:9 · 1280×720) ----------
+   Punchy video cover: full-bleed game art, oversized headline anchored
+   bottom-left over a side+bottom fade, category seal + badge up top, a
+   tag-colored highlight word, price chip + logo bottom-right. Falls back
+   to a solid/pattern bg when no art is uploaded. */
+function ThumbBody({ s, tag, exporting }){
+  const hasImg = !!s.image;
+  const base = hasImg ? GH.bg : (s.fill ? tag.color : GH.bg);
+  const auto = hasImg ? '#F4F1EC' : (s.fill ? readableOn(tag.color) : GH.white);
+  const ink = resolveInk(s.ink, auto);
+  const txt = ink.text;
+  const accentCol = hasImg ? tag.color : (s.fill ? (txt==='#0B0B0A'?GH.ink:readableOn(tag.color)) : tag.color);
+  const logoCol = (s.ink && s.ink!=='auto') ? ink.logo
+    : (hasImg ? 'white' : (s.fill?(readableOn(tag.color)==='#0B0B0A'?'black':'white'):'white'));
+  const sh = hasImg ? '0 6px 26px rgba(0,0,0,.62), 0 2px 5px rgba(0,0,0,.55)' : 'none';
+  const chipTx = readableOn(accentCol);
+  return (
+    <div style={{ position:'absolute', inset:0, background:base, overflow:'hidden' }}>
+      {hasImg
+        ? <>
+            <div style={{ position:'absolute', inset:0 }}><ImageOrSlot src={s.image} blur={s.imageBlur}/></div>
+            <div style={{ position:'absolute', inset:0, pointerEvents:'none',
+              background:'linear-gradient(90deg, rgba(0,0,0,.92) 0%, rgba(0,0,0,.6) 40%, rgba(0,0,0,.12) 70%, rgba(0,0,0,0) 100%)' }}/>
+            <div style={{ position:'absolute', left:0, right:0, bottom:0, height:'78%', pointerEvents:'none',
+              background:'linear-gradient(0deg, rgba(0,0,0,.86) 0%, rgba(0,0,0,.3) 48%, transparent 100%)' }}/>
+          </>
+        : <PatternLayer kind={s.pattern==='solid'?'8bit':s.pattern} accent={s.fill?readableOn(tag.color):tag.color} base={base} opacity={s.patternOpacity}/>}
+      <div style={{ position:'absolute', inset:0, padding:'50px 58px', display:'flex', flexDirection:'column',
+        justifyContent:'space-between' }}>
+        {/* top row — seal + badge */}
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
+          <Seal tag={tag} big/>
+          {s.badge && <span className="gh-pixel" style={{ background:GH.ink, color:tag.color,
+            padding:'15px 22px', fontSize:24, borderRadius:5, display:'inline-flex', gap:11, alignItems:'center',
+            boxShadow:'0 0 0 4px rgba(0,0,0,.18)' }}>
+            <span style={{ width:12, height:12, background:tag.color, borderRadius:'50%' }}/>{s.badge}</span>}
+        </div>
+        {/* bottom row — headline left, price + logo right */}
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end', gap:32 }}>
+          <div style={{ display:'flex', flexDirection:'column', gap:20, maxWidth:'80%' }}>
+            <Eyebrow text={s.eyebrow} color={accentCol} size={24}/>
+            <h1 className="gh-display" style={{ margin:0, color:txt, fontSize:s.titleSize||150,
+              lineHeight:.86, letterSpacing:'-.03em', textTransform:'uppercase', textWrap:'balance',
+              textShadow:sh }}>{s.title}</h1>
+            {s.accentWord && <div>
+              <span className="gh-display" style={{ background:accentCol, color:chipTx, padding:'6px 20px',
+                borderRadius:8, fontSize:Math.round((s.titleSize||150)*0.42), lineHeight:1.18,
+                letterSpacing:'-.01em', display:'inline-block', textTransform:'uppercase' }}>{s.accentWord}</span>
+            </div>}
+          </div>
+          <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:18, flex:'none' }}>
+            {s.priceLabel && <span className="gh-pixel" style={{ background:'rgba(11,11,10,.82)', color:GH.white,
+              padding:'15px 20px', fontSize:24, borderRadius:5, boxShadow:`inset 0 0 0 2px ${tag.color}` }}>{s.priceLabel}</span>}
+            <Lockup color={logoCol} h={42} style={{ filter: hasImg?'drop-shadow(0 4px 14px rgba(0,0,0,.55))':'none' }}/>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 /* ---------- shared footer logo (brand rule: bottom-center) ---------- */
@@ -388,11 +454,10 @@ function QuizBody({ s, tag }){
     <div style={{ position:'absolute', inset:0, background:base, overflow:'hidden' }}>
       {hasImg
         ? <><div style={{ position:'absolute', inset:0 }}><ImageOrSlot src={s.image} blur={s.imageBlur}/></div><FullScrim/></>
-        : <PatternLayer kind={s.pattern} accent={fill?readableOn(tag.color):tag.color} base={base}/>}
+        : <PatternLayer kind={s.pattern} accent={fill?readableOn(tag.color):tag.color} base={base} opacity={s.patternOpacity}/>}
       <div style={{ position:'absolute', inset:0, padding:'72px 70px 148px', display:'flex', flexDirection:'column' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
           <Seal tag={tag}/>
-          <Mark color={logoCol} h={54}/>
         </div>
         {esseou
           ? <EsseOuAquele s={s} txt={txt} accent={accent}/>
@@ -486,11 +551,10 @@ function RankingBody({ s, tag }){
     <div style={{ position:'absolute', inset:0, background:base, overflow:'hidden' }}>
       {hasImg
         ? <><div style={{ position:'absolute', inset:0 }}><ImageOrSlot src={s.image} blur={s.imageBlur}/></div><FullScrim/></>
-        : <PatternLayer kind={s.pattern} accent={fill?readableOn(tag.color):tag.color} base={base}/>}
+        : <PatternLayer kind={s.pattern} accent={fill?readableOn(tag.color):tag.color} base={base} opacity={s.patternOpacity}/>}
       <div style={{ position:'absolute', inset:0, padding:'72px 70px 148px', display:'flex', flexDirection:'column' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
           <Seal tag={tag}/>
-          <Mark color={logoCol} h={54}/>
         </div>
         <div style={{ marginTop:30, flex:1, display:'flex', flexDirection:'column',
           justifyContent: stories?'center':'space-between', gap: stories?54:0 }}>
@@ -520,11 +584,62 @@ function RankingBody({ s, tag }){
   );
 }
 
-/* artboard size = template size; Post Blocado / Quiz / Ranking can switch to
-   a 9:16 Stories format (1080×1920) */
+/* ---------- G · NOVIDADES DA SEMANA (grade · 4:5) ---------- */
+function ArrivalCard({ it, accent, txt, span }){
+  return (
+    <div style={{ position:'relative', borderRadius:16, overflow:'hidden', minHeight:0,
+      border:`2px solid ${hexA(txt,.18)}`, gridColumn: span?'1 / -1':'auto' }}>
+      <div style={{ position:'absolute', inset:0 }}><ImageOrSlot src={it.image} blur={it.imageBlur} label="CAPA DO JOGO"/></div>
+      <Scrim from="rgba(0,0,0,.92)" h="64%"/>
+      {it.console && <span className="gh-pixel" style={{ position:'absolute', top:16, right:16,
+        background:accent, color:readableOn(accent), padding:'9px 13px', fontSize:20, borderRadius:4,
+        boxShadow:'0 0 0 3px rgba(0,0,0,.22)' }}>{it.console}</span>}
+      <div style={{ position:'absolute', left:0, right:0, bottom:0, padding:'0 22px 20px' }}>
+        <span className="gh-display" style={{ color:'#F4F1EC', fontSize:span?40:32, lineHeight:1.0,
+          letterSpacing:'-.01em', textWrap:'balance' }}>{it.name}</span>
+      </div>
+    </div>
+  );
+}
+function ArrivalsBody({ s, tag }){
+  const fill = s.fill;
+  const base = fill ? tag.color : GH.bg;
+  const auto = fill ? readableOn(tag.color) : GH.white;
+  const ink = resolveInk(s.ink, auto);
+  const txt = ink.text;
+  const accent = fill ? (txt==='#0B0B0A'?'#0B0B0A':readableOn(tag.color)) : tag.color;
+  const items = (s.arrivals||[]).slice(0, s.arrivalCount||4).filter(it=>it && ((it.name||'').trim()!=='' || it.image));
+  const odd = items.length % 2 === 1;
+  return (
+    <div style={{ position:'absolute', inset:0, background:base, overflow:'hidden' }}>
+      <PatternLayer kind={s.pattern} accent={fill?readableOn(tag.color):tag.color} base={base} opacity={s.patternOpacity}/>
+      <div style={{ position:'absolute', inset:0, padding:'72px 70px 148px', display:'flex', flexDirection:'column' }}>
+        <div style={{ flex:'none', display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
+          <Seal tag={tag}/>
+        </div>
+        <div style={{ flex:'none', marginTop:28, display:'flex', flexDirection:'column', gap:14 }}>
+          <Eyebrow text={s.eyebrow} color={accent}/>
+          <h1 className="gh-display" style={{ margin:0, color:txt, fontSize:s.titleSize||84, lineHeight:.9,
+            letterSpacing:'-.025em', textWrap:'balance' }}>{s.title}</h1>
+        </div>
+        <div style={{ flex:1, minHeight:0, marginTop:26, display:'grid', gridTemplateColumns:'1fr 1fr',
+          gap:22, gridAutoRows:'1fr' }}>
+          {items.map((it,i)=>(
+            <ArrivalCard key={i} it={it} accent={accent} txt={txt}
+              span={odd && i===items.length-1}/>
+          ))}
+        </div>
+      </div>
+      <LogoFooter colorOverride={s.ink&&s.ink!=='auto'?ink.logo:null} dark={readableOn(base)==='#0B0B0A'}/>
+    </div>
+  );
+}
+
+/* artboard size = template size; Post Blocado / Quiz / Ranking / Novidades can
+   switch to a 9:16 Stories format (1080×1920) */
 function stageDims(s, pageIndex=0){
   const tpl = TEMPLATES.find(t=>t.id===s.template) || TEMPLATES[0];
-  if((s.template==='block'||s.template==='quiz'||s.template==='ranking') && s.format==='stories'){
+  if((s.template==='block'||s.template==='quiz'||s.template==='ranking'||s.template==='arrivals') && s.format==='stories'){
     return { w:1080, h:1920, ratio:'9:16' };
   }
   return { w:tpl.w, h:tpl.h, ratio:tpl.ratio };
@@ -540,6 +655,8 @@ function PostStage({ s, pageIndex=0, stageRef, exporting=false }){
   else if(s.template==='carousel') body = <CarouselBody s={s} tag={tag} pageIndex={pageIndex} exporting={exporting}/>;
   else if(s.template==='quiz') body = <QuizBody s={s} tag={tag}/>;
   else if(s.template==='ranking') body = <RankingBody s={s} tag={tag}/>;
+  else if(s.template==='arrivals') body = <ArrivalsBody s={s} tag={tag}/>;
+  else if(s.template==='thumb') body = <ThumbBody s={s} tag={tag} exporting={exporting}/>;
   else body = <ReelsBody s={s} tag={tag} exporting={exporting}/>;
   return (
     <div ref={stageRef} data-stage style={{ width:dims.w, height:dims.h, position:'relative',

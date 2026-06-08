@@ -8,8 +8,9 @@ const DEFAULT_STATE = {
   eyebrow:'DIRETO DA SONY',
   title:'A PRIMEIRA EXCLUSIVIDADE DA GAMER HUT',
   subtitle:'neste post', badge:'STATE OF PLAY', cta:'ARRASTA PRO LADO',
+  accentWord:'',
   footer:'MÍDIA FÍSICA\nNEVER DIES', priceLabel:'R$ 349 · LACRADO',
-  titleSize:108, image:null, pageCount:4, current:0,
+  titleSize:108, image:null, pageCount:4, current:0, patternOpacity:100,
   pages:[
     { title:'DRAGON QUEST XII', body:'Depois de 5 anos sem novidades, a Square Enix revelou oficialmente Beyond Dreams.', image:null },
     { title:'40 ANOS DE FRANQUIA', body:'O anúncio veio durante a celebração dos 40 anos da série.', image:null },
@@ -33,6 +34,16 @@ const DEFAULT_STATE = {
     { name:'METAL GEAR SOLID Δ', note:'AÇÃO' },
     { name:'', note:'' },
   ],
+  // NOVIDADES DA SEMANA (grid de chegadas)
+  arrivalCount:4,
+  arrivals:[
+    { name:'SILENT HILL 2', console:'PS5', image:null },
+    { name:'ASTRO BOT', console:'PS5', image:null },
+    { name:'FINAL FANTASY VII REBIRTH', console:'PS5', image:null },
+    { name:'METAL GEAR SOLID Δ', console:'PS5 · XBOX', image:null },
+    { name:'', console:'', image:null },
+    { name:'', console:'', image:null },
+  ],
 };
 
 const PRESETS = {
@@ -48,6 +59,11 @@ const PRESETS = {
               quizMode:'pergunta', titleSize:80 },
   ranking:  { template:'ranking', tagId:'review', pattern:'grid', fill:false, ink:'auto', eyebrow:'TOP DA SEMANA',
               title:'OS 5 MAIS VENDIDOS', titleSize:96 },
+  arrivals: { template:'arrivals', tagId:'restoque', pattern:'8bit', fill:false, ink:'auto', eyebrow:'CHEGOU NA LOJA',
+              title:'NOVIDADES DA SEMANA', titleSize:84 },
+  thumb:    { template:'thumb', tagId:'review', pattern:'8bit', fill:false, ink:'auto', eyebrow:'ANÁLISE COMPLETA',
+              title:'VALE A PENA?', accentWord:'EM 2025', subtitle:'', badge:'EXCLUSIVO GAMER HUT', priceLabel:'',
+              titleSize:150 },
 };
 
 function loadState(){

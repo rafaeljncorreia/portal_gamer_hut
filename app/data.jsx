@@ -37,13 +37,15 @@ const TEMPLATES = [
   { id:'image',    label:'POST C/ IMAGEM', ratio:'4:5', w:1080, h:1350, note:'Texto + imagem em destaque' },
   { id:'quiz',     label:'QUIZ',           ratio:'4:5', w:1080, h:1350, note:'Pergunta ou “esse ou aquele”' },
   { id:'ranking',  label:'TOP / RANKING',  ratio:'4:5', w:1080, h:1350, note:'Lista numerada · top da semana' },
+  { id:'arrivals', label:'NOVIDADES',      ratio:'4:5', w:1080, h:1350, note:'Grade de novidades da semana' },
+  { id:'thumb',    label:'THUMB YOUTUBE',  ratio:'16:9',w:1280, h:720,  note:'Capa de vídeo · texto gigante' },
   { id:'reels',    label:'CAPA DE REELS',  ratio:'9:16',w:1080, h:1920, note:'Safe zone 4:5 central' },
 ];
 
 /* Background patterns. Each returns inline-style layers given an accent color. */
-const PATTERNS = ['solid','signature','crt','8bit','hud','caution','retro','grid','dpad','checker','chevron','circuit','stars','triangles','vbars'];
+const PATTERNS = ['solid','signature','controle','crt','8bit','hud','caution','retro','grid','dpad','checker','chevron','circuit','stars','triangles','vbars'];
 const PATTERN_LABELS = {
-  solid:'SÓLIDO', signature:'SIGNATURE', crt:'CRT', '8bit':'8-BIT',
+  solid:'SÓLIDO', signature:'SIGNATURE', controle:'CONTROLE', crt:'CRT', '8bit':'8-BIT',
   hud:'HUD', caution:'CAUTION', retro:'RETRO', grid:'GRID', dpad:'D-PAD',
   checker:'CHECKER', chevron:'CHEVRON', circuit:'CIRCUITO', stars:'STARS',
   triangles:'TRIÂNGULOS', vbars:'BARRAS'
@@ -76,6 +78,15 @@ function patternStyle(kind, accent, base){
         backgroundColor: accent, opacity:0.14,
         // accent shows through the mask
       };
+    case 'controle': {
+      // ONE huge GH controller, centered and tilted -45° (single watermark, no tiling)
+      const markCol = readableOn(base)==='#0B0B0A' ? 'black' : 'white';
+      return {
+        backgroundImage:`url(assets/mark-${markCol}.png)`,
+        backgroundRepeat:'no-repeat', backgroundPosition:'center', backgroundSize:'75%',
+        opacity:0.5, transform:'rotate(-30deg)', transformOrigin:'center',
+      };
+    }
     case 'crt':
       return { background:`repeating-linear-gradient(0deg, ${hexA(accent,0.18)} 0 2px, transparent 2px 6px)`, opacity:1 };
     case '8bit':
