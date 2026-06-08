@@ -75,6 +75,7 @@ function App(){
   const [s, setS] = useState(loadState);
   const [scale, setScale] = useState(0.4);
   const [busy, setBusy] = useState(false);
+  const [vidProg, setVidProg] = useState({ p:0, r:0 });
   const [toast, setToast] = useState(null);
   const stageRef = useRef(null);
   const viewRef  = useRef(null);
@@ -244,8 +245,14 @@ function App(){
     };
     const drawFrame = ()=>{
       drawVideoComposite(ctx, W, H, { s, pg, tag:vtag, pageIndex, vid, bgImg, logoImg });
+      if(vid.duration && isFinite(vid.duration)){
+        const p = Math.min(100, Math.round((vid.currentTime/vid.duration)*100));
+        const r = Math.max(0, Math.ceil(vid.duration - vid.currentTime));
+        setVidProg(prev => prev.p===p ? prev : { p, r });
+      }
       raf = requestAnimationFrame(drawFrame);
     };
+    setVidProg({ p:0, r:0 });
     setBusy('vídeo');
     vid.onended = finish;
     vid.play().then(()=>{
@@ -297,7 +304,18 @@ function App(){
                 boxShadow:'0 0 0 0 rgba(226,59,46,.6)', animation:'ghpulse 1.1s ease-out infinite' }}/>
               <span className="gh-pixel" style={{ color:GH.orange, fontSize:16 }}>GRAVANDO VÍDEO…</span>
               <span className="gh-mono" style={{ color:GH.mut, fontSize:12, maxWidth:340, lineHeight:1.6 }}>
-                Reproduzindo o trailer com o quadro da marca. Aguarde o fim ou pare quando quiser.</span>
+                O vídeo é gravado em tempo real, com o trailer tocando dentro do quadro da marca.</span>
+              <div style={{ width:320, maxWidth:'78vw' }}>
+                <div style={{ height:9, borderRadius:99, background:'#2a2622', overflow:'hidden' }}>
+                  <div style={{ height:'100%', width:vidProg.p+'%', minWidth:vidProg.p>0?6:0, background:GH.orange,
+                    borderRadius:99, transition:'width .25s linear' }}/>
+                </div>
+                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginTop:9 }}>
+                  <span className="gh-pixel" style={{ color:GH.orange, fontSize:12 }}>{vidProg.p}%</span>
+                  <span className="gh-mono" style={{ color:GH.mut, fontSize:11, letterSpacing:'.04em' }}>
+                    {vidProg.p>=100 ? 'FINALIZANDO…' : (vidProg.r>0 ? '~'+vidProg.r+'s RESTANTES' : 'PREPARANDO…')}</span>
+                </div>
+              </div>
               <button onClick={()=>recStopRef.current && recStopRef.current()} className="gh-mono" style={{ cursor:'pointer',
                 background:GH.orange, color:GH.ink, border:'none', padding:'11px 20px', borderRadius:8,
                 fontSize:12, fontWeight:700, letterSpacing:'.04em' }}>■ PARAR E SALVAR</button>
