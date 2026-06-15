@@ -334,10 +334,14 @@
         <div class="step">
           <div class="step-num">01</div>
           <div class="step-body">
-            <strong>Baixe e instale o app Media Downloader</strong>
-            <p>Se ainda não instalou, baixe o ZIP no link abaixo, extraia em qualquer pasta e execute o <code style="color:var(--orange)">instalar.bat</code> como administrador.</p>
-            <a class="cmd" href="https://github.com/ZeroTrinta/media-downloader/releases/latest/download/media-downloader-app.zip" target="_blank" style="text-decoration:none;display:block;">
-              ↓ media-downloader-app.zip
+            <strong>Baixe os dois arquivos abaixo</strong>
+            <p>Salve os dois na mesma pasta (ex: sua Área de Trabalho ou Downloads).</p>
+            <a class="cmd" href="https://raw.githubusercontent.com/ZeroTrinta/media-downloader/main/backend/server.py" download="server.py" style="text-decoration:none;display:block;margin-bottom:8px;">
+              ↓ server.py
+              <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--mut);letter-spacing:.1em;">BAIXAR</span>
+            </a>
+            <a class="cmd" href="iniciar-servidor.bat" download="iniciar-servidor.bat" style="text-decoration:none;display:block;">
+              ↓ iniciar-servidor.bat
               <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--mut);letter-spacing:.1em;">BAIXAR</span>
             </a>
           </div>
@@ -345,21 +349,21 @@
         <div class="step">
           <div class="step-num">02</div>
           <div class="step-body">
-            <strong>Abra o app pelo atalho na Área de Trabalho</strong>
-            <p>Clique duas vezes em <code style="color:var(--orange)">Media Downloader</code> na sua Área de Trabalho. Uma janela vai abrir — pode minimizar, ela precisa ficar aberta.</p>
+            <strong>Execute o iniciar-servidor.bat</strong>
+            <p>Clique duas vezes no arquivo. Na primeira vez ele instala Python, ffmpeg e yt-dlp automaticamente. Deixe a janela aberta — ela é o servidor.</p>
           </div>
         </div>
         <div class="step">
           <div class="step-num">03</div>
           <div class="step-body">
-            <strong>Volte aqui e recarregue a página</strong>
-            <p>Com o app aberto, clique no botão abaixo. O portal vai conectar automaticamente.</p>
+            <strong>Volte aqui e verifique a conexão</strong>
+            <p>Com a janela rodando, clique no botão abaixo. O portal conecta automaticamente.</p>
           </div>
         </div>
       </div>
       <button class="retry-btn" onclick="retryConnection()">↺ VERIFICAR CONEXÃO</button>
       <div class="note-box">
-        <strong>Já tem o app?</strong> Basta abrir o <code style="color:var(--green)">Media Downloader</code> na Área de Trabalho e voltar aqui.
+        <strong>Da próxima vez:</strong> só dar dois cliques no <code style="color:var(--green)">iniciar-servidor.bat</code> e voltar aqui.
       </div>
     </div>
 
