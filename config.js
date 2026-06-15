@@ -8,5 +8,5 @@
    ============================================================ */
 window.GH_CONFIG = {
   // Ex: 'https://gamerhut-ia.SEU-USUARIO.workers.dev'
-  proxyUrl: 'https://dawn-moon-c724-gamerhut-ia.contatotgt.workers.dev'
+  proxyUrl: 'https://dawn-moon-c724-gamerhut-ia.contatotgt.workers.dev/'
 };

@@ -42,6 +42,17 @@
   .chip:hover{ border-color:var(--mut); }
   .chip.on{ background:var(--blue); color:#fff; border-color:var(--blue); }
   .chip.cat.on{ background:var(--ac,var(--orange)); color:var(-- acink,#0B0B0A); border-color:var(--ac,var(--orange)); }
+  .stepper{ display:inline-flex; align-items:center; gap:0; border:1px solid var(--lineSoft); border-radius:10px;
+    overflow:hidden; background:var(--bg); }
+  .stbtn{ cursor:pointer; width:42px; height:42px; border:none; background:transparent; color:var(--orange);
+    font-family:'Archivo',sans-serif; font-weight:900; font-size:22px; line-height:1; transition:background .12s; }
+  .stbtn:hover{ background:rgba(232,100,60,.12); }
+  .stbtn:disabled{ color:var(--mut2); cursor:not-allowed; background:transparent; }
+  .stval{ min-width:120px; text-align:center; font-family:'Space Mono',monospace; font-size:13px; color:var(--white);
+    border-left:1px solid var(--lineSoft); border-right:1px solid var(--lineSoft); padding:0 14px; line-height:42px; }
+  .stval b{ font-family:'Press Start 2P',monospace; font-size:13px; color:var(--orange); margin-right:6px; }
+  .stephint{ margin:9px 0 0; font-family:'Space Mono',monospace; font-size:11px; color:var(--mut); line-height:1.5; }
+  .stephint b{ color:var(--white); }
   .row2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
   @media (max-width:480px){ .row2{ grid-template-columns:1fr; } }
 
@@ -82,6 +93,15 @@
     font-size:12px; font-weight:700; letter-spacing:.06em; color:#0B0B0A; background:var(--ac,var(--orange));
     border:none; border-radius:9px; padding:11px 14px; transition:filter .13s, transform .12s; }
   .copy .artbtn:hover{ filter:brightness(1.08); transform:translateY(-1px); }
+  .pagesblock{ margin:0 0 13px; border:1px solid var(--lineSoft); border-radius:11px; padding:13px 14px; background:var(--bg); }
+  .pagesblock .pblabel{ display:block; font-family:'Space Mono',monospace; font-size:10px; font-weight:700;
+    letter-spacing:.12em; color:var(--ac,var(--orange)); margin-bottom:10px; }
+  .pagesblock .pgrow{ display:flex; gap:11px; padding:7px 0; border-top:1px solid rgba(244,241,236,.06); }
+  .pagesblock .pgrow:first-of-type{ border-top:none; }
+  .pagesblock .pgn{ flex:none; width:42px; font-family:'Press Start 2P',monospace; font-size:9px;
+    color:var(--ac,var(--orange)); line-height:1.5; padding-top:1px; }
+  .pagesblock .pgt{ flex:1; font-size:13px; line-height:1.45; color:#cfc9c1; }
+  .pagesblock .pgt b{ color:#fff; font-weight:700; }
 
   .err{ background:rgba(226,59,46,.08); border:1px solid rgba(226,59,46,.4); border-left:3px solid #E23B2E;
     border-radius:12px; padding:15px 17px; font-family:'Space Mono',monospace; font-size:12px; line-height:1.6; color:#e7b4ad; }
@@ -157,6 +177,15 @@
             <span class="chip" data-m="reels">CAPA DE REELS</span>
           </div>
         </div>
+        <div class="field" id="pagesField" style="display:none;">
+          <label>Páginas do carrossel <span class="hint">capa + internas</span></label>
+          <div class="stepper" id="pagesStepper">
+            <button type="button" class="stbtn" data-d="-1">−</button>
+            <span class="stval"><b id="pagesVal">4</b> páginas</span>
+            <button type="button" class="stbtn" data-d="1">+</button>
+          </div>
+          <p class="stephint">A IA estrutura o texto pensando na <b>capa</b> e em <b id="innerVal">3</b> páginas internas.</p>
+        </div>
         <button id="gen" class="btn btn-primary" style="width:100%; justify-content:center; margin-top:4px;">⚡ GERAR COPYS</button>
       </section>
 
@@ -217,9 +246,26 @@
   // ---- art model single-select ----
   const modelsEl = document.getElementById('models');
   let activeModel = 'image';
+  const pagesField = document.getElementById('pagesField');
   [...modelsEl.children].forEach(el=>{
-    el.onclick = ()=>{ activeModel=el.dataset.m; [...modelsEl.children].forEach(c=>c.classList.remove('on')); el.classList.add('on'); };
+    el.onclick = ()=>{ activeModel=el.dataset.m; [...modelsEl.children].forEach(c=>c.classList.remove('on')); el.classList.add('on');
+      pagesField.style.display = (activeModel==='carousel') ? 'block' : 'none'; };
   });
+
+  // ---- carousel page count stepper (3–8, includes cover) ----
+  const MIN_PG=3, MAX_PG=8;
+  let pageCount = 4;
+  const pagesVal = document.getElementById('pagesVal');
+  const innerVal = document.getElementById('innerVal');
+  const stBtns = document.querySelectorAll('#pagesStepper .stbtn');
+  function renderPages(){
+    pagesVal.textContent = pageCount;
+    innerVal.textContent = pageCount-1;
+    stBtns[0].disabled = pageCount<=MIN_PG;
+    stBtns[1].disabled = pageCount>=MAX_PG;
+  }
+  stBtns.forEach(b=> b.onclick=()=>{ pageCount = Math.max(MIN_PG, Math.min(MAX_PG, pageCount + (+b.dataset.d))); renderPages(); });
+  renderPages();
 
   // ---- send a copy variation into the Creative Studio (preserves current work) ----
   function sendToStudio(v){
@@ -236,11 +282,12 @@
       patch = { ...patch, template:'reels', fill:true, pattern:'8bit', format:'stories', image:null,
         eyebrow: activeCat.label, title: titulo, subtitle: cta||'assiste já', titleSize:110 };
     } else if(activeModel==='carousel'){
-      // cover text on the carousel; first inner page seeded with the legend
+      const inner = Array.isArray(v.paginas) && v.paginas.length
+        ? v.paginas.map(p=>({ title:(p.titulo||'').toUpperCase(), body:(p.texto||''), image:null }))
+        : [ { title: titulo, body: legenda, image:null }, { title:'', body: cta||'', image:null } ];
       patch = { ...patch, template:'carousel', fill:true, pattern:'8bit', current:0, image:null,
         eyebrow: activeCat.label, title: titulo, subtitle: 'arrasta pro lado', cta:'ARRASTA PRO LADO',
-        titleSize:104, pages:[ { title: titulo, body: legenda, image:null },
-          { title:'', body: cta||'', image:null }, { title:'', body:'', image:null }, { title:'', body:'', image:null } ] };
+        titleSize:104, pageCount: inner.length + 1, pages: inner };
     } else if(activeModel==='quiz'){
       patch = { ...patch, template:'quiz', fill:false, ink:'auto', pattern:'8bit', quizMode:'pergunta',
         image:null, eyebrow: 'RESPONDE AÍ', question: titulo, answer:-1, hideOptions:false, titleSize:80 };
@@ -306,11 +353,21 @@
     variacoes.forEach((v,i)=>{
       const tags = (v.hashtags||[]).map(h=> '#'+String(h).replace(/^#/,'').replace(/\s+/g,''));
       const full = [v.titulo, '', v.legenda, '', v.cta, '', tags.join(' ')].filter(x=>x!==undefined).join('\n').trim();
+      const hasPages = Array.isArray(v.paginas) && v.paginas.length;
+      let pagesHTML = '';
+      if(hasPages){
+        pagesHTML = '<div class="pagesblock"><span class="pblabel">ESTRUTURA · '+(v.paginas.length+1)+' PÁGINAS</span>'+
+          '<div class="pgrow"><span class="pgn">CAPA</span><span class="pgt">'+esc(v.titulo)+'</span></div>'+
+          v.paginas.map((p,idx)=>'<div class="pgrow"><span class="pgn">P'+(idx+2)+'</span><span class="pgt">'+
+            '<b>'+esc(p.titulo||'')+'</b>'+(p.texto?' — '+esc(p.texto):'')+'</span></div>').join('')+
+          '</div>';
+      }
       const c=document.createElement('div'); c.className='copy'; c.style.setProperty('--ac',activeCat.color);
       c.innerHTML =
         '<div class="ch"><span class="vlabel">VARIAÇÃO 0'+(i+1)+'</span>'+
         '<button class="cbtn">COPIAR</button></div>'+
         (v.titulo?'<h3 class="ttl">'+esc(v.titulo)+'</h3>':'')+
+        pagesHTML+
         (v.legenda?'<p class="body">'+esc(v.legenda)+'</p>':'')+
         (v.cta?'<p class="cta">'+esc(v.cta)+'</p>':'')+
         (tags.length?'<div class="tags">'+tags.map(t=>'<span class="tag2">'+esc(t)+'</span>').join('')+'</div>':'')+
@@ -329,10 +386,32 @@
   }
 
   function extractJSON(text){
-    try{ return JSON.parse(text); }catch(e){}
-    const m = text.match(/\{[\s\S]*\}/);
+    const src = text.replace(/```json|```/g,'');
+    try{ return JSON.parse(src); }catch(e){}
+    let m = src.match(/\{[\s\S]*\}/);
     if(m){ try{ return JSON.parse(m[0]); }catch(e){} }
-    return null;
+    // salvage a truncated response: walk the "variacoes" array and parse each complete {...}
+    const ai = src.indexOf('variacoes');
+    const arrStart = ai>=0 ? src.indexOf('[', ai) : src.indexOf('[');
+    if(arrStart<0) return null;
+    const objs=[]; let i=arrStart+1;
+    while(i < src.length){
+      // find next object opener
+      while(i<src.length && src[i]!=='{' && src[i]!==']') i++;
+      if(i>=src.length || src[i]===']') break;
+      // scan to matching close, string-aware
+      let depth=0, inStr=false, esc=false, start=i;
+      for(; i<src.length; i++){ const ch=src[i];
+        if(inStr){ if(esc)esc=false; else if(ch==='\\')esc=true; else if(ch==='"')inStr=false; continue; }
+        if(ch==='"'){ inStr=true; continue; }
+        if(ch==='{') depth++;
+        else if(ch==='}'){ depth--; if(depth===0){ i++; break; } }
+      }
+      if(depth!==0) break; // truncated mid-object → stop
+      const frag = src.slice(start, i);
+      try{ const o=JSON.parse(frag); if(o && (o.titulo||o.legenda)) objs.push(o); }catch(e){}
+    }
+    return objs.length ? { variacoes: objs } : null;
   }
 
   // AI completion: native connector inside the Portal, or the proxy server when published.
@@ -366,7 +445,14 @@
 ---
 TAREFA: Use o branding book acima como base obrigatória de tom de voz e estrutura. Escreva como a Gamer Hut escreveria.
 
-Crie 3 variações de copy para um post da categoria abaixo, seguindo a Fórmula de copy (gancho → jogo → diferencial → info comercial → CTA que pergunta algo).
+${activeModel==='carousel'
+? `Este post é um CARROSSEL de Instagram com ${pageCount} páginas no total (1 capa + ${pageCount-1} páginas internas).
+Crie 2 variações. Em cada variação, estruture o conteúdo seguindo o branding:
+- CAPA (página 1): gancho forte + título curto que faça parar o dedo.
+- PÁGINAS INTERNAS (${pageCount-1} no total): uma ideia por página — contexto, diferenciais, destaques, e a ÚLTIMA página com CTA ou informação comercial.
+Cada página interna tem um título curto e um texto de 1 frase curta e direta. Seja conciso.
+Inclua também a legenda do feed e hashtags.`
+: `Crie 3 variações de copy para um post da categoria abaixo, seguindo a Fórmula de copy (gancho → jogo → diferencial → info comercial → CTA que pergunta algo).`}
 Categoria do post: ${activeCat.label}
 Tom de voz pedido: ${activeTone.dataset.v}
 ${plat?('Plataforma: '+plat+'\n'):''}${price?('Preço/condição: '+price+'\n'):''}Briefing do post: ${brief}
@@ -381,7 +467,10 @@ Regras:
 - Português do Brasil.
 
 Responda SOMENTE com JSON válido, sem texto fora dele, neste formato exato:
-{"variacoes":[{"titulo":"chamada curta","legenda":"legenda de 2-4 frases","cta":"chamada para ação curta","hashtags":["5 a 7 hashtags sem #, sem espaços"]}]}`;
+${activeModel==='carousel'
+? `{"variacoes":[{"titulo":"título da CAPA, curto e forte","legenda":"legenda do feed 2-4 frases","cta":"chamada para ação curta","hashtags":["5 a 7 hashtags sem #, sem espaços"],"paginas":[{"titulo":"título da página interna","texto":"1-2 frases"}]}]}
+IMPORTANTE: o array "paginas" deve ter EXATAMENTE ${pageCount-1} itens (as páginas internas, sem contar a capa).`
+: `{"variacoes":[{"titulo":"chamada curta","legenda":"legenda de 2-4 frases","cta":"chamada para ação curta","hashtags":["5 a 7 hashtags sem #, sem espaços"]}]}`}`;
 
     try{
       const text = await aiComplete(prompt);

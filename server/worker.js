@@ -12,7 +12,7 @@ const ALLOWED_ORIGINS = ['*'];
 
 // Modelo da Anthropic. Sonnet 4.6 = ótimo p/ copy. Haiku 4.5 = mais barato/rápido.
 const MODEL = 'claude-sonnet-4-6';        // ou 'claude-haiku-4-5'
-const MAX_TOKENS = 1024;
+const MAX_TOKENS = 2048;
 
 export default {
   async fetch(request, env) {

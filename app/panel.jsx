@@ -41,7 +41,7 @@ function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS }){
       {/* CAROUSEL page manager */}
       {isCarousel &&
         <CtrlSection title="PÁGINAS" right={
-          <Stepper label="" value={s.pageCount} min={3} max={5}
+          <Stepper label="" value={s.pageCount} min={3} max={8}
             onChange={n=>setS(p=>{
               const pages = p.pages.slice();
               while(pages.length < n-1) pages.push({ title:'', body:'', image:null });
