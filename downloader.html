@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Media Downloader · Portal Gamer Hut</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,800;0,900;1,900&family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="portal.css"/>
+<style>
+
+/* ── Page header ─────────────────────────────────────────────────── */
+.page-hero { border-bottom: 1px solid var(--lineSoft); position: relative; overflow: hidden; }
+.page-hero .inner {
+  position: relative; z-index: 1; max-width: 1180px; margin: 0 auto;
+  padding: clamp(48px,7vw,96px) clamp(20px,5vw,56px) clamp(40px,6vw,72px);
+}
+.page-hero h1 { font-size: clamp(40px,8vw,96px); line-height: .9; margin: 20px 0 0; }
+.page-hero h1 span { color: var(--orange); }
+.page-hero p.lead { margin: 20px 0 0; max-width: 56ch; font-size: clamp(15px,1.8vw,19px); line-height: 1.6; color: #cfc9c1; }
+
+/* ── Offline screen ──────────────────────────────────────────────── */
+#offline-screen { display: none; }
+#offline-screen.show { display: block; }
+#main-screen { display: none; }
+#main-screen.show { display: block; }
+
+.offline-wrap {
+  max-width: 860px; margin: 0 auto;
+  padding: clamp(40px,7vw,96px) clamp(20px,5vw,56px);
+}
+.offline-header {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 36px;
+}
+.offline-icon {
+  width: 52px; height: 52px; border-radius: 14px;
+  background: rgba(232,100,60,.12); border: 1px solid rgba(232,100,60,.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.offline-title { font-family: 'Archivo', sans-serif; font-weight: 900; font-size: clamp(24px,4vw,40px); line-height: 1; }
+.offline-sub { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--mut); margin-top: 6px; }
+
+.os-tabs { display: flex; gap: 8px; margin-bottom: 28px; }
+.os-tab {
+  font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: .06em;
+  padding: 10px 20px; border-radius: 9px; cursor: pointer;
+  border: 1px solid var(--lineSoft); color: var(--mut); background: transparent;
+  transition: all .14s;
+}
+.os-tab:hover { color: var(--white); border-color: var(--lineSoft); }
+.os-tab.active { background: var(--orange); color: var(--ink); border-color: var(--orange); font-weight: 700; }
+
+.os-panel { display: none; }
+.os-panel.show { display: block; }
+
+.step-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
+.step {
+  display: flex; gap: 16px; align-items: flex-start;
+  background: var(--panel); border: 1px solid var(--lineSoft);
+  border-radius: 12px; padding: 18px 20px;
+}
+.step-num {
+  font-family: 'Press Start 2P', monospace; font-size: 11px;
+  color: var(--orange); flex-shrink: 0; padding-top: 2px;
+  width: 28px;
+}
+.step-body { flex: 1; }
+.step-body strong { display: block; font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.step-body p { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--mut); line-height: 1.7; margin: 0; }
+.step-body .cmd {
+  display: block; background: var(--panel2); border: 1px solid var(--lineSoft);
+  border-radius: 7px; padding: 10px 13px; margin-top: 10px;
+  font-family: 'Space Mono', monospace; font-size: 12px; color: var(--white);
+  letter-spacing: .04em; cursor: pointer; position: relative;
+  transition: border-color .14s;
+}
+.step-body .cmd:hover { border-color: var(--orange); }
+.step-body .cmd::after {
+  content: 'COPIAR'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  font-size: 9px; color: var(--mut); letter-spacing: .1em;
+}
+.step-body .cmd.copied::after { content: 'COPIADO ✓'; color: var(--green); }
+
+.retry-btn {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; letter-spacing: .04em;
+  padding: 14px 22px; border-radius: 10px; cursor: pointer; border: none;
+  background: var(--orange); color: var(--ink); transition: filter .14s, transform .12s;
+}
+.retry-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+
+.note-box {
+  background: rgba(46,157,91,.07); border: 1px solid rgba(46,157,91,.25);
+  border-radius: 10px; padding: 14px 16px; margin-top: 20px;
+  font-family: 'Space Mono', monospace; font-size: 11px; color: var(--green); line-height: 1.7;
+}
+.note-box strong { color: #5ddb8a; }
+
+/* ── Layout ──────────────────────────────────────────────────────── */
+.dl-layout { display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start; }
+@media (max-width: 860px) { .dl-layout { grid-template-columns: 1fr; } }
+
+/* ── Panel box ───────────────────────────────────────────────────── */
+.panel-box {
+  background: var(--panel); border: 1px solid var(--lineSoft);
+  border-radius: 18px; padding: 28px; position: relative; overflow: hidden;
+}
+.panel-box::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--orange); }
+
+/* ── Status bar ──────────────────────────────────────────────────── */
+.status-row {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  padding-bottom: 20px; margin-bottom: 22px; border-bottom: 1px solid var(--lineSoft);
+}
+.dep-pill { display: flex; align-items: center; gap: 7px; font-family: 'Space Mono', monospace; font-size: 11px; color: var(--mut); }
+.dep-pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--mut); transition: background .3s; }
+.dep-pill .dot.ok  { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.dep-pill .dot.err { background: #e84040; }
+.dep-pill strong   { color: var(--white); font-size: 11px; }
+.dep-version { font-size: 10px; color: var(--mut2); }
+.upd-btn {
+  margin-left: auto; font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .06em;
+  color: var(--mut); background: transparent; border: 1px solid var(--lineSoft);
+  border-radius: 7px; padding: 6px 11px; cursor: pointer; transition: all .14s;
+}
+.upd-btn:hover { color: var(--orange); border-color: var(--orange); }
+.upd-toast { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--green); display: none; }
+.upd-toast.show { display: block; }
+.upd-toast.err  { color: #e84040; }
+
+/* ── Platforms ───────────────────────────────────────────────────── */
+.platforms { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+.plat-badge {
+  display: flex; align-items: center; gap: 7px;
+  background: var(--panel2); border: 1px solid var(--lineSoft);
+  border-radius: 100px; padding: 5px 14px 5px 9px;
+  font-family: 'Space Mono', monospace; font-size: 11px; color: var(--mut); transition: all .15s;
+}
+.plat-badge.active-plat { border-color: var(--orange); color: var(--orange); background: rgba(232,100,60,.08); }
+.plat-icon { width: 18px; height: 18px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; }
+.plat-yt .plat-icon { background: #ff0000; color: #fff; }
+.plat-ig .plat-icon { background: #c13584; color: #fff; }
+.plat-x  .plat-icon { background: #111; border: 1px solid #333; color: #fff; }
+
+/* ── Fields ──────────────────────────────────────────────────────── */
+.field-label {
+  font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--mut); margin-bottom: 8px; display: block;
+}
+.url-wrap { position: relative; margin-bottom: 18px; }
+.url-wrap input {
+  width: 100%; background: var(--panel2); border: 1px solid var(--lineSoft);
+  border-radius: 10px; color: var(--white); font-family: 'Space Mono', monospace;
+  font-size: 13px; padding: 13px 14px; outline: none; transition: border-color .15s;
+}
+.url-wrap input:focus { border-color: var(--orange); }
+.url-wrap input::placeholder { color: var(--mut2); }
+.detected-tag {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .06em;
+  padding: 3px 8px; border-radius: 100px; display: none;
+}
+.detected-tag.show { display: block; }
+.detected-tag.yt { background: rgba(255,0,0,.15); color: #ff7070; }
+.detected-tag.ig { background: rgba(193,53,132,.15); color: #e060a0; }
+.detected-tag.x  { background: rgba(160,160,160,.12); color: #aaa; }
+
+.preview-card {
+  display: none; align-items: center; gap: 12px;
+  background: var(--panel2); border: 1px solid var(--lineSoft);
+  border-radius: 10px; padding: 12px 14px; margin-bottom: 18px;
+}
+.preview-card.show { display: flex; }
+.preview-card img { width: 68px; height: 44px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
+.preview-title { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+.preview-meta  { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--mut); }
+
+.plat-note {
+  font-family: 'Space Mono', monospace; font-size: 11px; color: var(--mut);
+  background: rgba(244,241,236,.04); border: 1px solid var(--lineSoft);
+  border-radius: 8px; padding: 10px 13px; margin-bottom: 16px; line-height: 1.6; display: none;
+}
+.plat-note.show { display: block; }
+
+.mode-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.mode-btn {
+  background: var(--panel2); border: 1px solid var(--lineSoft); border-radius: 10px;
+  color: var(--mut); font-family: 'Space Mono', monospace; font-size: 12px;
+  padding: 12px; cursor: pointer; text-align: center; transition: all .15s;
+}
+.mode-btn:hover  { border-color: var(--orange); color: var(--white); }
+.mode-btn.active { border-color: var(--orange); color: var(--orange); background: rgba(232,100,60,.08); }
+.mode-btn.disabled { opacity: .3; cursor: not-allowed; border-color: var(--lineSoft); color: var(--mut); background: var(--panel2); }
+
+.qual-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.qual-chip {
+  background: var(--panel2); border: 1px solid var(--lineSoft); border-radius: 7px;
+  color: var(--mut); font-family: 'Space Mono', monospace; font-size: 11px;
+  padding: 7px 14px; cursor: pointer; transition: all .15s;
+}
+.qual-chip:hover  { border-color: var(--orange); color: var(--white); }
+.qual-chip.active { border-color: var(--orange); color: var(--orange); background: rgba(232,100,60,.08); }
+.qual-section.hidden { display: none; }
+
+.browser-row { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 22px; }
+.br-btn {
+  background: var(--panel2); border: 1px solid var(--lineSoft); border-radius: 7px;
+  color: var(--mut); font-family: 'Space Mono', monospace; font-size: 11px;
+  padding: 7px 12px; cursor: pointer; transition: all .15s;
+}
+.br-btn:hover  { border-color: var(--orange); color: var(--white); }
+.br-btn.active { border-color: var(--orange); color: var(--orange); background: rgba(232,100,60,.08); }
+
+.dl-btn {
+  width: 100%; padding: 15px; background: var(--orange); border: none; border-radius: 10px;
+  color: var(--ink); font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700;
+  letter-spacing: .06em; cursor: pointer; transition: filter .14s, transform .12s;
+}
+.dl-btn:hover    { filter: brightness(1.08); transform: translateY(-1px); }
+.dl-btn:active   { transform: translateY(0); }
+.dl-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; filter: none; }
+
+/* ── Progress ────────────────────────────────────────────────────── */
+.prog-box { display: none; }
+.prog-box.show { display: block; }
+.prog-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.prog-label { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--mut); letter-spacing: .06em; }
+.prog-pct   { font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 28px; color: var(--orange); }
+.prog-track { background: var(--panel2); border-radius: 100px; height: 5px; overflow: hidden; margin-bottom: 14px; }
+.prog-fill  { height: 100%; background: var(--orange); border-radius: 100px; width: 0%; transition: width .4s ease; }
+.log-box {
+  background: var(--panel2); border: 1px solid var(--lineSoft); border-radius: 8px;
+  padding: 11px 13px; max-height: 110px; overflow-y: auto;
+  font-family: 'Space Mono', monospace; font-size: 10px; color: var(--mut);
+  line-height: 1.7; white-space: pre-wrap; word-break: break-all;
+}
+.done-msg {
+  display: none; flex-direction: column; align-items: center; gap: 10px;
+  background: rgba(46,157,91,.08); border: 1px solid rgba(46,157,91,.3);
+  border-radius: 10px; padding: 16px; margin-top: 14px;
+  font-family: 'Space Mono', monospace; font-size: 12px; color: var(--green); text-align: center;
+}
+.done-msg.show { display: flex; }
+.open-folder-btn {
+  background: var(--green); border: none; border-radius: 7px; color: var(--ink);
+  font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700;
+  padding: 8px 18px; cursor: pointer; transition: filter .14s;
+}
+.open-folder-btn:hover { filter: brightness(1.1); }
+.err-msg {
+  display: none; background: rgba(232,64,64,.08); border: 1px solid rgba(232,64,64,.3);
+  border-radius: 10px; padding: 14px; margin-top: 14px;
+  font-family: 'Space Mono', monospace; font-size: 10px; color: #e84040;
+  line-height: 1.6; white-space: pre-wrap; word-break: break-word;
+}
+.err-msg.show { display: block; }
+
+/* ── Sidebar ─────────────────────────────────────────────────────── */
+.info-card { background: var(--panel); border: 1px solid var(--lineSoft); border-radius: 14px; padding: 20px; margin-bottom: 14px; }
+.info-card h4 { font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--orange); margin: 0 0 12px; letter-spacing: .04em; }
+.info-card ul { margin: 0; padding: 0; list-style: none; font-family: 'Space Mono', monospace; font-size: 11px; color: var(--mut); line-height: 1.9; }
+.info-card ul li::before { content: '→ '; color: var(--orange); }
+.folder-path { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--mut); line-height: 1.6; }
+.folder-path strong { color: var(--white); }
+
+/* ── Checking overlay ────────────────────────────────────────────── */
+#checking-screen { text-align: center; padding: clamp(60px,10vw,120px) 20px; }
+#checking-screen .spin {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 2px solid var(--lineSoft); border-top-color: var(--orange);
+  animation: spin .8s linear infinite; margin: 0 auto 20px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+#checking-screen p { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--mut); }
+</style>
+</head>
+<body>
+<div class="dots"></div>
+
+<header class="nav">
+  <a class="brand" href="index.html">
+    <img src="assets/logo-white.png" alt="Gamer Hut"/>
+    <span class="tag">
+      <span class="pixel t1">PORTAL</span>
+      <span class="mono t2">ECOSSISTEMA DE CRIAÇÃO</span>
+    </span>
+  </a>
+  <nav class="links">
+    <a href="index.html">PORTAL</a>
+    <a href="studio.html">CREATIVE STUDIO</a>
+    <a href="copys.html">COPYS</a>
+    <a href="review.html">REVIEW</a>
+    <a class="active" href="downloader.html">DOWNLOADER</a>
+  </nav>
+</header>
+
+<section class="page-hero">
+  <div class="inner">
+    <span class="eyebrow">Mídia para criativos · Gamer Hut</span>
+    <h1 class="display">MEDIA <span>DOWN<br/>LOADER</span></h1>
+    <p class="lead">Baixe vídeos do YouTube, Instagram e X para usar nas suas artes e criativos — sem sair do portal.</p>
+  </div>
+</section>
+
+<!-- VERIFICANDO -->
+<div id="checking-screen">
+  <div class="spin"></div>
+  <p>verificando servidor local...</p>
+</div>
+
+<!-- OFFLINE: instruções -->
+<div id="offline-screen">
+  <div class="offline-wrap">
+
+    <div class="offline-header">
+      <div class="offline-icon">⚡</div>
+      <div>
+        <div class="offline-title">Servidor não encontrado</div>
+        <div class="offline-sub">SIGA AS INSTRUÇÕES ABAIXO PARA ATIVAR O DOWNLOADER</div>
+      </div>
+    </div>
+
+    <div class="os-tabs">
+      <button class="os-tab active" onclick="switchOS('win')">🪟 Windows</button>
+      <button class="os-tab" onclick="switchOS('mac')">🍎 macOS</button>
+    </div>
+
+    <!-- WINDOWS -->
+    <div class="os-panel show" id="panel-win">
+      <div class="step-list">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <strong>Baixe e instale o app Media Downloader</strong>
+            <p>Se ainda não instalou, baixe o ZIP no link abaixo, extraia em qualquer pasta e execute o <code style="color:var(--orange)">instalar.bat</code> como administrador.</p>
+            <a class="cmd" href="https://github.com/ZeroTrinta/media-downloader/releases/latest/download/media-downloader-app.zip" target="_blank" style="text-decoration:none;display:block;">
+              ↓ media-downloader-app.zip
+              <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--mut);letter-spacing:.1em;">BAIXAR</span>
+            </a>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <strong>Abra o app pelo atalho na Área de Trabalho</strong>
+            <p>Clique duas vezes em <code style="color:var(--orange)">Media Downloader</code> na sua Área de Trabalho. Uma janela vai abrir — pode minimizar, ela precisa ficar aberta.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <strong>Volte aqui e recarregue a página</strong>
+            <p>Com o app aberto, clique no botão abaixo. O portal vai conectar automaticamente.</p>
+          </div>
+        </div>
+      </div>
+      <button class="retry-btn" onclick="retryConnection()">↺ VERIFICAR CONEXÃO</button>
+      <div class="note-box">
+        <strong>Já tem o app?</strong> Basta abrir o <code style="color:var(--green)">Media Downloader</code> na Área de Trabalho e voltar aqui.
+      </div>
+    </div>
+
+    <!-- MAC -->
+    <div class="os-panel" id="panel-mac">
+      <div class="step-list">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <strong>Instale as dependências (só na primeira vez)</strong>
+            <p>Abra o Terminal (CMD + Espaço → "Terminal") e rode os comandos abaixo um por um:</p>
+            <span class="cmd" onclick="copyCmd(this, 'pip3 install yt-dlp')">pip3 install yt-dlp</span>
+            <span class="cmd" onclick="copyCmd(this, 'brew install ffmpeg')">brew install ffmpeg</span>
+            <p style="margin-top:10px;">Não tem o Homebrew? Instale primeiro em <a href="https://brew.sh" target="_blank" style="color:var(--orange);">brew.sh</a></p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <strong>Baixe o servidor</strong>
+            <p>Baixe o arquivo <code style="color:var(--orange)">server.py</code> e coloque em qualquer pasta (ex: Downloads).</p>
+            <a class="cmd" href="https://raw.githubusercontent.com/ZeroTrinta/media-downloader/main/backend/server.py" download="server.py" style="text-decoration:none;display:block;">
+              ↓ server.py
+              <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--mut);letter-spacing:.1em;">BAIXAR</span>
+            </a>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <strong>Inicie o servidor no Terminal</strong>
+            <p>No Terminal, navegue até onde salvou o arquivo e rode:</p>
+            <span class="cmd" onclick="copyCmd(this, 'python3 server.py')">python3 server.py</span>
+            <p style="margin-top:10px;">Deixe o Terminal aberto. Vai aparecer "Pronto em http://127.0.0.1:8765".</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">04</div>
+          <div class="step-body">
+            <strong>Volte aqui e verifique a conexão</strong>
+            <p>Com o Terminal rodando o servidor, clique no botão abaixo.</p>
+          </div>
+        </div>
+      </div>
+      <button class="retry-btn" onclick="retryConnection()">↺ VERIFICAR CONEXÃO</button>
+      <div class="note-box">
+        <strong>Da próxima vez:</strong> só abrir o Terminal e rodar <code style="color:var(--green)">python3 server.py</code> na pasta onde salvou o arquivo.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ONLINE: downloader -->
+<div id="main-screen">
+  <main class="wrap">
+    <div class="dl-layout">
+
+      <div>
+        <div class="panel-box" style="margin-bottom:20px;">
+
+          <div class="status-row">
+            <div class="dep-pill"><div class="dot" id="dot-ytdlp"></div><strong>yt-dlp</strong><span class="dep-version" id="ytdlp-ver"></span></div>
+            <div class="dep-pill"><div class="dot" id="dot-ffmpeg"></div><strong>ffmpeg</strong></div>
+            <button class="upd-btn" onclick="startUpdate()">↑ ATUALIZAR</button>
+            <span class="upd-toast" id="upd-toast"></span>
+          </div>
+
+          <div class="platforms">
+            <div class="plat-badge plat-yt" id="badge-yt"><div class="plat-icon">▶</div>YouTube</div>
+            <div class="plat-badge plat-ig" id="badge-ig"><div class="plat-icon">◈</div>Instagram</div>
+            <div class="plat-badge plat-x"  id="badge-x" ><div class="plat-icon">𝕏</div>X / Twitter</div>
+          </div>
+
+          <label class="field-label">URL DO CONTEÚDO</label>
+          <div class="url-wrap">
+            <input type="url" id="url-input" placeholder="YouTube, Instagram ou X (Twitter)..." oninput="onUrlChange()"/>
+            <span class="detected-tag" id="detected-tag"></span>
+          </div>
+
+          <div class="preview-card" id="preview-card">
+            <img id="preview-thumb" src="" alt="" onerror="this.style.display='none'"/>
+            <div style="flex:1;min-width:0;">
+              <div class="preview-title" id="preview-title"></div>
+              <div class="preview-meta"  id="preview-meta"></div>
+            </div>
+          </div>
+
+          <div class="plat-note" id="plat-note"></div>
+
+          <label class="field-label">FORMATO</label>
+          <div class="mode-row">
+            <div class="mode-btn active" id="btn-video" onclick="setMode('video')">▶ Vídeo (MP4)</div>
+            <div class="mode-btn"        id="btn-audio" onclick="setMode('audio')">♪ Somente áudio (MP3)</div>
+          </div>
+
+          <div id="qual-section">
+            <label class="field-label">QUALIDADE</label>
+            <div class="qual-row">
+              <div class="qual-chip active" id="q-best" onclick="setQuality('best')">Melhor disponível</div>
+              <div class="qual-chip"        id="q-720"  onclick="setQuality('720')">720p</div>
+              <div class="qual-chip"        id="q-480"  onclick="setQuality('480')">480p</div>
+            </div>
+          </div>
+
+          <label class="field-label">COOKIES DO NAVEGADOR <span style="text-transform:none;letter-spacing:0;font-size:9px;color:var(--mut2);">(para vídeos com restrição de idade)</span></label>
+          <div class="browser-row">
+            <div class="br-btn active" id="br-none"    onclick="setBrowser('none')">Sem cookies</div>
+            <div class="br-btn"        id="br-chrome"  onclick="setBrowser('chrome')">Chrome</div>
+            <div class="br-btn"        id="br-firefox" onclick="setBrowser('firefox')">Firefox</div>
+            <div class="br-btn"        id="br-safari"  onclick="setBrowser('safari')">Safari</div>
+            <div class="br-btn"        id="br-brave"   onclick="setBrowser('brave')">Brave</div>
+            <div class="br-btn"        id="br-edge"    onclick="setBrowser('edge')">Edge</div>
+            <div class="br-btn"        id="br-opera"   onclick="setBrowser('opera')">Opera</div>
+          </div>
+
+          <button class="dl-btn" id="dl-btn" onclick="startDownload()">BAIXAR</button>
+        </div>
+
+        <div class="panel-box prog-box" id="prog-box">
+          <div class="prog-head">
+            <span class="prog-label" id="prog-label">BAIXANDO...</span>
+            <span class="prog-pct"   id="prog-pct">0%</span>
+          </div>
+          <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+          <div class="log-box" id="log-box"></div>
+          <div class="done-msg" id="done-msg">
+            <span>✓ DOWNLOAD CONCLUÍDO</span>
+            <button class="open-folder-btn" onclick="openFolder()">ABRIR PASTA →</button>
+          </div>
+          <div class="err-msg" id="err-msg"></div>
+        </div>
+      </div>
+
+      <aside>
+        <div class="info-card">
+          <h4>PLATAFORMAS</h4>
+          <ul>
+            <li>YouTube — MP4 até 4K ou MP3</li>
+            <li>Instagram — posts e reels públicos</li>
+            <li>X / Twitter — vídeos nativos</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <h4>COMO USAR</h4>
+          <ul>
+            <li>Cole a URL do vídeo</li>
+            <li>Escolha vídeo ou áudio</li>
+            <li>Selecione a qualidade</li>
+            <li>Clique em BAIXAR</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <h4>PASTA DE DESTINO</h4>
+          <p class="folder-path" id="folder-path">verificando...</p>
+        </div>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<footer class="foot">
+  <img src="assets/logo-orange.png" alt="Gamer Hut"/>
+  <div class="fr">
+    <span class="a">MÍDIA FÍSICA NEVER DIES</span>
+    <span class="b">© 2025 GAMER HUT · PORTAL DE CRIAÇÃO</span>
+  </div>
+</footer>
+
+<script>
+const PORT = 8765;
+const BASE = `http://127.0.0.1:${PORT}`;
+let mode = 'video', quality = 'best', browser = 'none', currentPlat = null;
+let pollInterval = null, infoTimeout = null, lastDownloadFolder = null;
+
+const PLATFORMS = {
+  yt: { patterns: [/youtube\.com/, /youtu\.be/], label: 'YouTube', cls: 'yt', note: null, audioOk: true },
+  ig: { patterns: [/instagram\.com/], label: 'Instagram', cls: 'ig', note: 'Instagram: apenas conteúdo público. Conteúdo privado requer cookies configurados.', audioOk: false },
+  x:  { patterns: [/twitter\.com/, /x\.com/], label: 'X / Twitter', cls: 'x', note: 'X/Twitter: apenas tweets com vídeo nativo. Qualidade limitada ao disponível no post.', audioOk: false },
+};
+const BROWSERS = ['none','chrome','firefox','safari','brave','edge','opera'];
+
+// ── Detecção do servidor ───────────────────────────────────────────
+async function checkServer() {
+  try {
+    const r = await fetch(`${BASE}/api/status`, { signal: AbortSignal.timeout(3000) });
+    if (r.ok) return await r.json();
+  } catch {}
+  return null;
+}
+
+async function init() {
+  const status = await checkServer();
+  document.getElementById('checking-screen').style.display = 'none';
+  if (status) {
+    showMainScreen(status);
+  } else {
+    showOfflineScreen();
+  }
+}
+
+function showMainScreen(status) {
+  document.getElementById('main-screen').classList.add('show');
+  document.getElementById('dot-ytdlp').className = 'dot ' + (status.yt_dlp ? 'ok' : 'err');
+  document.getElementById('dot-ffmpeg').className = 'dot ' + (status.ffmpeg ? 'ok' : 'err');
+  if (status.yt_dlp_version) document.getElementById('ytdlp-ver').textContent = 'v' + status.yt_dlp_version;
+  if (status.download_dir) document.getElementById('folder-path').innerHTML = `<strong>${status.download_dir}</strong>`;
+}
+
+function showOfflineScreen() {
+  document.getElementById('offline-screen').classList.add('show');
+  // Detecta OS automaticamente
+  const isMac = navigator.platform.toUpperCase().includes('MAC') || navigator.userAgent.includes('Mac');
+  if (isMac) switchOS('mac');
+}
+
+async function retryConnection() {
+  document.getElementById('offline-screen').classList.remove('show');
+  document.getElementById('checking-screen').style.display = 'block';
+  document.getElementById('checking-screen').querySelector('p').textContent = 'verificando conexão...';
+  await new Promise(r => setTimeout(r, 1000));
+  const status = await checkServer();
+  document.getElementById('checking-screen').style.display = 'none';
+  if (status) {
+    showMainScreen(status);
+  } else {
+    document.getElementById('offline-screen').classList.add('show');
+  }
+}
+
+// ── OS tabs ───────────────────────────────────────────────────────
+function switchOS(os) {
+  document.querySelectorAll('.os-tab').forEach((t,i) => t.classList.toggle('active', (i===0&&os==='win')||(i===1&&os==='mac')));
+  document.getElementById('panel-win').classList.toggle('show', os==='win');
+  document.getElementById('panel-mac').classList.toggle('show', os==='mac');
+}
+
+function copyCmd(el, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    el.classList.add('copied');
+    setTimeout(() => el.classList.remove('copied'), 2000);
+  });
+}
+
+// ── Update ────────────────────────────────────────────────────────
+let updPoll = null;
+async function startUpdate() {
+  const toast = document.getElementById('upd-toast');
+  toast.textContent = 'atualizando...'; toast.className = 'upd-toast show';
+  await fetch(`${BASE}/api/update`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: '{}' });
+  clearInterval(updPoll);
+  updPoll = setInterval(async () => {
+    const s = await fetch(`${BASE}/api/update-status`).then(r => r.json());
+    if (s.done) { clearInterval(updPoll); toast.textContent = '✓ atualizado!'; init(); }
+    else if (s.error) { clearInterval(updPoll); toast.textContent = 'erro: ' + s.error; toast.className = 'upd-toast show err'; }
+  }, 1000);
+}
+
+// ── Platform UI ───────────────────────────────────────────────────
+function detectPlatform(url) {
+  for (const [k, p] of Object.entries(PLATFORMS))
+    if (p.patterns.some(r => r.test(url))) return k;
+  return null;
+}
+
+function updatePlatUI(key) {
+  currentPlat = key;
+  Object.keys(PLATFORMS).forEach(k => document.getElementById('badge-' + k).classList.toggle('active-plat', k === key));
+  const tag = document.getElementById('detected-tag');
+  const note = document.getElementById('plat-note');
+  const audioBtn = document.getElementById('btn-audio');
+  if (key) {
+    const p = PLATFORMS[key];
+    tag.textContent = p.label; tag.className = 'detected-tag show ' + p.cls;
+    if (p.note) { note.textContent = p.note; note.classList.add('show'); } else { note.classList.remove('show'); }
+    if (!p.audioOk) { audioBtn.classList.add('disabled'); audioBtn.onclick = null; if (mode==='audio') setMode('video'); }
+    else { audioBtn.classList.remove('disabled'); audioBtn.onclick = () => setMode('audio'); }
+  } else {
+    tag.classList.remove('show'); note.classList.remove('show');
+    audioBtn.classList.remove('disabled'); audioBtn.onclick = () => setMode('audio');
+  }
+}
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('btn-video').className = 'mode-btn' + (m==='video' ? ' active' : '');
+  const audioDisabled = currentPlat && !PLATFORMS[currentPlat]?.audioOk;
+  document.getElementById('btn-audio').className = 'mode-btn' + (m==='audio' ? ' active' : '') + (audioDisabled ? ' disabled' : '');
+  document.getElementById('qual-section').className = m==='audio' ? 'qual-section hidden' : 'qual-section';
+}
+
+function setQuality(q) {
+  quality = q;
+  ['best','720','480'].forEach(v => document.getElementById('q-' + v).className = 'qual-chip' + (q===v ? ' active' : ''));
+}
+
+function setBrowser(b) {
+  browser = b;
+  BROWSERS.forEach(v => { const el = document.getElementById('br-' + v); if (el) el.className = 'br-btn' + (v===b ? ' active' : ''); });
+}
+
+let lastUrl = '';
+function onUrlChange() {
+  const url = document.getElementById('url-input').value.trim();
+  if (url === lastUrl) return; lastUrl = url;
+  clearTimeout(infoTimeout);
+  document.getElementById('preview-card').classList.remove('show');
+  updatePlatUI(detectPlatform(url));
+  if (url) infoTimeout = setTimeout(() => fetchInfo(url), 900);
+}
+
+async function fetchInfo(url) {
+  try {
+    const d = await fetch(`${BASE}/api/info?url=${encodeURIComponent(url)}&browser=${browser}`).then(r => r.json());
+    if (d.title) {
+      document.getElementById('preview-title').textContent = d.title;
+      document.getElementById('preview-meta').textContent = (d.uploader||'') + (d.duration ? ' · ' + d.duration : '');
+      const img = document.getElementById('preview-thumb');
+      if (d.thumbnail) { img.src = d.thumbnail; img.style.display=''; } else { img.style.display='none'; }
+      document.getElementById('preview-card').classList.add('show');
+    }
+  } catch {}
+}
+
+async function startDownload() {
+  const url = document.getElementById('url-input').value.trim();
+  if (!url) { alert('Cole uma URL primeiro.'); return; }
+  document.getElementById('dl-btn').disabled = true;
+  document.getElementById('prog-box').classList.add('show');
+  document.getElementById('done-msg').classList.remove('show');
+  document.getElementById('err-msg').classList.remove('show');
+  document.getElementById('prog-fill').style.width = '0%';
+  document.getElementById('prog-pct').textContent = '0%';
+  document.getElementById('log-box').textContent = '';
+  document.getElementById('prog-label').textContent = mode==='audio' ? 'EXTRAINDO ÁUDIO...' : 'BAIXANDO VÍDEO...';
+  try {
+    const d = await fetch(`${BASE}/api/download`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({url, mode, quality, browser})
+    }).then(r => r.json());
+    if (d.id) pollProgress(d.id); else showErr(d.error || 'Erro ao iniciar.');
+  } catch { showErr('Servidor desconectado. Verifique se o app está aberto.'); document.getElementById('dl-btn').disabled = false; }
+}
+
+function pollProgress(id) {
+  clearInterval(pollInterval);
+  pollInterval = setInterval(async () => {
+    try {
+      const d = await fetch(`${BASE}/api/progress?id=${id}`).then(r => r.json());
+      const pct = d.progress || 0;
+      document.getElementById('prog-fill').style.width = pct + '%';
+      document.getElementById('prog-pct').textContent = pct + '%';
+      if (d.log?.length) { const b = document.getElementById('log-box'); b.textContent = d.log.slice(-10).join('\n'); b.scrollTop = b.scrollHeight; }
+      if (d.status === 'done') {
+        clearInterval(pollInterval); lastDownloadFolder = d.folder || null;
+        document.getElementById('done-msg').classList.add('show');
+        document.getElementById('prog-label').textContent = 'CONCLUÍDO';
+        document.getElementById('dl-btn').disabled = false;
+      } else if (d.status === 'error') {
+        clearInterval(pollInterval);
+        showErr((d.log||[]).slice(-3).join('\n') || 'Erro desconhecido');
+        document.getElementById('dl-btn').disabled = false;
+      }
+    } catch {}
+  }, 700);
+}
+
+function showErr(msg) {
+  document.getElementById('err-msg').textContent = 'ERRO: ' + msg;
+  document.getElementById('err-msg').classList.add('show');
+  document.getElementById('prog-label').textContent = 'FALHOU';
+}
+
+function openFolder() {
+  if (window.electronAPI) window.electronAPI.openFolder(lastDownloadFolder);
+  else alert('Arquivo salvo em:\n' + (lastDownloadFolder || 'Downloads/media-downloader'));
+}
+
+init();
+</script>
+</body>
+</html>
