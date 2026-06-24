@@ -18,6 +18,11 @@ const DEFAULT_STATE = {
     { title:'', body:'', image:null },
   ],
   showSafe:true,
+  // MEME
+  memeMode:'classic',
+  memeTop:'QUANDO VOCÊ VÊ PRÉ-VENDA DE MÍDIA FÍSICA',
+  memeBot:'E JÁ ABRE O SITE DA GAMER HUT',
+  memeCaption:'EU QUANDO VEM LANÇAMENTO EXCLUSIVO',
   // QUIZ
   quizMode:'pergunta',
   question:'QUAL É O MELHOR JOGO DE 2024?',
@@ -64,6 +69,11 @@ const PRESETS = {
   thumb:    { template:'thumb', tagId:'review', pattern:'8bit', fill:false, ink:'auto', eyebrow:'ANÁLISE COMPLETA',
               title:'VALE A PENA?', accentWord:'EM 2025', subtitle:'', badge:'EXCLUSIVO GAMER HUT', priceLabel:'',
               titleSize:150 },
+  meme:     { template:'meme', tagId:'quiz', pattern:'solid', fill:false, memeMode:'classic', titleSize:96,
+              memeTop:'QUANDO VOCÊ VÊ PRÉ-VENDA DE MÍDIA FÍSICA',
+              memeBot:'E JÁ ABRE O SITE DA GAMER HUT',
+              memeCaption:'EU QUANDO VEM LANÇAMENTO EXCLUSIVO',
+              aLabel:'FÍSICO', bLabel:'DIGITAL', vsWord:'VS' },
 };
 
 function loadState(){

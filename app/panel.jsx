@@ -11,6 +11,7 @@ function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS }){
   const isRanking  = s.template==='ranking';
   const isThumb    = s.template==='thumb';
   const isArrivals = s.template==='arrivals';
+  const isMeme     = s.template==='meme';
   const accent = s.fill ? readableOn(tag.color) : tag.color;
 
   const setPage = (patch)=> setS(p=>{
@@ -24,6 +25,11 @@ function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS }){
       <CtrlSection title="MODELO">
         <TemplatePicker value={s.template} onChange={pickTemplate}/>
       </CtrlSection>
+
+      {isMeme &&
+        <CtrlSection title="CONTEÚDO DO MEME">
+          <MemeFields s={s} set={set}/>
+        </CtrlSection>}
 
       {(isBlock||isQuiz||isRanking||isArrivals) &&
         <CtrlSection title="FORMATO" right={
@@ -60,8 +66,8 @@ function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS }){
           </div>
         </CtrlSection>}
 
-      {/* CONTENT */}
-      <CtrlSection title={isCarousel ? (onCover?'CONTEÚDO · CAPA':'CONTEÚDO · PÁGINA '+(pageIdx+1)) : 'CONTEÚDO'}>
+      {/* CONTENT — skip for meme (has own section above) */}
+      {!isMeme && <CtrlSection title={isCarousel ? (onCover?'CONTEÚDO · CAPA':'CONTEÚDO · PÁGINA '+(pageIdx+1)) : 'CONTEÚDO'}>
         {/* carousel content page */}
         {isCarousel && !onCover ? <>
           <div style={{ marginBottom:18 }}>
@@ -185,10 +191,20 @@ function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS }){
             <TextInput value={s.cta||''} placeholder="ARRASTA PRO LADO" onChange={e=>set({cta:e.target.value})}/>
           </Field>}
         </>}
-      </CtrlSection>
+      </CtrlSection>}
+
+      {/* STYLE — tipografia para meme */}
+      {isMeme &&
+        <CtrlSection title="TIPOGRAFIA" right={
+          <span className="gh-pixel" style={{ color:GH.orange, fontSize:11 }}>{s.titleSize||96}px</span>}>
+          <input type="range" min={48} max={148} value={s.titleSize||96}
+            onChange={e=>set({titleSize:+e.target.value})} style={{ width:'100%', accentColor:GH.orange }}/>
+          <div className="gh-mono" style={{ color:GH.mut, fontSize:10, letterSpacing:'.1em', marginTop:6 }}>
+            TAMANHO DO TEXTO PRINCIPAL</div>
+        </CtrlSection>}
 
       {/* STYLE */}
-      {onCover && !isImage &&
+      {!isMeme && onCover && !isImage &&
         <CtrlSection title="ESTILO DE FUNDO" right={
           <span className="gh-mono" style={{ color:GH.mut, fontSize:9, letterSpacing:'.1em' }}>{PATTERNS.length} PADRÕES</span>}>
           {(isReels||isCarousel||isQuiz||isRanking||isThumb) && s.image
@@ -230,7 +246,7 @@ function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS }){
         </CtrlSection>}
 
       {/* INK — text + logo color */}
-      {((onCover && !isBlock) || isImage) &&
+      {!isMeme && ((onCover && !isBlock) || isImage) &&
         <CtrlSection title="COR DO TEXTO / LOGO">
           <Segmented value={s.ink||'auto'} onChange={v=>set({ink:v})} options={[
             {id:'auto', label:'AUTO'}, {id:'white', label:'BRANCO'}, {id:'black', label:'PRETO'} ]}/>
@@ -240,7 +256,7 @@ function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS }){
         </CtrlSection>}
 
       {/* TYPE */}
-      {onCover &&
+      {!isMeme && onCover &&
         <CtrlSection title="TIPOGRAFIA" right={
           <span className="gh-pixel" style={{ color:GH.orange, fontSize:11 }}>{s.titleSize}px</span>}>
           <input type="range" min={64} max={172} value={s.titleSize}
@@ -511,6 +527,88 @@ function ArrivalsFields({ s, set, setS }){
           );
         })}
       </div>
+    </>
+  );
+}
+
+/* ---- MEME fields ---- */
+function MemeFields({ s, set }){
+  const mode = s.memeMode || 'classic';
+  return (
+    <>
+      <div style={{ marginBottom:18 }}>
+        <Segmented value={mode} onChange={v=>set({ memeMode:v })}
+          options={[ {id:'classic', label:'CLÁSSICO'}, {id:'reaction', label:'REACTION'}, {id:'dual', label:'DUAL'} ]}/>
+      </div>
+      <p className="gh-mono" style={{ margin:'0 0 16px', color:GH.mut, fontSize:10, lineHeight:1.6 }}>
+        {mode==='classic' && 'Imagem de fundo + texto em cima e em baixo. O clássico da internet.'}
+        {mode==='reaction' && 'Imagem de reação em destaque + bloco de legenda na parte inferior.'}
+        {mode==='dual'    && 'Dois painéis lado a lado com imagens e rótulos. Perfeito para comparações.'}
+      </p>
+
+      {mode==='classic' && <>
+        <Field label="Texto de cima (branco)">
+          <TextArea value={s.memeTop||''} placeholder="QUANDO VOCÊ VÊ PRÉ-VENDA DE MÍDIA FÍSICA" onChange={e=>set({ memeTop:e.target.value })} style={{ minHeight:56 }}/>
+        </Field>
+        <Field label="Texto de baixo (cor da tag)">
+          <TextArea value={s.memeBot||''} placeholder="E JÁ ABRE O SITE DA GAMER HUT" onChange={e=>set({ memeBot:e.target.value })} style={{ minHeight:56 }}/>
+        </Field>
+        <Field label="Imagem de fundo">
+          <ImageDrop value={s.image} onChange={v=>set({ image:v })} label="IMAGEM DO MEME"
+            blur={s.imageBlur} onBlur={v=>set({ imageBlur:v })}
+            zoom={s.imageZoom} onZoom={v=>set({ imageZoom:v })}
+            imgX={s.imageX} onImgX={v=>set({ imageX:v })}
+            imgY={s.imageY} onImgY={v=>set({ imageY:v })}/>
+        </Field>
+      </>}
+
+      {mode==='reaction' && <>
+        <Field label="Legenda (bloco inferior)">
+          <TextArea value={s.memeCaption||''} placeholder="EU QUANDO VEM LANÇAMENTO DE MÍDIA FÍSICA EXCLUSIVA" onChange={e=>set({ memeCaption:e.target.value })} style={{ minHeight:56 }}/>
+        </Field>
+        <Field label="Subtexto (opcional)">
+          <TextInput value={s.memeBot||''} placeholder="TODO MÊS, SEM FALTA" onChange={e=>set({ memeBot:e.target.value })}/>
+        </Field>
+        <Field label="Imagem de reação">
+          <ImageDrop value={s.image} onChange={v=>set({ image:v })} label="IMAGEM DE REAÇÃO"
+            blur={s.imageBlur} onBlur={v=>set({ imageBlur:v })}
+            zoom={s.imageZoom} onZoom={v=>set({ imageZoom:v })}
+            imgX={s.imageX} onImgX={v=>set({ imageX:v })}
+            imgY={s.imageY} onImgY={v=>set({ imageY:v })}/>
+        </Field>
+        <div style={{ marginTop:4 }}>
+          <Toggle label="Preencher bloco com a cor da tag" checked={!!s.fill} onChange={v=>set({ fill:v })}/>
+        </div>
+      </>}
+
+      {mode==='dual' && <>
+        <Field label="Texto superior (opcional)">
+          <TextInput value={s.memeTop||''} placeholder="QUAL É O MELHOR?" onChange={e=>set({ memeTop:e.target.value })}/>
+        </Field>
+        <Field label="Rótulo esquerda">
+          <TextInput value={s.aLabel||''} placeholder="JOGO A" onChange={e=>set({ aLabel:e.target.value })}/>
+        </Field>
+        <Field label="Imagem esquerda">
+          <ImageDrop value={s.aImg} onChange={v=>set({ aImg:v })} label="IMAGEM A"
+            blur={s.aImgBlur} onBlur={v=>set({ aImgBlur:v })}
+            zoom={s.aImgZoom} onZoom={v=>set({ aImgZoom:v })}
+            imgX={s.aImgX} onImgX={v=>set({ aImgX:v })}
+            imgY={s.aImgY} onImgY={v=>set({ aImgY:v })}/>
+        </Field>
+        <Field label="Rótulo direita">
+          <TextInput value={s.bLabel||''} placeholder="JOGO B" onChange={e=>set({ bLabel:e.target.value })}/>
+        </Field>
+        <Field label="Imagem direita">
+          <ImageDrop value={s.bImg} onChange={v=>set({ bImg:v })} label="IMAGEM B"
+            blur={s.bImgBlur} onBlur={v=>set({ bImgBlur:v })}
+            zoom={s.bImgZoom} onZoom={v=>set({ bImgZoom:v })}
+            imgX={s.bImgX} onImgX={v=>set({ bImgX:v })}
+            imgY={s.bImgY} onImgY={v=>set({ bImgY:v })}/>
+        </Field>
+        <Field label="Divisor central">
+          <TextInput value={s.vsWord||''} placeholder="VS" onChange={e=>set({ vsWord:e.target.value })}/>
+        </Field>
+      </>}
     </>
   );
 }

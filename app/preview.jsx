@@ -428,6 +428,141 @@ function ThumbBody({ s, tag, exporting }){
   );
 }
 
+/* ---------- H · MEME (1:1 · 1080×1080) — três modos ---------- */
+
+function MemeClassic({ s, tag }){
+  const topText = (s.memeTop || 'TEXTO DE CIMA').toUpperCase();
+  const botText = (s.memeBot || 'TEXTO DE BAIXO').toUpperCase();
+  const fs = s.titleSize || 96;
+  const outline = '3px 3px 0 #0B0B0A,-3px -3px 0 #0B0B0A,3px -3px 0 #0B0B0A,-3px 3px 0 #0B0B0A,0 4px 0 #0B0B0A,-4px 0 0 #0B0B0A,4px 0 0 #0B0B0A';
+  return (
+    <div style={{ position:'absolute', inset:0, background:GH.bg, overflow:'hidden' }}>
+      <div style={{ position:'absolute', inset:0 }}>
+        <ImageOrSlot src={s.image} blur={s.imageBlur} zoom={s.imageZoom} x={s.imageX} y={s.imageY} label="ARRASTE A IMAGEM DO MEME"/>
+      </div>
+      {/* overlay gradient leve para legibilidade */}
+      <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg,rgba(0,0,0,.55) 0%,rgba(0,0,0,.02) 30%,rgba(0,0,0,.02) 68%,rgba(0,0,0,.58) 100%)' }}/>
+
+      {/* TOP TEXT */}
+      <div style={{ position:'absolute', top:0, left:0, right:0, padding:'46px 52px 0',
+        display:'flex', justifyContent:'center' }}>
+        <h1 className="gh-display" style={{ margin:0, color:'#F4F1EC', fontSize:fs,
+          lineHeight:.92, letterSpacing:'-.02em', textAlign:'center', textWrap:'balance',
+          textShadow:outline }}>{topText}</h1>
+      </div>
+
+      {/* BOTTOM TEXT */}
+      <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'0 52px 48px',
+        display:'flex', flexDirection:'column', alignItems:'center', gap:22 }}>
+        <h2 className="gh-display" style={{ margin:0, color:tag.color, fontSize:fs,
+          lineHeight:.92, letterSpacing:'-.02em', textAlign:'center', textWrap:'balance',
+          textShadow:outline }}>{botText}</h2>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', width:'100%' }}>
+          <Seal tag={tag}/>
+          <Mark color="orange" h={38}/>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MemeReaction({ s, tag }){
+  const caption = (s.memeCaption || 'LEGENDA DO MEME').toUpperCase();
+  const sub = s.memeBot || '';
+  const fs = s.titleSize || 68;
+  const filled = !!s.fill;
+  const blockBg = filled ? tag.color : GH.bg2;
+  const blockTxt = filled ? readableOn(tag.color) : GH.white;
+  const blockMut = filled ? hexA(readableOn(tag.color),.68) : GH.mut;
+  return (
+    <div style={{ position:'absolute', inset:0, background:GH.bg, overflow:'hidden' }}>
+      {/* Imagem top 65% */}
+      <div style={{ position:'absolute', top:0, left:0, right:0, bottom:'35%' }}>
+        <ImageOrSlot src={s.image} blur={s.imageBlur} zoom={s.imageZoom} x={s.imageX} y={s.imageY} label="IMAGEM DE REAÇÃO"/>
+      </div>
+      {/* Caption block bottom 35% */}
+      <div style={{ position:'absolute', left:0, right:0, bottom:0, height:'35%',
+        background:blockBg, borderTop:`5px solid ${tag.color}`,
+        display:'flex', flexDirection:'column', justifyContent:'center',
+        padding:'0 44px', gap:10 }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', gap:16 }}>
+          <h2 className="gh-display" style={{ margin:0, color:blockTxt,
+            fontSize:fs, lineHeight:.94, letterSpacing:'-.02em', flex:1, textWrap:'balance' }}>
+            {caption}
+          </h2>
+          <div style={{ flex:'none', display:'flex', flexDirection:'column', alignItems:'flex-end', gap:8 }}>
+            <Mark color="orange" h={34}/>
+            <Seal tag={tag}/>
+          </div>
+        </div>
+        {sub && <p className="gh-mono" style={{ margin:0, color:blockMut, fontSize:22,
+          letterSpacing:'.08em', fontWeight:700, textTransform:'uppercase' }}>{sub}</p>}
+      </div>
+    </div>
+  );
+}
+
+function MemeDual({ s, tag }){
+  const topText    = s.memeTop  || '';
+  const leftLabel  = s.aLabel   || 'OPÇÃO A';
+  const rightLabel = s.bLabel   || 'OPÇÃO B';
+  const vsWord     = s.vsWord   || 'VS';
+  const fs         = s.titleSize || 64;
+  const headerH    = topText ? 90 : 0;
+  return (
+    <div style={{ position:'absolute', inset:0, background:GH.bg, overflow:'hidden' }}>
+      {/* Header opcional */}
+      {topText && (
+        <div style={{ position:'absolute', top:0, left:0, right:0, height:headerH, zIndex:4,
+          background:'rgba(11,11,10,.94)', display:'flex', alignItems:'center',
+          justifyContent:'space-between', padding:'0 40px',
+          borderBottom:`3px solid ${tag.color}` }}>
+          <Seal tag={tag}/>
+          <h2 className="gh-display" style={{ margin:0, color:GH.white, fontSize:40,
+            letterSpacing:'-.02em', textAlign:'center', flex:1 }}>{topText.toUpperCase()}</h2>
+          <Mark color="orange" h={34}/>
+        </div>
+      )}
+
+      {/* Painel esquerdo */}
+      <div style={{ position:'absolute', top:headerH, left:0, width:'50%', bottom:0,
+        borderRight:`2px solid ${hexA(tag.color,.5)}` }}>
+        <ImageOrSlot src={s.aImg} blur={s.aImgBlur} zoom={s.aImgZoom} x={s.aImgX} y={s.aImgY} label="IMAGEM A"/>
+        <Scrim from="rgba(0,0,0,.9)" h="55%"/>
+        <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'0 26px 28px' }}>
+          <span className="gh-display" style={{ color:GH.white, fontSize:fs, lineHeight:.96,
+            letterSpacing:'-.01em', textWrap:'balance', display:'block' }}>{leftLabel.toUpperCase()}</span>
+        </div>
+      </div>
+
+      {/* Painel direito */}
+      <div style={{ position:'absolute', top:headerH, right:0, width:'50%', bottom:0 }}>
+        <ImageOrSlot src={s.bImg} blur={s.bImgBlur} zoom={s.bImgZoom} x={s.bImgX} y={s.bImgY} label="IMAGEM B"/>
+        <Scrim from="rgba(0,0,0,.9)" h="55%"/>
+        <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'0 26px 28px' }}>
+          <span className="gh-display" style={{ color:tag.color, fontSize:fs, lineHeight:.96,
+            letterSpacing:'-.01em', textWrap:'balance', display:'block' }}>{rightLabel.toUpperCase()}</span>
+        </div>
+      </div>
+
+      {/* VS badge central */}
+      <div style={{ position:'absolute', top:'50%', left:'50%', zIndex:5,
+        transform:`translate(-50%, ${headerH/2}px) translateY(-50%)` }}>
+        <span className="gh-pixel" style={{ display:'grid', placeItems:'center',
+          width:74, height:74, borderRadius:'50%', background:tag.color,
+          color:tag.ink, fontSize:18, boxShadow:'0 0 0 8px rgba(11,11,10,.72)' }}>{vsWord}</span>
+      </div>
+    </div>
+  );
+}
+
+function MemeBody({ s, tag }){
+  const mode = s.memeMode || 'classic';
+  if(mode==='reaction') return <MemeReaction s={s} tag={tag}/>;
+  if(mode==='dual')     return <MemeDual s={s} tag={tag}/>;
+  return <MemeClassic s={s} tag={tag}/>;
+}
+
 /* ---------- shared footer logo (brand rule: bottom-center) ---------- */
 function LogoFooter({ dark=false, onImage=false, colorOverride=null }){
   const col = colorOverride || (onImage ? 'white' : (dark ? 'black' : 'white'));
@@ -672,6 +807,7 @@ function PostStage({ s, pageIndex=0, stageRef, exporting=false }){
   else if(s.template==='ranking') body = <RankingBody s={s} tag={tag}/>;
   else if(s.template==='arrivals') body = <ArrivalsBody s={s} tag={tag}/>;
   else if(s.template==='thumb') body = <ThumbBody s={s} tag={tag} exporting={exporting}/>;
+  else if(s.template==='meme') body = <MemeBody s={s} tag={tag}/>;
   else body = <ReelsBody s={s} tag={tag} exporting={exporting}/>;
   return (
     <div ref={stageRef} data-stage style={{ width:dims.w, height:dims.h, position:'relative',
