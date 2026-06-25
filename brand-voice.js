@@ -48,4 +48,21 @@ Comunicar games como eventos, lançamentos como momentos especiais e mídia fís
 - "PRÉ-VENDAS A TODO VAPOR! Tem RPG, terror, estratégia… 👀 Se liga que ainda tem mais por vir!"
 
 O que os bons exemplos têm em comum: emoção primeiro; o jogo é o protagonista; conversa com a comunidade; hype controlado; transformam um anúncio em uma conversa sobre games.
+
+## NOTA SOBRE GERAÇÕES
+A Gamer Hut atende 3 gerações de público (Gen Z, Millennials, Gen X).
+Cada post é feito para UMA geração específica. O contexto geracional
+detalhado está em \`generation-context.js\` e DEVE ser respeitado.
 `.trim();
+
+/* ============================================================
+   Retorna o guia de marca completo incluindo o contexto
+   geracional específico quando disponível.
+   Uso: getBrandVoice('gen-z') | 'millennial' | 'gen-x'
+   ============================================================ */
+window.getBrandVoice = function(generation){
+  var base = window.GH_BRAND || '';
+  var gen = window.GH_GENERATIONS && window.GH_GENERATIONS[generation];
+  if(!gen) return base;
+  return base + '\n\n---\n' + gen.context.trim();
+};

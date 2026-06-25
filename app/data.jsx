@@ -40,7 +40,7 @@ const TEMPLATES = [
   { id:'arrivals', label:'NOVIDADES',      ratio:'4:5', w:1080, h:1350, note:'Grade de novidades da semana' },
   { id:'thumb',    label:'THUMB YOUTUBE',  ratio:'16:9',w:1280, h:720,  note:'Capa de vídeo · texto gigante' },
   { id:'reels',    label:'CAPA DE REELS',  ratio:'9:16',w:1080, h:1920, note:'Safe zone 4:5 central' },
-  { id:'meme',     label:'MEME',          ratio:'1:1', w:1080, h:1080, note:'Clássico · Reaction · Dual' },
+  { id:'meme',     label:'MEME',          ratio:'4:5', w:1080, h:1350, note:'Clássico · Reaction · Dual' },
 ];
 
 /* Background patterns. Each returns inline-style layers given an accent color. */

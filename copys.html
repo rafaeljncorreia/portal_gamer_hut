@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,800;0,900;1,900&family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="portal.css"/>
+<script src="generation-context.js"></script>
 <script src="brand-voice.js"></script>
 <script src="config.js"></script>
 <style>
@@ -106,6 +107,17 @@
   .err{ background:rgba(226,59,46,.08); border:1px solid rgba(226,59,46,.4); border-left:3px solid #E23B2E;
     border-radius:12px; padding:15px 17px; font-family:'Space Mono',monospace; font-size:12px; line-height:1.6; color:#e7b4ad; }
   .err b{ color:#fff; }
+
+  /* ---- generation switch ---- */
+  .gen-switch{ display:flex; gap:8px; margin-bottom:18px; }
+  .gen-btn{ flex:1; cursor:pointer; padding:10px 6px; border-radius:10px; border:1px solid var(--lineSoft);
+    background:var(--bg); color:var(--mut); text-align:center; transition:all .14s; user-select:none; }
+  .gen-btn:hover{ border-color:var(--mut); }
+  .gen-btn.on{ background:var(--panel2); color:var(--white); border-color:var(--orange); box-shadow:0 0 0 1px var(--orange); }
+  .gen-btn .gen-emoji{ font-size:16px; display:block; margin-bottom:2px; }
+  .gen-btn .gen-label{ font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.06em; }
+  .gen-btn .gen-sub{ font-family:'Space Mono',monospace; font-size:8px; letter-spacing:.08em; color:var(--mut2); display:block; margin-top:2px; }
+  .gen-btn.on .gen-sub{ color:var(--mut); }
 </style>
 </head>
 <body>
@@ -143,6 +155,10 @@
         <div class="field">
           <label>Sobre o que é o post? <span class="hint">jogo, plataforma, preço…</span></label>
           <textarea id="brief" class="input" placeholder="Ex: Pré-venda do Metal Gear Solid Δ em mídia física, lacrado, dublado em PT-BR, PS5. R$ 349 com brinde de pôster."></textarea>
+        </div>
+        <div class="field">
+          <label>Geração <span class="hint">público-alvo</span></label>
+          <div class="gen-switch" id="genSwitch"></div>
         </div>
         <div class="field">
           <label>Tom de voz</label>
@@ -221,6 +237,38 @@
     { id:'review',     label:'REVIEW',     color:'#2BB1C4', ink:'#0B0B0A' },
     { id:'quiz',       label:'QUIZ',       color:'#E8643C', ink:'#0B0B0A' },
   ];
+
+  // ---- generation switch ----
+  const GEN_KEYS = ['gen-z', 'millennial', 'gen-x'];
+  let activeGen = localStorage.getItem('gh-generation') || 'gen-z';
+  const genSwitchEl = document.getElementById('genSwitch');
+  function buildGenSwitch(){
+    genSwitchEl.innerHTML = '';
+    GEN_KEYS.forEach(function(key){
+      var g = window.GH_GENERATIONS && window.GH_GENERATIONS[key];
+      if(!g) return;
+      var el = document.createElement('div');
+      el.className = 'gen-btn' + (key === activeGen ? ' on' : '');
+      el.innerHTML = '<span class="gen-emoji">'+g.emoji+'</span>'+
+        '<span class="gen-label">'+g.label+'</span>'+
+        '<span class="gen-sub">'+g.desc+'</span>';
+      el.onclick = function(){
+        activeGen = key;
+        localStorage.setItem('gh-generation', key);
+        document.querySelectorAll('#genSwitch .gen-btn').forEach(function(c){ c.classList.remove('on'); });
+        el.classList.add('on');
+        if(typeof refreshBrandtag === 'function') refreshBrandtag();
+      };
+      genSwitchEl.appendChild(el);
+    });
+  }
+  buildGenSwitch();
+  // fallback se GH_GENERATIONS não carregou
+  if(!window.GH_GENERATIONS){
+    genSwitchEl.innerHTML = '<div class="gen-btn on"><span class="gen-label">GERAÇÃO Z</span></div>'+
+      '<div class="gen-btn"><span class="gen-label">MILLENNIAL</span></div>'+
+      '<div class="gen-btn"><span class="gen-label">GERAÇÃO X</span></div>';
+  }
 
   // ---- build category chips ----
   const catsEl = document.getElementById('cats');
@@ -439,11 +487,19 @@
     const price = document.getElementById('price').value.trim();
     btn.disabled=true; btn.textContent='⏳ GERANDO…'; skeleton();
 
+    var genVoice = (typeof window.getBrandVoice === 'function')
+      ? window.getBrandVoice(activeGen)
+      : (window.GH_BRAND || 'Você é o redator social da GAMER HUT, loja de jogos em mídia física.');
+    var genInfo = window.GH_GENERATIONS && window.GH_GENERATIONS[activeGen];
+    var genLabel = genInfo ? genInfo.full : 'Gamer geral';
+
     const prompt =
-`${window.GH_BRAND || 'Você é o redator social da GAMER HUT, loja de jogos em mídia física.'}
+`${genVoice}
 
 ---
 TAREFA: Use o branding book acima como base obrigatória de tom de voz e estrutura. Escreva como a Gamer Hut escreveria.
+
+PÚBLICO-ALVO DESTE POST: ${genLabel}
 
 ${activeModel==='carousel'
 ? `Este post é um CARROSSEL de Instagram com ${pageCount} páginas no total (1 capa + ${pageCount-1} páginas internas).
@@ -458,6 +514,7 @@ Tom de voz pedido: ${activeTone.dataset.v}
 ${plat?('Plataforma: '+plat+'\n'):''}${price?('Preço/condição: '+price+'\n'):''}Briefing do post: ${brief}
 
 Regras:
+- PÚBLICO-ALVO (${genLabel}): respeite o contexto geracional acima — vocabulário, tom, comprimento, hooks e CTAs específicos.
 - Comece pelo nome do jogo quando ele for o foco.
 - Título curto e forte (máx ~6 palavras), nunca longo demais para arte.
 - Legenda de 2 a 4 frases, calorosa e específica ao briefing.
@@ -487,10 +544,19 @@ IMPORTANTE: o array "paginas" deve ter EXATAMENTE ${pageCount-1} itens (as pági
     }
   }
 
+  // ---- helper: refresh brand status indicator ----
+  function refreshBrandtag(){
+    var bt = document.getElementById('brandtag');
+    if(!bt) return;
+    if(!window.GH_BRAND){ bt.classList.add('off'); bt.textContent='● Guia de marca não carregado'; return; }
+    bt.classList.remove('off');
+    var g = window.GH_GENERATIONS && window.GH_GENERATIONS[activeGen];
+    bt.textContent = '● ' + (g ? g.full : 'GEN Z') + ' · BRANDING BOOK v2';
+  }
+
   btn.onclick=generate;
-  // brand guide status indicator
-  (function(){ const bt=document.getElementById('brandtag');
-    if(!window.GH_BRAND){ bt.classList.add('off'); bt.textContent='● Guia de marca não carregado'; } })();
+  // brand guide status indicator  
+  refreshBrandtag();
   document.getElementById('brief').addEventListener('keydown',e=>{ if((e.metaKey||e.ctrlKey)&&e.key==='Enter') generate(); });
   </script>
 </body>
