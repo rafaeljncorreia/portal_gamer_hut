@@ -54,7 +54,20 @@
     border:1px solid var(--lineSoft); border-left:3px solid var(--orange); border-radius:12px; padding:16px 18px; }
   .note p{ margin:0; color:var(--mut); font-family:'Space Mono',monospace; font-size:12px; line-height:1.7; }
   .note .w{ color:var(--white); }
+
+  .gen-switch{ display:flex; gap:8px; margin-bottom:18px; }
+  .gen-btn{ flex:1; cursor:pointer; padding:10px 6px; border-radius:10px; border:1px solid var(--lineSoft);
+    background:var(--bg); color:var(--mut); text-align:center; transition:all .14s; user-select:none; }
+  .gen-btn:hover{ border-color:var(--mut); }
+  .gen-btn.on{ background:var(--panel2); color:var(--white); border-color:var(--orange); box-shadow:0 0 0 1px var(--orange); }
+  .gen-btn .gen-emoji{ font-size:16px; display:block; margin-bottom:2px; }
+  .gen-btn .gen-label{ font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.06em; }
+  .gen-btn .gen-sub{ font-family:'Space Mono',monospace; font-size:8px; letter-spacing:.08em; color:var(--mut2); display:block; margin-top:2px; }
+  .gen-btn.on .gen-sub{ color:var(--mut); }
 </style>
+<script src="config.js"></script>
+<script src="generation-context.js"></script>
+<script src="brand-voice.js"></script>
 </head>
 <body>
   <div class="dots"></div>
@@ -71,13 +84,13 @@
       <a href="index.html">PORTAL</a>
       <a href="studio.html">CREATIVE STUDIO</a>
       <a href="copys.html">COPYS</a>
+      <a href="descricoes.html">DESCRIÇÕES</a>
       <a class="active" href="review.html">REVIEW</a>
     </nav>
   </header>
 
   <main class="wrap">
     <div class="head">
-      <span class="soon">● EM BREVE</span>
       <h1 class="display">Review de Criativos</h1>
       <p>Envie a imagem e o texto do criativo e receba uma análise antes de publicar. Esta é uma prévia da
         interface — a revisão automática será conectada em seguida.</p>
@@ -89,17 +102,22 @@
         <h2 class="ptitle">ENVIAR CRIATIVO</h2>
         <div class="field">
           <label>Imagem do criativo</label>
-          <div class="drop">
-            <span class="ic">↑</span>
-            <span class="t">Arraste a imagem aqui</span>
+          <div class="drop" id="imageDrop">
+            <input type="file" id="imageFile" accept="image/png,image/jpeg" style="display:none"/>
+            <span class="ic" id="dropIcon">↑</span>
+            <span class="t" id="dropText">Arraste a imagem aqui</span>
             <span class="s">PNG · JPG · até 1080×1350</span>
           </div>
         </div>
         <div class="field">
           <label>Texto / legenda</label>
-          <textarea class="input" placeholder="Cole aqui a copy que vai junto com o criativo..." disabled></textarea>
+          <textarea class="input" id="copyText" placeholder="Cole aqui a copy que vai junto com o criativo..."></textarea>
         </div>
-        <button class="btn btn-primary" style="width:100%; justify-content:center; margin-top:6px;" disabled>🔍 REVISAR CRIATIVO</button>
+        <div class="field">
+          <label>Geração <span class="hint">público-alvo da peça</span></label>
+          <div class="gen-switch" id="genSwitch"></div>
+        </div>
+        <button class="btn btn-primary" id="reviewBtn" style="width:100%; justify-content:center; margin-top:6px;">🔍 REVISAR CRIATIVO</button>
       </section>
 
       <!-- report mock -->
@@ -131,5 +149,254 @@
       <span class="b">© 2025 GAMER HUT · PORTAL DE CRIAÇÃO</span>
     </div>
   </footer>
+<script>
+var activeImage = null;
+var dropEl = document.getElementById('imageDrop');
+var fileInput = document.getElementById('imageFile');
+
+dropEl.addEventListener('click', function(){ fileInput.click(); });
+dropEl.addEventListener('dragover', function(e){ e.preventDefault(); dropEl.style.borderColor='var(--orange)'; });
+dropEl.addEventListener('dragleave', function(){ dropEl.style.borderColor=''; });
+dropEl.addEventListener('drop', function(e){
+  e.preventDefault(); dropEl.style.borderColor='';
+  var file = e.dataTransfer.files[0];
+  if(file) loadImage(file);
+});
+fileInput.addEventListener('change', function(){
+  if(fileInput.files[0]) loadImage(fileInput.files[0]);
+});
+
+function loadImage(file){
+  var reader = new FileReader();
+  reader.onload = function(e){
+    activeImage = e.target.result;
+    document.getElementById('dropIcon').innerHTML =
+      '<img src="'+activeImage+'" style="width:100%;height:100%;object-fit:cover;border-radius:10px;"/>';
+    document.getElementById('dropText').textContent = file.name + ' · clique para trocar';
+  };
+  reader.readAsDataURL(file);
+}
+
+var textarea = document.getElementById('copyText');
+var btn = document.getElementById('reviewBtn');
+
+textarea.addEventListener('input', function(){
+  btn.disabled = textarea.value.trim().length < 10;
+});
+btn.disabled = true;
+
+var GEN_KEYS = ['gen-z', 'millennial', 'gen-x'];
+var activeGen = localStorage.getItem('gh-generation') || 'gen-z';
+var genSwitchEl = document.getElementById('genSwitch');
+
+function buildGenSwitch(){
+  genSwitchEl.innerHTML = '';
+  GEN_KEYS.forEach(function(key){
+    var g = window.GH_GENERATIONS && window.GH_GENERATIONS[key];
+    if(!g) return;
+    var el = document.createElement('div');
+    el.className = 'gen-btn' + (key === activeGen ? ' on' : '');
+    el.innerHTML = '<span class="gen-emoji">'+g.emoji+'</span>'+
+      '<span class="gen-label">'+g.label+'</span>'+
+      '<span class="gen-sub">'+g.desc+'</span>';
+    el.onclick = function(){
+      activeGen = key;
+      localStorage.setItem('gh-generation', key);
+      document.querySelectorAll('#genSwitch .gen-btn').forEach(function(c){ c.classList.remove('on'); });
+      el.classList.add('on');
+    };
+    genSwitchEl.appendChild(el);
+  });
+}
+buildGenSwitch();
+
+function esc(s){ return String(s||'').replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+
+async function aiComplete(prompt){
+  if(typeof window.claude !== 'undefined' && window.claude.complete){
+    return await window.claude.complete(prompt);
+  }
+  var url = ((window.GH_CONFIG && window.GH_CONFIG.proxyUrl) || '').trim();
+  if(!url){ throw new Error('Servidor de IA não configurado. Abra config.js e cole a URL do proxy em proxyUrl.'); }
+  var r = await fetch(url, {
+    method:'POST', headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ prompt:prompt })
+  });
+  var data; try{ data = await r.json(); }catch(e){ throw new Error('Resposta inválida do servidor de IA.'); }
+  if(!r.ok || (data && data.error)){ throw new Error((data && data.error) || ('Erro '+r.status+' do servidor.')); }
+  return (data && data.text) || '';
+}
+
+function extractJSON(text){
+  var src = text.replace(/```json|```/g,'');
+  try{ return JSON.parse(src); }catch(e){}
+  var m = src.match(/\{[\s\S]*\}/);
+  if(m){ try{ return JSON.parse(m[0]); }catch(e){} }
+  return null;
+}
+
+function copyText(text){
+  if(navigator.clipboard && window.isSecureContext){
+    return navigator.clipboard.writeText(text).catch(function(){ return legacyCopy(text); });
+  }
+  return legacyCopy(text);
+}
+function legacyCopy(text){
+  return new Promise(function(res,rej){
+    try{
+      var ta = document.createElement('textarea'); ta.value = text;
+      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      var ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      ok ? res() : rej();
+    }catch(e){ rej(e); }
+  });
+}
+
+btn.onclick = reviewCreative;
+
+async function reviewCreative(){
+  var copy = document.getElementById('copyText').value.trim();
+  if(copy.length < 10) return;
+
+  btn.disabled = true;
+  btn.textContent = '⏳ ANALISANDO…';
+  showSkeleton();
+
+  var voice = (window.getBrandVoice && window.getBrandVoice(activeGen))
+    || window.GH_BRAND
+    || 'Você é o redator social da GAMER HUT, loja de jogos em mídia física.';
+  var genLabel = (window.GH_GENERATIONS && window.GH_GENERATIONS[activeGen])
+    ? window.GH_GENERATIONS[activeGen].full
+    : 'Gamer geral';
+
+  var prompt = voice + '\n\n---\nTAREFA: Revisar um criativo da Gamer Hut antes de publicar.\n\n' +
+    'PÚBLICO-ALVO DA PEÇA: ' + genLabel + '\n\n' +
+    'COPY DO CRIATIVO:\n"""\n' + copy + '\n"""\n\n' +
+    'Analise a copy acima contra o brandbook e o contexto geracional. Responda SOMENTE com JSON válido:\n' +
+    '{\n' +
+    '  "clareza": 0-100,\n' +
+    '  "contraste": 0-100,\n' +
+    '  "tomDeVoz": 0-100,\n' +
+    '  "identidade": 0-100,\n' +
+    '  "cta": 0-100,\n' +
+    '  "scoreGeral": 0-100,\n' +
+    '  "aprovado": true ou false,\n' +
+    '  "resumo": "1 frase com o diagnóstico geral",\n' +
+    '  "pontos": ["ponto positivo 1", "ponto positivo 2"],\n' +
+    '  "melhorias": ["melhoria 1", "melhoria 2", "melhoria 3"],\n' +
+    '  "reescrita": "versão melhorada da copy, pronta para publicar"\n' +
+    '}\n\n' +
+    'Critérios:\n' +
+    '- clareza: o público entende de imediato o que está sendo comunicado?\n' +
+    '- contraste: o criativo se destaca vs. conteúdo genérico de gaming?\n' +
+    '- tomDeVoz: segue o tom da Gamer Hut (acessível, instigante, transparente)?\n' +
+    '- identidade: usa vocabulário, CTAs e abordagem da marca?\n' +
+    '- cta: o call-to-action é claro, natural e da lista aprovada (não usa "Bora")?\n' +
+    '- aprovado: true só se todos os critérios >= 60 e nenhuma regra de ouro violada';
+
+  try{
+    var text = await aiComplete(prompt);
+    var data = extractJSON(text);
+    if(!data) throw new Error('Formato inesperado na resposta da IA');
+    renderReport(data);
+  }catch(e){
+    showErr(e.message || 'Erro de conexão com a IA');
+  }finally{
+    btn.disabled = false;
+    btn.textContent = '🔍 REVISAR CRIATIVO';
+  }
+}
+
+function showSkeleton(){
+  document.querySelectorAll('.crit .bar i').forEach(function(bar){
+    bar.style.width = '60%';
+    bar.style.background = '';
+    bar.style.animation = 'shimmer 1.6s linear infinite';
+  });
+  document.querySelectorAll('.crit .sc').forEach(function(sc){
+    sc.textContent = '··';
+    sc.style.color = '';
+  });
+  document.querySelector('.lock').innerHTML =
+    '<span class="b">⏳</span><span>Analisando o criativo contra o brandbook…</span>';
+}
+
+function showErr(msg){
+  document.querySelector('.lock').innerHTML =
+    '<span class="b" style="color:#E23B2E;">!</span>'+
+    '<span style="color:#e7b4ad;"><b style="color:#fff;">Não consegui analisar.</b> '+esc(msg)+'</span>';
+}
+
+function renderReport(data){
+  var scores = {
+    'Clareza':       data.clareza,
+    'Contraste':     data.contraste,
+    'Tom de voz':    data.tomDeVoz,
+    'Identidade':    data.identidade,
+    'Chamada (CTA)': data.cta,
+  };
+
+  document.querySelectorAll('.crit').forEach(function(row){
+    var label = row.querySelector('.cl').textContent.trim();
+    var score = scores[label];
+    if(score === undefined) return;
+    var bar = row.querySelector('.bar i');
+    var sc = row.querySelector('.sc');
+    bar.style.animation = 'none';
+    bar.style.width = score + '%';
+    bar.style.background = score >= 80 ? '#2ecc71' : score >= 60 ? 'var(--orange)' : '#E23B2E';
+    sc.textContent = score;
+    sc.style.color = score >= 80 ? '#2ecc71' : score >= 60 ? 'var(--orange)' : '#E23B2E';
+  });
+
+  var badge = data.aprovado
+    ? '<span style="color:#2ecc71;font-family:\'Space Mono\',monospace;font-size:12px;font-weight:700;">✓ APROVADO</span>'
+    : '<span style="color:#E23B2E;font-family:\'Space Mono\',monospace;font-size:12px;font-weight:700;">✗ REVISAR ANTES DE PUBLICAR</span>';
+
+  var pontos = (data.pontos||[]).map(function(p){ return '<li>'+esc(p)+'</li>'; }).join('');
+  var melhorias = (data.melhorias||[]).map(function(m){ return '<li>'+esc(m)+'</li>'; }).join('');
+
+  var html = '<div style="width:100%">'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">'+
+      badge+
+      '<span style="font-family:\'Press Start 2P\',monospace;font-size:16px;color:var(--orange);">'+
+        (data.scoreGeral||0)+'/100</span>'+
+    '</div>'+
+    '<p style="margin:0 0 14px;color:var(--white);font-size:14px;line-height:1.6;">'+esc(data.resumo||'')+'</p>';
+
+  if(pontos){
+    html += '<p style="color:var(--mut);font-family:\'Space Mono\',monospace;font-size:10px;letter-spacing:.1em;margin:0 0 6px;">✓ PONTOS FORTES</p>'+
+      '<ul style="margin:0 0 14px;padding-left:18px;color:#cfc9c1;font-size:13px;line-height:1.7;">'+pontos+'</ul>';
+  }
+  if(melhorias){
+    html += '<p style="color:var(--mut);font-family:\'Space Mono\',monospace;font-size:10px;letter-spacing:.1em;margin:0 0 6px;">⚠ MELHORIAS SUGERIDAS</p>'+
+      '<ul style="margin:0 0 18px;padding-left:18px;color:#cfc9c1;font-size:13px;line-height:1.7;">'+melhorias+'</ul>';
+  }
+  if(data.reescrita){
+    html += '<p style="color:var(--mut);font-family:\'Space Mono\',monospace;font-size:10px;letter-spacing:.1em;margin:0 0 8px;">✍ VERSÃO MELHORADA</p>'+
+      '<div id="reescritaBox" style="background:var(--bg);border:1px solid var(--lineSoft);border-left:3px solid var(--orange);'+
+        'border-radius:10px;padding:14px 16px;font-size:14px;line-height:1.6;color:var(--white);white-space:pre-wrap;">'+
+        esc(data.reescrita)+'</div>'+
+      '<button id="copyReescritaBtn" style="margin-top:10px;cursor:pointer;font-family:\'Space Mono\',monospace;'+
+        'font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--ink);background:var(--orange);'+
+        'border:none;border-radius:7px;padding:9px 14px;">COPIAR VERSÃO MELHORADA</button>';
+  }
+  html += '</div>';
+
+  document.querySelector('.lock').innerHTML = html;
+
+  var copyBtn = document.getElementById('copyReescritaBtn');
+  if(copyBtn){
+    copyBtn.onclick = function(){
+      copyText(data.reescrita).then(function(){
+        copyBtn.textContent = 'COPIADO ✓';
+        setTimeout(function(){ copyBtn.textContent = 'COPIAR VERSÃO MELHORADA'; }, 1600);
+      });
+    };
+  }
+}
+</script>
 </body>
 </html>

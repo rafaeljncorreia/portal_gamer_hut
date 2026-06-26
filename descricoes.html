@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Descrições Padronizadas · Portal Gamer Hut</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,800;0,900;1,900&family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="portal.css"/>
+<script src="config.js"></script>
+<script src="generation-context.js"></script>
+<script src="brand-voice.js"></script>
+<style>
+  .head{ display:flex; flex-direction:column; gap:18px; margin-bottom:36px; }
+  .head h1{ font-size:clamp(40px,7vw,84px); line-height:.9; margin:0; text-wrap:balance; }
+  .head p{ margin:0; max-width:64ch; color:#cfc9c1; font-size:clamp(15px,2vw,19px); line-height:1.6; }
+
+  .layout{ display:grid; grid-template-columns:1fr 1.5fr; gap:22px; align-items:start; }
+  @media (max-width:960px){ .layout{ grid-template-columns:1fr; } }
+
+  .panel{ background:var(--panel); border:1px solid var(--lineSoft); border-radius:18px; padding:26px 26px 28px; }
+  .panel .ptitle{ font-family:'Press Start 2P',monospace; font-size:12px; color:var(--orange); margin:0 0 20px; }
+  .field{ margin-bottom:18px; }
+  .field label{ display:flex; align-items:center; justify-content:space-between; gap:10px;
+    font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--mut); margin-bottom:9px; }
+  .field label .hint{ letter-spacing:.04em; color:var(--mut2); text-transform:none; }
+  .input, textarea.input{ width:100%; background:var(--bg); color:var(--white); border:1px solid var(--lineSoft);
+    border-radius:10px; padding:13px 15px; font-size:15px; font-family:'Space Grotesk',sans-serif; outline:none;
+    transition:border-color .14s; }
+  .input:focus, textarea.input:focus{ border-color:var(--orange); }
+  textarea.input{ resize:vertical; min-height:104px; line-height:1.5; }
+  .pill-group{ display:flex; gap:8px; flex-wrap:wrap; }
+  .pill{ cursor:pointer; font-family:'Space Mono',monospace; font-size:12px; font-weight:700; letter-spacing:.04em;
+    padding:9px 16px; border-radius:8px; background:var(--bg); color:var(--white); border:1px solid var(--lineSoft);
+    transition:all .13s; user-select:none; }
+  .pill:hover{ border-color:var(--mut); }
+  .pill.on{ background:var(--orange); color:var(--ink); border-color:var(--orange); }
+
+  .gen-switch{ display:flex; gap:8px; margin-bottom:18px; }
+  .gen-btn{ flex:1; cursor:pointer; padding:10px 6px; border-radius:10px; border:1px solid var(--lineSoft);
+    background:var(--bg); color:var(--mut); text-align:center; transition:all .14s; user-select:none; }
+  .gen-btn:hover{ border-color:var(--mut); }
+  .gen-btn.on{ background:var(--panel2); color:var(--white); border-color:var(--orange); box-shadow:0 0 0 1px var(--orange); }
+  .gen-btn .gen-emoji{ font-size:16px; display:block; margin-bottom:2px; }
+  .gen-btn .gen-label{ font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.06em; }
+  .gen-btn .gen-sub{ font-family:'Space Mono',monospace; font-size:8px; letter-spacing:.08em; color:var(--mut2); display:block; margin-top:2px; }
+  .gen-btn.on .gen-sub{ color:var(--mut); }
+
+  .conditional{ display:none; background:var(--bg); border:1px solid var(--lineSoft); border-radius:12px; padding:16px 16px; margin-bottom:18px; }
+  .conditional.show{ display:block; }
+  .conditional .ctitle{ font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.12em; color:var(--orange); margin:0 0 12px; }
+
+  #gen[disabled]{ opacity:.55; cursor:wait; }
+
+  .out{ display:flex; flex-direction:column; gap:14px; min-height:240px; }
+  .empty{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+    text-align:center; color:var(--mut); padding:40px 20px; }
+  .empty .ic{ width:52px; height:52px; border-radius:14px; border:1px solid var(--lineSoft); display:grid;
+    place-items:center; color:var(--orange); font-size:22px; }
+  .empty p{ margin:0; font-family:'Space Mono',monospace; font-size:12px; line-height:1.6; max-width:34ch; }
+
+  .skl{ height:14px; border-radius:6px; background:linear-gradient(90deg,#221e1b 0%,#2c2723 50%,#221e1b 100%);
+    background-size:200% 100%; animation:shimmer 1.5s linear infinite; }
+  @keyframes shimmer{ to{ background-position:-200% 0; } }
+
+  .result{ background:var(--bg); border:1px solid var(--lineSoft); border-radius:14px; padding:18px 18px 16px;
+    border-left:3px solid var(--orange); animation:pop .28s ease both; }
+  @keyframes pop{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:none; } }
+  .result .rh{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+  .result .rplat{ font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.12em;
+    color:var(--orange); }
+  .result .rbtn{ cursor:pointer; font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.08em;
+    color:var(--mut); background:transparent; border:1px solid var(--lineSoft); border-radius:7px; padding:6px 10px;
+    transition:all .13s; }
+  .result .rbtn:hover{ color:#fff; border-color:var(--orange); }
+  .result .rbtn.done{ color:#0B0B0A; background:var(--green); border-color:var(--green); }
+  .result .rbody{ font-size:14px; line-height:1.62; color:#d7d1c9; margin:0 0 12px; white-space:pre-wrap; }
+  .result .rartbtn{ margin-top:12px; width:100%; cursor:pointer; font-family:'Space Mono',monospace;
+    font-size:12px; font-weight:700; letter-spacing:.06em; color:#0B0B0A; background:var(--orange);
+    border:none; border-radius:9px; padding:11px 14px; transition:filter .13s, transform .12s; }
+  .result .rartbtn:hover{ filter:brightness(1.08); transform:translateY(-1px); }
+
+  .err{ background:rgba(226,59,46,.08); border:1px solid rgba(226,59,46,.4); border-left:3px solid #E23B2E;
+    border-radius:12px; padding:15px 17px; font-family:'Space Mono',monospace; font-size:12px; line-height:1.6; color:#e7b4ad; }
+  .err b{ color:#fff; }
+
+  /* history */
+  .hist{ margin-top:22px; border-top:1px solid var(--lineSoft); padding-top:16px; }
+  .hist h3{ font-family:'Press Start 2P',monospace; font-size:10px; color:var(--mut); margin:0 0 12px; }
+  .hist-item{ display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:9px 0; border-bottom:1px solid rgba(244,241,236,.04); cursor:pointer; }
+  .hist-item:hover{ opacity:.8; }
+  .hist-item .hi-plat{ font-family:'Space Mono',monospace; font-size:9px; font-weight:700; letter-spacing:.08em;
+    color:var(--orange); flex:none; }
+  .hist-item .hi-title{ font-size:12px; color:var(--white); white-space:nowrap; overflow:hidden;
+    text-overflow:ellipsis; flex:1; }
+  .hist-item .hi-del{ cursor:pointer; font-family:'Space Mono',monospace; font-size:11px;
+    color:var(--mut2); background:none; border:none; padding:2px 4px; }
+  .hist-item .hi-del:hover{ color:#E23B2E; }
+</style>
+</head>
+<body>
+  <div class="dots"></div>
+
+  <header class="nav">
+    <a class="brand" href="index.html">
+      <img src="assets/logo-white.png" alt="Gamer Hut"/>
+      <span class="tag">
+        <span class="pixel t1" style="display:block;">DESCRIÇÕES</span>
+        <span class="mono t2" style="display:block;">YT · TIKTOK · INSTA</span>
+      </span>
+    </a>
+    <nav class="links">
+      <a href="index.html">PORTAL</a>
+      <a href="studio.html">CREATIVE STUDIO</a>
+      <a href="copys.html">COPYS</a>
+      <a class="active" href="descricoes.html">DESCRIÇÕES</a>
+      <a href="downloader.html">DOWNLOADER</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div class="head">
+      <span class="eyebrow">Descrições Padronizadas · Gamer Hut</span>
+      <h1 class="display">Descrições</h1>
+      <p>Gere descrições otimizadas para YouTube, TikTok e Instagram — cada plataforma com seu formato,
+        tom e regras específicas. O switch geracional ajusta o vocabulário e a abordagem.</p>
+    </div>
+
+    <div class="layout">
+      <!-- form -->
+      <section class="panel">
+        <h2 class="ptitle">BRIEFING</h2>
+        <div class="field">
+          <label>Plataforma</label>
+          <div class="pill-group" id="platforms">
+            <span class="pill on" data-p="youtube">YOUTUBE</span>
+            <span class="pill" data-p="tiktok">TIKTOK</span>
+            <span class="pill" data-p="instagram">INSTAGRAM</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Título do conteúdo</label>
+          <input id="title" class="input" placeholder="Ex: Metal Gear Solid Δ — Análise Completa"/>
+        </div>
+        <div class="field">
+          <label>Descrição breve <span class="hint">o que o público vai ver</span></label>
+          <textarea id="brief" class="input" placeholder="Ex: Review do MGS Delta rodando no PS5, comparando com o original de 2004, mostrando gráficos, gameplay e preço da mídia física."></textarea>
+        </div>
+        <div class="field">
+          <label>Geração <span class="hint">público-alvo</span></label>
+          <div class="gen-switch" id="genSwitch"></div>
+        </div>
+
+        <!-- conditional: YouTube -->
+        <div class="conditional show" id="condYoutube">
+          <p class="ctitle">YOUTUBE · CAMPOS EXTRAS</p>
+          <div class="field">
+            <label>Palavras-chave SEO <span class="hint">separadas por vírgula</span></label>
+            <input id="ytKeywords" class="input" placeholder="mgs delta, review ps5, metal gear solid remake…"/>
+          </div>
+          <div class="field">
+            <label>Links <span class="hint">loja, redes, etc.</span></label>
+            <input id="ytLinks" class="input" placeholder="https://gamerhut.com.br/mgs-delta"/>
+          </div>
+        </div>
+
+        <!-- conditional: TikTok -->
+        <div class="conditional" id="condTiktok">
+          <p class="ctitle">TIKTOK · CAMPOS EXTRAS</p>
+          <div class="field">
+            <label>Trend / som <span class="hint">opcional</span></label>
+            <input id="ttSound" class="input" placeholder="Ex: som de prévia de jogo, trending audio…"/>
+          </div>
+          <div class="field">
+            <label>Duração do vídeo</label>
+            <div class="pill-group" id="ttDuration">
+              <span class="pill on" data-v="15s">15s</span>
+              <span class="pill" data-v="30s">30s</span>
+              <span class="pill" data-v="60s">60s</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- conditional: Instagram -->
+        <div class="conditional" id="condInsta">
+          <p class="ctitle">INSTAGRAM · CAMPOS EXTRAS</p>
+          <div class="field">
+            <label>Ângulo do storytelling</label>
+            <div class="pill-group" id="instaAngle">
+              <span class="pill on" data-v="review">REVIEW</span>
+              <span class="pill" data-v="unboxing">UNBOXING</span>
+              <span class="pill" data-v="comparison">COMPARAÇÃO</span>
+              <span class="pill" data-v="nostalgia">NOSTALGIA</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Marcações <span class="hint">@contas, separadas por espaço</span></label>
+            <input id="instaMentions" class="input" placeholder="@gamerhut @jogador_nostalgico"/>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Call to Action</label>
+          <div class="pill-group" id="ctaChips">
+            <span class="pill on" data-v="Compre na Gamer Hut">COMPRE NA LOJA</span>
+            <span class="pill" data-v="Comente o que achou">COMENTE</span>
+            <span class="pill" data-v="Salve para ver depois">SALVE</span>
+            <span class="pill" data-v="Compartilhe com quem gosta">COMPARTILHE</span>
+            <span class="pill" data-v="Ative o sininho">SININHO</span>
+          </div>
+        </div>
+
+        <button id="gen" class="btn btn-primary" style="width:100%; justify-content:center; margin-top:4px;">⚡ GERAR DESCRIÇÃO</button>
+      </section>
+
+      <!-- output -->
+      <section class="panel">
+        <h2 class="ptitle" style="color:var(--orange);">RESULTADO</h2>
+        <div class="out" id="out">
+          <div class="empty">
+            <span class="ic">✍</span>
+            <p>Preencha o briefing e clique em <b style="color:#fff;">GERAR DESCRIÇÃO</b>. A descrição otimizada aparece aqui.</p>
+          </div>
+        </div>
+        <div class="hist" id="historySection" style="display:none;">
+          <h3>HISTÓRICO</h3>
+          <div id="historyList"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <img src="assets/logo-orange.png" alt="Gamer Hut"/>
+    <div class="fr">
+      <span class="a">MÍDIA FÍSICA NEVER DIES</span>
+      <span class="b">© 2025 GAMER HUT · PORTAL DE CRIAÇÃO</span>
+    </div>
+  </footer>
+
+  <script>
+  // ---- generation switch ----
+  const GEN_KEYS = ['gen-z', 'millennial', 'gen-x'];
+  let activeGen = localStorage.getItem('gh-generation') || 'gen-z';
+  const genSwitchEl = document.getElementById('genSwitch');
+  function buildGenSwitch(){
+    genSwitchEl.innerHTML = '';
+    GEN_KEYS.forEach(function(key){
+      var g = window.GH_GENERATIONS && window.GH_GENERATIONS[key];
+      if(!g) return;
+      var el = document.createElement('div');
+      el.className = 'gen-btn' + (key === activeGen ? ' on' : '');
+      el.innerHTML = '<span class="gen-emoji">'+g.emoji+'</span>'+
+        '<span class="gen-label">'+g.label+'</span>'+
+        '<span class="gen-sub">'+g.desc+'</span>';
+      el.onclick = function(){
+        activeGen = key;
+        localStorage.setItem('gh-generation', key);
+        document.querySelectorAll('#genSwitch .gen-btn').forEach(function(c){ c.classList.remove('on'); });
+        el.classList.add('on');
+      };
+      genSwitchEl.appendChild(el);
+    });
+  }
+  buildGenSwitch();
+  if(!window.GH_GENERATIONS){
+    genSwitchEl.innerHTML = '<div class="gen-btn on"><span class="gen-label">GEN Z</span></div>'+
+      '<div class="gen-btn"><span class="gen-label">MILLENNIAL</span></div>'+
+      '<div class="gen-btn"><span class="gen-label">GEN X</span></div>';
+  }
+
+  // ---- platform select ----
+  const platformsEl = document.getElementById('platforms');
+  let activePlatform = 'youtube';
+  const condMap = { youtube:'condYoutube', tiktok:'condTiktok', instagram:'condInsta' };
+  [...platformsEl.children].forEach(function(el){
+    el.onclick = function(){
+      activePlatform = el.dataset.p;
+      [...platformsEl.children].forEach(function(c){ c.classList.remove('on'); });
+      el.classList.add('on');
+      Object.keys(condMap).forEach(function(k){
+        document.getElementById(condMap[k]).classList.toggle('show', k === activePlatform);
+      });
+    };
+  });
+
+  // ---- TikTok duration select ----
+  let activeTtDuration = '15s';
+  const ttDurEl = document.getElementById('ttDuration');
+  [...ttDurEl.children].forEach(function(el){
+    el.onclick = function(){
+      activeTtDuration = el.dataset.v;
+      [...ttDurEl.children].forEach(function(c){ c.classList.remove('on'); });
+      el.classList.add('on');
+    };
+  });
+
+  // ---- Instagram angle select ----
+  let activeInstaAngle = 'review';
+  const instaAngleEl = document.getElementById('instaAngle');
+  [...instaAngleEl.children].forEach(function(el){
+    el.onclick = function(){
+      activeInstaAngle = el.dataset.v;
+      [...instaAngleEl.children].forEach(function(c){ c.classList.remove('on'); });
+      el.classList.add('on');
+    };
+  });
+
+  // ---- CTA chips (multi-select) ----
+  let activeCtas = ['Compre na Gamer Hut'];
+  const ctaEl = document.getElementById('ctaChips');
+  [...ctaEl.children].forEach(function(el){
+    el.onclick = function(){
+      var v = el.dataset.v;
+      var idx = activeCtas.indexOf(v);
+      if(idx >= 0){ activeCtas.splice(idx, 1); el.classList.remove('on'); }
+      else { activeCtas.push(v); el.classList.add('on'); }
+      if(activeCtas.length === 0){ activeCtas.push(v); el.classList.add('on'); }
+    };
+  });
+
+  // ---- history ----
+  const HIST_KEY = 'gh-desc-history';
+  function getHistory(){ try{ return JSON.parse(localStorage.getItem(HIST_KEY))||[]; }catch(e){ return []; } }
+  function addHistory(item){
+    var h = getHistory();
+    h.unshift(item);
+    if(h.length > 5) h = h.slice(0,5);
+    try{ localStorage.setItem(HIST_KEY, JSON.stringify(h)); }catch(e){}
+    renderHistory();
+  }
+  function renderHistory(){
+    var h = getHistory();
+    var section = document.getElementById('historySection');
+    var list = document.getElementById('historyList');
+    if(!h.length){ section.style.display = 'none'; return; }
+    section.style.display = 'block';
+    list.innerHTML = h.map(function(item, idx){
+      return '<div class="hist-item" data-idx="'+idx+'">'+
+        '<span class="hi-plat">'+item.platform.toUpperCase()+'</span>'+
+        '<span class="hi-title">'+esc(item.title||'(sem título)')+'</span>'+
+        '<button class="hi-del" data-idx="'+idx+'">✕</button></div>';
+    }).join('');
+    list.querySelectorAll('.hist-item').forEach(function(el){
+      el.addEventListener('click', function(e){
+        if(e.target.classList.contains('hi-del')){
+          var h2 = getHistory();
+          h2.splice(+e.target.dataset.idx, 1);
+          try{ localStorage.setItem(HIST_KEY, JSON.stringify(h2)); }catch(e2){}
+          renderHistory();
+          return;
+        }
+        var h2 = getHistory();
+        var item = h2[+el.dataset.idx];
+        if(item) renderDesc([{ texto:item.texto, platform:item.platform, title:item.title }]);
+      });
+    });
+  }
+
+  // ---- helpers ----
+  const out = document.getElementById('out');
+  const btn = document.getElementById('gen');
+  function esc(s){ return String(s||'').replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+
+  function skeleton(){
+    out.innerHTML = '<div class="skl" style="width:70%;height:18px;margin-bottom:14px"></div>'+
+      '<div class="skl" style="width:96%;margin-bottom:9px"></div>'+
+      '<div class="skl" style="width:90%;margin-bottom:9px"></div>'+
+      '<div class="skl" style="width:80%;margin-bottom:9px"></div>'+
+      '<div class="skl" style="width:55%;margin-bottom:14px"></div>'+
+      '<div class="skl" style="width:40%"></div>';
+  }
+
+  function renderDesc(variacoes){
+    if(!variacoes || !variacoes.length){
+      out.innerHTML = '<div class="empty"><span class="ic">✍</span><p>Nenhuma descrição gerada. Tente novamente.</p></div>';
+      return;
+    }
+    out.innerHTML = variacoes.map(function(v){
+      var texto = v.texto || '';
+      return '<div class="result">'+
+        '<div class="rh"><span class="rplat">'+esc((v.platform||activePlatform).toUpperCase())+'</span>'+
+        '<button class="rbtn">COPIAR</button></div>'+
+        (v.title?'<p class="rbody" style="font-size:17px;font-weight:700;color:#fff;margin-bottom:6px;">'+esc(v.title)+'</p>':'')+
+        '<p class="rbody">'+esc(texto)+'</p>'+
+        '<button class="rartbtn">CRIAR ARTE →</button></div>';
+    }).join('');
+
+    out.querySelectorAll('.result').forEach(function(el, i){
+      var v = variacoes[i];
+      var cb = el.querySelector('.rbtn');
+      cb.onclick = function(){
+        var full = (v.title? v.title+'\n\n' : '') + v.texto;
+        copyText(full).then(function(){
+          cb.textContent = 'COPIADO ✓'; cb.classList.add('done');
+          setTimeout(function(){ cb.textContent = 'COPIAR'; cb.classList.remove('done'); }, 1600);
+        }).catch(function(){
+          cb.textContent = 'SELECIONE E COPIE';
+          setTimeout(function(){ cb.textContent = 'COPIAR'; }, 1800);
+        });
+      };
+      el.querySelector('.rartbtn').onclick = function(){ sendToStudio(v); };
+    });
+  }
+
+  function showErr(msg){
+    out.innerHTML = '<div class="err"><b>Não consegui gerar agora.</b><br>'+esc(msg)+'</div>';
+  }
+
+  function copyText(text){
+    if(navigator.clipboard && window.isSecureContext){
+      return navigator.clipboard.writeText(text).catch(function(){ return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  function legacyCopy(text){
+    return new Promise(function(res,rej){
+      try{
+        var ta = document.createElement('textarea'); ta.value = text;
+        ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none';
+        document.body.appendChild(ta); ta.focus(); ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        ok ? res() : rej();
+      }catch(e){ rej(e); }
+    });
+  }
+
+  function sendToStudio(v){
+    var texto = v.texto || '';
+    var titulo = v.title || document.getElementById('title').value.trim().toUpperCase() || 'DESCRIÇÃO';
+    var plat = activePlatform;
+    var patch = {};
+    if(plat === 'youtube'){
+      patch = { template:'thumb', tagId:'review', fill:false, ink:'auto', pattern:'8bit',
+        eyebrow:'ANÁLISE COMPLETA', title:titulo, accentWord:'', subtitle:'', badge:'EXCLUSIVO GAMER HUT',
+        priceLabel:'', titleSize:140 };
+    } else if(plat === 'tiktok'){
+      patch = { template:'reels', tagId:'noticias', fill:true, pattern:'8bit', format:'stories',
+        eyebrow:'EM 30 SEGUNDOS', title:titulo, subtitle:'assiste já', titleSize:110 };
+    } else {
+      patch = { template:'block', tagId:'lancamento', fill:true, pattern:'solid',
+        eyebrow:'POST', title:titulo, subtitle: texto.slice(0,80), titleSize:108 };
+    }
+    var cur = {};
+    try{ cur = JSON.parse(localStorage.getItem('gh-studio')||'{}'); }catch(e){}
+    localStorage.setItem('gh-studio', JSON.stringify({ ...cur, ...patch }));
+    window.location.href = 'studio.html';
+  }
+
+  // ---- AI completion ----
+  async function aiComplete(prompt){
+    if(typeof window.claude !== 'undefined' && window.claude.complete){
+      return await window.claude.complete(prompt);
+    }
+    var url = ((window.GH_CONFIG && window.GH_CONFIG.proxyUrl) || '').trim();
+    if(!url){
+      throw new Error('Servidor de IA não configurado. Abra config.js e cole a URL do seu servidor em proxyUrl.');
+    }
+    var r = await fetch(url, {
+      method:'POST', headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({ prompt:prompt })
+    });
+    var data; try{ data = await r.json(); }catch(e){ throw new Error('Resposta inválida do servidor de IA.'); }
+    if(!r.ok || (data && data.error)){ throw new Error((data && data.error) || ('Erro '+r.status+' do servidor.')); }
+    return (data && data.text) || '';
+  }
+
+  function extractJSON(text){
+    var src = text.replace(/```json|```/g,'');
+    try{ return JSON.parse(src); }catch(e){}
+    var m = src.match(/\{[\s\S]*\}/);
+    if(m){ try{ return JSON.parse(m[0]); }catch(e){} }
+    return null;
+  }
+
+  // ---- generate ----
+  async function generate(){
+    var title = document.getElementById('title').value.trim();
+    var brief = document.getElementById('brief').value.trim();
+    if(!title || !brief){ if(!title) document.getElementById('title').focus(); else document.getElementById('brief').focus(); return; }
+
+    btn.disabled = true; btn.textContent = '⏳ GERANDO…'; skeleton();
+
+    var genVoice = (typeof window.getBrandVoice === 'function')
+      ? window.getBrandVoice(activeGen)
+      : (window.GH_BRAND || 'Você é o redator social da GAMER HUT, loja de jogos em mídia física.');
+    var genInfo = window.GH_GENERATIONS && window.GH_GENERATIONS[activeGen];
+    var genLabel = genInfo ? genInfo.full : 'Gamer geral';
+
+    var platformRules = '';
+    if(activePlatform === 'youtube'){
+      var keywords = document.getElementById('ytKeywords').value.trim();
+      var links = document.getElementById('ytLinks').value.trim();
+      platformRules = 'Regras YouTube:\n'+
+        '- Descrição LONGA (200-500 palavras) com parágrafo introdutório, análise do conteúdo, seção de links\n'+
+        '- Incluir timestamps se for análise/review\n'+
+        '- SEO keywords no primeiro parágrafo e dispersas no texto\n'+
+        '- Bloco "📦 Compre na Gamer Hut:" com link para o produto\n'+
+        '- Hashtags no final (5-10)\n'+
+        '- Fechar com "🔔 Inscreva-se no canal e ative o sininho!"\n'+
+        (keywords?'Palavras-chave SEO: '+keywords+'\n':'')+
+        (links?'Links: '+links+'\n':'');
+    } else if(activePlatform === 'tiktok'){
+      platformRules = 'Regras TikTok:\n'+
+        '- Descrição CURTA (1-3 frases + hashtags)\n'+
+        '- Gancho forte nos primeiros 2 segundos\n'+
+        '- Tom direto, conversational, sem enrolação\n'+
+        '- 3-5 trending hashtags no final\n'+
+        '- CTA no final: "segue a @gamerhut pra mais conteúdo"\n'+
+        'Duração do vídeo: '+activeTtDuration+'\n'+
+        (document.getElementById('ttSound').value.trim() ? 'Som/trend: '+document.getElementById('ttSound').value.trim()+'\n' : '');
+    } else {
+      var mentions = document.getElementById('instaMentions').value.trim();
+      platformRules = 'Regras Instagram:\n'+
+        '- Descrição MÉDIA (100-250 palavras)\n'+
+        '- Storytelling com gancho emocional\n'+
+        '- Tom de comunidade e pertencimento\n'+
+        '- 5-10 hashtags segmentadas\n'+
+        '- CTA nos comentários\n'+
+        'Ângulo: '+activeInstaAngle+'\n'+
+        (mentions?'Marcações: '+mentions+'\n':'');
+    }
+
+    var prompt = genVoice +
+'\n\n---\nTAREFA: Gere uma descrição padronizada e otimizada para a plataforma especificada. Use o branding book acima como base de tom.\n'+
+'PÚBLICO-ALVO: '+genLabel+'\n'+
+'Plataforma: '+activePlatform.toUpperCase()+'\n'+
+'Título: '+title+'\n'+
+'Briefing: '+brief+'\n'+
+'\n'+platformRules+
+'\nRegras gerais:\n'+
+'- Respeite o contexto geracional ('+genLabel+') — vocabulário, tom, comprimento\n'+
+'- Português do Brasil\n'+
+'- Descreva o conteúdo de forma que engaje o público-alvo da plataforma\n'+
+'\nResponda SOMENTE com JSON válido, sem texto fora dele, neste formato:\n'+
+'{"texto":"descrição completa formatada para a plataforma","title":"título otimizado (opcional se diferente do informado)"}';
+
+    try{
+      var text = await aiComplete(prompt);
+      var data = extractJSON(text);
+      if(!data || !data.texto){
+        // use raw text as fallback
+        var clean = text.replace(/```json|```/g,'').trim();
+        if(clean.length > 20){
+          renderDesc([{ texto:clean, platform:activePlatform, title:title }]);
+          addHistory({ texto:clean, platform:activePlatform, title:title });
+        } else {
+          showErr('A resposta veio em um formato inesperado. Tente de novo.');
+        }
+      } else {
+        renderDesc([{ texto:data.texto, platform:activePlatform, title:data.title||title }]);
+        addHistory({ texto:data.texto, platform:activePlatform, title:data.title||title });
+      }
+    }catch(e){
+      showErr((e&&e.message)||'Erro de conexão com a IA.');
+    }finally{
+      btn.disabled = false; btn.textContent = '⚡ GERAR DESCRIÇÃO';
+    }
+  }
+
+  btn.onclick = generate;
+  document.getElementById('brief').addEventListener('keydown', function(e){
+    if((e.metaKey||e.ctrlKey)&&e.key==='Enter') generate();
+  });
+  document.getElementById('title').addEventListener('keydown', function(e){
+    if((e.metaKey||e.ctrlKey)&&e.key==='Enter') generate();
+  });
+
+  renderHistory();
+  </script>
+</body>
+</html>
