@@ -118,6 +118,13 @@
   .gen-btn .gen-label{ font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.06em; }
   .gen-btn .gen-sub{ font-family:'Space Mono',monospace; font-size:8px; letter-spacing:.08em; color:var(--mut2); display:block; margin-top:2px; }
   .gen-btn.on .gen-sub{ color:var(--mut); }
+
+  .pill-group{ display:flex; gap:8px; flex-wrap:wrap; }
+  .pill{ cursor:pointer; font-family:'Space Mono',monospace; font-size:12px; font-weight:700; letter-spacing:.04em;
+    padding:9px 14px; border-radius:8px; background:var(--bg); color:var(--white); border:1px solid var(--lineSoft);
+    transition:all .13s; user-select:none; }
+  .pill:hover{ border-color:var(--mut); }
+  .pill.on{ background:var(--blue); color:#fff; border-color:var(--blue); }
 </style>
 </head>
 <body>
@@ -164,10 +171,10 @@
         <div class="field">
           <label>Tom de voz</label>
           <div class="chips" id="tones">
-            <span class="chip on" data-v="Hype, empolgado, gíria gamer">HYPE</span>
-            <span class="chip" data-v="Informativo e claro, direto ao ponto">INFORMATIVO</span>
-            <span class="chip" data-v="Nostálgico, saudosista, retrô">NOSTÁLGICO</span>
-            <span class="chip" data-v="Engraçado, debochado, meme">ZUEIRO</span>
+            <span class="chip on" data-v="hype">HYPE</span>
+            <span class="chip" data-v="informativo">INFORMATIVO</span>
+            <span class="chip" data-v="nostalgico">NOSTÁLGICO</span>
+            <span class="chip" data-v="zueiro">ZUEIRO</span>
           </div>
         </div>
         <div class="field">
@@ -175,9 +182,14 @@
           <div class="chips" id="cats"></div>
         </div>
         <div class="field">
-          <label>Plataforma <span class="hint">opcional</span></label>
+          <label>Plataforma <span class="hint">onde publicar</span></label>
           <div class="row2">
-            <input id="plat" class="input" placeholder="PS5 / Switch / Xbox…"/>
+            <div class="pill-group" id="platChips">
+              <span class="pill on" data-v="instagram">INSTAGRAM</span>
+              <span class="pill" data-v="tiktok">TIKTOK</span>
+              <span class="pill" data-v="youtube">YOUTUBE</span>
+              <span class="pill" data-v="feed">FEED</span>
+            </div>
             <input id="price" class="input" placeholder="Preço ou condição"/>
           </div>
         </div>
@@ -287,10 +299,23 @@
 
   // ---- tone single-select ----
   const tonesEl = document.getElementById('tones');
-  let activeTone = tonesEl.children[0];
+  let activeTone = tonesEl.children[0].dataset.v;
   [...tonesEl.children].forEach(el=>{
-    el.onclick = ()=>{ activeTone=el; [...tonesEl.children].forEach(c=>c.classList.remove('on')); el.classList.add('on'); };
+    el.onclick = ()=>{ activeTone=el.dataset.v; [...tonesEl.children].forEach(c=>c.classList.remove('on')); el.classList.add('on'); };
   });
+
+  // ---- platform single-select ----
+  var activePlatformCopys = 'instagram';
+  var platChipsEl = document.getElementById('platChips');
+  if(platChipsEl){
+    [...platChipsEl.children].forEach(function(el){
+      el.onclick = function(){
+        activePlatformCopys = el.dataset.v;
+        [...platChipsEl.children].forEach(function(c){ c.classList.remove('on'); });
+        el.classList.add('on');
+      };
+    });
+  }
 
   // ---- art model single-select ----
   const modelsEl = document.getElementById('models');
@@ -322,7 +347,7 @@
     const legenda = (v.legenda||'').trim();
     const cta     = (v.cta||'').trim();
     const price   = document.getElementById('price').value.trim();
-    const plat    = document.getElementById('plat').value.trim();
+    const plat    = activePlatformCopys || '';
     let patch = { tagId: activeCat.id };
     if(activeModel==='block'){
       patch = { ...patch, template:'block', fill:true, pattern:'solid', image:null,
@@ -484,12 +509,12 @@
   async function generate(){
     const brief = document.getElementById('brief').value.trim();
     if(!brief){ document.getElementById('brief').focus(); return; }
-    const plat = document.getElementById('plat').value.trim();
+    const plat = activePlatformCopys || '';
     const price = document.getElementById('price').value.trim();
     btn.disabled=true; btn.textContent='⏳ GERANDO…'; skeleton();
 
     var genVoice = (typeof window.getBrandVoice === 'function')
-      ? window.getBrandVoice(activeGen)
+      ? window.getBrandVoice(activeGen, activePlatformCopys, activeTone)
       : (window.GH_BRAND || 'Você é o redator social da GAMER HUT, loja de jogos em mídia física.');
     var genInfo = window.GH_GENERATIONS && window.GH_GENERATIONS[activeGen];
     var genLabel = genInfo ? genInfo.full : 'Gamer geral';
@@ -511,7 +536,7 @@ Cada página interna tem um título curto e um texto de 1 frase curta e direta. 
 Inclua também a legenda do feed e hashtags.`
 : `Crie 3 variações de copy para um post da categoria abaixo, seguindo a Fórmula de copy (gancho → jogo → diferencial → info comercial → CTA que pergunta algo).`}
 Categoria do post: ${activeCat.label}
-Tom de voz pedido: ${activeTone.dataset.v}
+Tom de voz pedido: ${activeTone}
 ${plat?('Plataforma: '+plat+'\n'):''}${price?('Preço/condição: '+price+'\n'):''}Briefing do post: ${brief}
 
 Regras:

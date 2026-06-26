@@ -56,13 +56,68 @@ detalhado está em \`generation-context.js\` e DEVE ser respeitado.
 `.trim();
 
 /* ============================================================
-   Retorna o guia de marca completo incluindo o contexto
-   geracional específico quando disponível.
-   Uso: getBrandVoice('gen-z') | 'millennial' | 'gen-x'
+   TONS DE VOZ — 4 perfis para guiar o tom da copy
    ============================================================ */
-window.getBrandVoice = function(generation){
+window.GH_TONES = {
+  'hype': {
+    label: 'HYPE',
+    desc: 'Empolgado, gíria gamer, alta energia',
+    context: 'TOM DE VOZ: HYPE\n- Energia máxima desde a primeira palavra\n- Gíria gamer atual (drop, corre, tá on, lacrou)\n- Frases curtas e impacto direto\n- Emojis como pontuação (não decoração)\n- CTA urgente mas real: "Corre", "Garanta o seu"\n- EVITE: explicações longas, linguagem corporativa, "prezado"'
+  },
+  'informativo': {
+    label: 'INFORMATIVO',
+    desc: 'Claro, direto, educativo',
+    context: 'TOM DE VOZ: INFORMATIVO\n- Clareza acima de tudo — o leitor entende em 1 leitura\n- Dados concretos: preço, plataforma, data, edição\n- Estrutura: fato → contexto → CTA\n- Zero gíria, zero hype vazio\n- Emojis apenas para organizar blocos\n- CTA preciso: "Disponível agora", "Pré-venda aberta"'
+  },
+  'nostalgico': {
+    label: 'NOSTÁLGICO',
+    desc: 'Saudosista, retrô, memória afetiva',
+    context: 'TOM DE VOZ: NOSTÁLGICO\n- Evoca memória afetiva antes de vender\n- Referências à época original do jogo/franquia\n- Tom de "quem viveu aquilo", não de quem está tentando vender\n- Storytelling antes do CTA\n- Emojis retrô ou nenhum\n- CTA: "A versão definitiva chegou", "Para quem zerou em [ano]"'
+  },
+  'zueiro': {
+    label: 'ZUEIRO',
+    desc: 'Engraçado, meme, debochado',
+    context: 'TOM DE VOZ: ZUEIRO\n- Humor autêntico de gamer, não forçado\n- Referência a meme ou situação que o público reconhece\n- Tom de conversa entre amigos, não de marca\n- Pode quebrar a 4ª parede\n- Emojis com intenção cômica\n- CTA leve: "já garantiu o seu né?", "só na Gamer Hut"\n- EVITE: humor corporativo, piada explicada, forçar trend'
+  }
+};
+
+/* ============================================================
+   PLATAFORMAS — contexto de formato para cada canal
+   ============================================================ */
+window.GH_PLATFORMS = {
+  'instagram': {
+    label: 'Instagram',
+    context: 'PLATAFORMA: INSTAGRAM\n- Feed: 2200 chars max, mas 125 aparecem sem "ver mais" — gancho obrigatório\n- Stories/Reels: texto mínimo, visual fala primeiro\n- Hashtags: 5-10 no final, bloco separado\n- CTA: "link na bio", "salva esse post", "marca um amigo"\n- Engajamento: perguntas nos comentários funcionam'
+  },
+  'tiktok': {
+    label: 'TikTok',
+    context: 'PLATAFORMA: TIKTOK\n- Descrição: 150 chars visíveis — gancho FORTE antes do corte\n- Tom: casual, conversacional, direto\n- Hashtags: 3-5, misturar nicho + trending\n- CTA: "segue a @gamerhut", "comenta o que achou"\n- Vídeo fala primeiro — texto é complemento'
+  },
+  'youtube': {
+    label: 'YouTube',
+    context: 'PLATAFORMA: YOUTUBE\n- Descrição longa: 200-500 palavras, SEO-friendly\n- Primeiras 2 linhas aparecem antes do "ver mais" — devem fisgar\n- Estrutura: gancho → conteúdo → links → hashtags\n- Keywords no primeiro parágrafo e dispersas\n- CTA: "Inscreva-se", "ativa o sininho", "link na descrição"'
+  },
+  'feed': {
+    label: 'Feed (genérico)',
+    context: 'PLATAFORMA: FEED DE REDES SOCIAIS\n- Priorizar visual forte + texto de apoio\n- CTA claro e direto\n- Hashtags relevantes ao nicho gaming/mídia física'
+  }
+};
+
+/* ============================================================
+   Retorna o guia de marca completo incluindo o contexto
+   geracional, plataforma e/ou tom de voz quando disponíveis.
+   Uso: getBrandVoice('gen-z', 'instagram', 'hype')
+   Chamadas com só 1 parâmetro continuam funcionando.
+   ============================================================ */
+window.getBrandVoice = function(generation, platform, tone){
   var base = window.GH_BRAND || '';
   var gen = window.GH_GENERATIONS && window.GH_GENERATIONS[generation];
-  if(!gen) return base;
-  return base + '\n\n---\n' + gen.context.trim();
+  var plt = platform && window.GH_PLATFORMS && window.GH_PLATFORMS[platform];
+  var tn  = tone && window.GH_TONES && window.GH_TONES[tone];
+
+  var result = base;
+  if(gen) result += '\n\n---\n' + gen.context.trim();
+  if(plt) result += '\n\n---\n' + plt.context.trim();
+  if(tn)  result += '\n\n---\n' + tn.context.trim();
+  return result;
 };

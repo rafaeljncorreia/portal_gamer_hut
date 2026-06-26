@@ -64,6 +64,21 @@
   .gen-btn .gen-label{ font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.06em; }
   .gen-btn .gen-sub{ font-family:'Space Mono',monospace; font-size:8px; letter-spacing:.08em; color:var(--mut2); display:block; margin-top:2px; }
   .gen-btn.on .gen-sub{ color:var(--mut); }
+
+  .axis-cards{ display:flex; flex-direction:column; gap:10px; margin:14px 0; }
+  .axis-card{ background:var(--panel); border:1px solid var(--lineSoft); border-left:3px solid var(--orange);
+    border-radius:10px; padding:12px 14px; }
+  .axis-card .axis-label{ font-family:'Space Mono',monospace; font-size:10px; font-weight:700;
+    letter-spacing:.1em; color:var(--orange); display:block; margin-bottom:6px; }
+  .axis-card p{ margin:0; color:#cfc9c1; font-size:13px; line-height:1.6; }
+
+  .pill-group{ display:flex; gap:8px; flex-wrap:wrap; }
+  .pill{ cursor:pointer; font-family:'Space Mono',monospace; font-size:12px; font-weight:700; letter-spacing:.04em;
+    padding:9px 14px; border-radius:8px; background:var(--bg); color:var(--white); border:1px solid var(--lineSoft);
+    transition:all .13s; user-select:none; }
+  .pill:hover{ border-color:var(--mut); }
+  .pill.on{ background:var(--blue); color:#fff; border-color:var(--blue); }
+  .field .hint{ font-family:'Space Mono',monospace; font-size:9px; letter-spacing:.04em; color:var(--mut2); text-transform:none; }
 </style>
 <script src="config.js"></script>
 <script src="generation-context.js"></script>
@@ -116,6 +131,24 @@
         <div class="field">
           <label>Geração <span class="hint">público-alvo da peça</span></label>
           <div class="gen-switch" id="genSwitch"></div>
+        </div>
+        <div class="field">
+          <label>Tom de voz <span class="hint">como essa peça foi escrita</span></label>
+          <div class="pill-group" id="toneChips">
+            <span class="pill on" data-v="hype">HYPE</span>
+            <span class="pill" data-v="informativo">INFORMATIVO</span>
+            <span class="pill" data-v="nostalgico">NOSTÁLGICO</span>
+            <span class="pill" data-v="zueiro">ZUEIRO</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Plataforma <span class="hint">onde vai publicar</span></label>
+          <div class="pill-group" id="platformChips">
+            <span class="pill on" data-v="instagram">INSTAGRAM</span>
+            <span class="pill" data-v="tiktok">TIKTOK</span>
+            <span class="pill" data-v="youtube">YOUTUBE</span>
+            <span class="pill" data-v="feed">FEED</span>
+          </div>
         </div>
         <button class="btn btn-primary" id="reviewBtn" style="width:100%; justify-content:center; margin-top:6px;">🔍 REVISAR CRIATIVO</button>
       </section>
@@ -210,6 +243,28 @@ function buildGenSwitch(){
 }
 buildGenSwitch();
 
+var activeTone = 'hype';
+var toneChipsEl = document.getElementById('toneChips');
+[...toneChipsEl.children].forEach(function(el){
+  el.onclick = function(){
+    activeTone = el.dataset.v;
+    [...toneChipsEl.children].forEach(function(c){ c.classList.remove('on'); });
+    el.classList.add('on');
+  };
+});
+
+var activePlatformReview = 'instagram';
+var platformChipsEl = document.getElementById('platformChips');
+[...platformChipsEl.children].forEach(function(el){
+  el.onclick = function(){
+    activePlatformReview = el.dataset.v;
+    [...platformChipsEl.children].forEach(function(c){ c.classList.remove('on'); });
+    el.classList.add('on');
+  };
+});
+
+var genLabel = '', toneLabel = '', platLabel = '';
+
 function esc(s){ return String(s||'').replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
 
 async function aiComplete(prompt){
@@ -264,17 +319,26 @@ async function reviewCreative(){
   btn.textContent = '⏳ ANALISANDO…';
   showSkeleton();
 
-  var voice = (window.getBrandVoice && window.getBrandVoice(activeGen))
-    || window.GH_BRAND
-    || 'Você é o redator social da GAMER HUT, loja de jogos em mídia física.';
-  var genLabel = (window.GH_GENERATIONS && window.GH_GENERATIONS[activeGen])
+  var voice = window.getBrandVoice
+    ? window.getBrandVoice(activeGen, activePlatformReview, activeTone)
+    : (window.GH_BRAND || 'Você é o redator social da GAMER HUT, loja de jogos em mídia física.');
+  genLabel = (window.GH_GENERATIONS && window.GH_GENERATIONS[activeGen])
     ? window.GH_GENERATIONS[activeGen].full
     : 'Gamer geral';
+  toneLabel = (window.GH_TONES && window.GH_TONES[activeTone])
+    ? window.GH_TONES[activeTone].label
+    : activeTone.toUpperCase();
+  platLabel = (window.GH_PLATFORMS && window.GH_PLATFORMS[activePlatformReview])
+    ? window.GH_PLATFORMS[activePlatformReview].label
+    : activePlatformReview;
 
-  var prompt = voice + '\n\n---\nTAREFA: Revisar um criativo da Gamer Hut antes de publicar.\n\n' +
-    'PÚBLICO-ALVO DA PEÇA: ' + genLabel + '\n\n' +
+  var prompt = voice + '\n\n---\n' +
+    'TAREFA: Revisar um criativo da Gamer Hut antes de publicar.\n\n' +
+    'PÚBLICO-ALVO: ' + genLabel + '\n' +
+    'TOM DE VOZ DECLARADO: ' + toneLabel + '\n' +
+    'PLATAFORMA: ' + platLabel + '\n\n' +
     'COPY DO CRIATIVO:\n"""\n' + copy + '\n"""\n\n' +
-    'Analise a copy acima contra o brandbook e o contexto geracional. Responda SOMENTE com JSON válido:\n' +
+    'Analise em 3 dimensões e responda SOMENTE com JSON válido:\n' +
     '{\n' +
     '  "clareza": 0-100,\n' +
     '  "contraste": 0-100,\n' +
@@ -283,18 +347,14 @@ async function reviewCreative(){
     '  "cta": 0-100,\n' +
     '  "scoreGeral": 0-100,\n' +
     '  "aprovado": true ou false,\n' +
-    '  "resumo": "1 frase com o diagnóstico geral",\n' +
-    '  "pontos": ["ponto positivo 1", "ponto positivo 2"],\n' +
-    '  "melhorias": ["melhoria 1", "melhoria 2", "melhoria 3"],\n' +
-    '  "reescrita": "versão melhorada da copy, pronta para publicar"\n' +
-    '}\n\n' +
-    'Critérios:\n' +
-    '- clareza: o público entende de imediato o que está sendo comunicado?\n' +
-    '- contraste: o criativo se destaca vs. conteúdo genérico de gaming?\n' +
-    '- tomDeVoz: segue o tom da Gamer Hut (acessível, instigante, transparente)?\n' +
-    '- identidade: usa vocabulário, CTAs e abordagem da marca?\n' +
-    '- cta: o call-to-action é claro, natural e da lista aprovada (não usa "Bora")?\n' +
-    '- aprovado: true só se todos os critérios >= 60 e nenhuma regra de ouro violada';
+    '  "feedbackGeracao": "avalie especificamente para ' + genLabel + ': funciona para essa geração? por quê?",\n' +
+    '  "feedbackTom": "o tom da copy bate com ' + toneLabel + '? o que está fora do tom?",\n' +
+    '  "feedbackPlataforma": "esta copy funciona para ' + platLabel + '? o que mudar para essa plataforma?",\n' +
+    '  "resumo": "diagnóstico geral em 1 frase",\n' +
+    '  "pontos": ["ponto forte 1", "ponto forte 2"],\n' +
+    '  "melhorias": ["melhoria 1", "melhoria 2"],\n' +
+    '  "reescrita": "versão melhorada respeitando os 3 eixos declarados"\n' +
+    '}';
 
   try{
     var text = await aiComplete(prompt);
@@ -374,6 +434,17 @@ function renderReport(data){
     html += '<p style="color:var(--mut);font-family:\'Space Mono\',monospace;font-size:10px;letter-spacing:.1em;margin:0 0 6px;">⚠ MELHORIAS SUGERIDAS</p>'+
       '<ul style="margin:0 0 18px;padding-left:18px;color:#cfc9c1;font-size:13px;line-height:1.7;">'+melhorias+'</ul>';
   }
+
+  var axisCards = '';
+  if(data.feedbackGeracao || data.feedbackTom || data.feedbackPlataforma){
+    axisCards = '<div class="axis-cards">';
+    if(data.feedbackGeracao) axisCards += '<div class="axis-card"><span class="axis-label">👥 ' + esc(genLabel) + '</span><p>' + esc(data.feedbackGeracao) + '</p></div>';
+    if(data.feedbackTom)     axisCards += '<div class="axis-card"><span class="axis-label">🎙️ TOM: ' + esc(toneLabel) + '</span><p>' + esc(data.feedbackTom) + '</p></div>';
+    if(data.feedbackPlataforma) axisCards += '<div class="axis-card"><span class="axis-label">📱 ' + esc(platLabel) + '</span><p>' + esc(data.feedbackPlataforma) + '</p></div>';
+    axisCards += '</div>';
+  }
+  if(axisCards) html += axisCards;
+
   if(data.reescrita){
     html += '<p style="color:var(--mut);font-family:\'Space Mono\',monospace;font-size:10px;letter-spacing:.1em;margin:0 0 8px;">✍ VERSÃO MELHORADA</p>'+
       '<div id="reescritaBox" style="background:var(--bg);border:1px solid var(--lineSoft);border-left:3px solid var(--orange);'+
