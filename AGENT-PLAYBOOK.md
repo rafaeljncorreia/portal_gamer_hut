@@ -106,6 +106,7 @@ Em toda revisão de copy/criativo, audite contra esta lista. Se violar, **reescr
 - **Linguagem:** ritmo rápido, gíria gamer atual, frases curtas, hype real
 - **Dor presumida:** medo de não pertencer ao hype, FOMO de edição
 - **Evite:** explicação longa, nostalgia anos 90, "lembra quando..."
+- **Regra Editorial TikTok (Obrigatória):** Estrutura de 5 blocos: 1) Ideia forte/emoção, 2) Contexto (1-2 frases), 3) Pergunta para comentários, 4) Informação comercial + CTA (evitar "Bora"), 5) Hashtags.
 
 ### 🟦 Millennials (30–44) · 35% do esforço
 - **Objetivo KPI:** Engajamento / Conversão recorrente

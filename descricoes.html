@@ -505,12 +505,13 @@
         (keywords?'Palavras-chave SEO: '+keywords+'\n':'')+
         (links?'Links: '+links+'\n':'');
     } else if(activePlatform === 'tiktok'){
-      platformRules = 'Regras TikTok:\n'+
-        '- Descrição CURTA (1-3 frases + hashtags)\n'+
-        '- Gancho forte nos primeiros 2 segundos\n'+
-        '- Tom direto, conversational, sem enrolação\n'+
-        '- 3-5 trending hashtags no final\n'+
-        '- CTA no final: "segue a @gamerhut pra mais conteúdo"\n'+
+      platformRules = 'Regras TikTok (ESTRUTURA OBRIGATÓRIA DE 5 BLOCOS):\n'+
+        '- Bloco 1 (1ª linha): uma ideia forte ou uma emoção que capture a atenção.\n'+
+        '- Bloco 2 (Contexto): 1 ou 2 frases curtas posicionando o assunto.\n'+
+        '- Bloco 3 (Pergunta): uma pergunta direta para fomentar comentários.\n'+
+        '- Bloco 4 (Comercial): informação comercial (pré-venda, disponibilidade, mídia física) com CTA (ex: "Garanta o seu", "Pré-venda liberada", "Link na Bio"). NUNCA use "Bora".\n'+
+        '- Bloco 5 (Hashtags): 3-5 trending hashtags.\n'+
+        '- Tom direto, conversational, sem enrolação.\n'+
         'Duração do vídeo: '+activeTtDuration+'\n'+
         (document.getElementById('ttSound').value.trim() ? 'Som/trend: '+document.getElementById('ttSound').value.trim()+'\n' : '');
     } else {
