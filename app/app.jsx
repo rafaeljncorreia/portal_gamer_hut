@@ -489,9 +489,7 @@ function GridDots(){
 }
 
 /* ---- top bar ---- */
-var GEN_KEYS_S = ['gen-z','millennial','gen-x'];
 function TopBar({ s, dims, tag, busy, isVideoPage, gen, setGen, onExport, onExportAll, onExportVideo }){
-  var genData = (typeof window !== 'undefined' && window.GH_GENERATIONS) || null;
   return (
     <header style={{ height:64, flex:'none', display:'flex', alignItems:'center', justifyContent:'space-between',
       padding:'0 22px', background:GH.panel, borderBottom:`1px solid ${GH.lineSoft}` }}>
@@ -502,23 +500,6 @@ function TopBar({ s, dims, tag, busy, isVideoPage, gen, setGen, onExport, onExpo
         <div style={{ borderLeft:`1px solid ${GH.lineSoft}`, paddingLeft:14 }}>
           <div className="gh-pixel" style={{ color:GH.white, fontSize:12, letterSpacing:'.02em' }}>CREATIVE STUDIO</div>
           <div className="gh-mono" style={{ color:GH.mut, fontSize:10, letterSpacing:'.18em', marginTop:3 }}>AUTOMAÇÃO DE CRIATIVOS</div>
-        </div>
-        {/* generation switch */}
-        <div style={{ display:'flex', gap:4, marginLeft:10, paddingLeft:14, borderLeft:`1px solid ${GH.lineSoft}` }}>
-          {GEN_KEYS_S.map(function(k){
-            var g = genData && genData[k];
-            var active = k === gen;
-            return (
-              <button key={k} onClick={function(){ setGen(k); }}
-                style={{ cursor:'pointer', padding:'4px 8px', borderRadius:6, border:'none',
-                  fontSize:10, fontFamily:'"Space Mono",monospace', fontWeight:700,
-                  letterSpacing:'.04em', transition:'all .12s',
-                  background: active ? GH.orange : 'transparent',
-                  color: active ? GH.ink : GH.mut }}>
-                {g ? g.label : k.toUpperCase()}
-              </button>
-            );
-          })}
         </div>
       </div>
       <div style={{ display:'flex', alignItems:'center', gap:12 }}>
