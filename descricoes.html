@@ -342,6 +342,17 @@
     };
   });
 
+  // ---- tone chips ----
+  let activeTone = 'hype';
+  const toneChipsEl = document.getElementById('toneChips');
+  [...toneChipsEl.children].forEach(function(el){
+    el.onclick = function(){
+      activeTone = el.dataset.v;
+      [...toneChipsEl.children].forEach(function(c){ c.classList.remove('on'); });
+      el.classList.add('on');
+    };
+  });
+
   // ---- history ----
   const HIST_KEY = 'gh-desc-history';
   function getHistory(){ try{ return JSON.parse(localStorage.getItem(HIST_KEY))||[]; }catch(e){ return []; } }
@@ -506,7 +517,7 @@
     btn.disabled = true; btn.textContent = '⏳ GERANDO…'; skeleton();
 
     var genVoice = (typeof window.getBrandVoice === 'function')
-      ? window.getBrandVoice(activeGen, activePlatform)
+      ? window.getBrandVoice(activeGen, activePlatform, activeTone)
       : (window.GH_BRAND || 'Você é o redator social da GAMER HUT, loja de jogos em mídia física.');
     var genInfo = window.GH_GENERATIONS && window.GH_GENERATIONS[activeGen];
     var genLabel = genInfo ? genInfo.full : 'Gamer geral';
