@@ -117,6 +117,7 @@
       <a href="studio.html">CREATIVE STUDIO</a>
       <a href="copys.html">COPYS</a>
       <a class="active" href="descricoes.html">DESCRIÇÕES</a>
+      <a href="review.html">REVIEW</a>
       <a href="downloader.html">DOWNLOADER</a>
     </nav>
   </header>
@@ -152,6 +153,15 @@
         <div class="field">
           <label>Geração <span class="hint">público-alvo</span></label>
           <div class="gen-switch" id="genSwitch"></div>
+        </div>
+        <div class="field">
+          <label>Tom de voz <span class="hint">como a descrição deve soar</span></label>
+          <div class="pill-group" id="toneChips">
+            <span class="pill on" data-v="hype">HYPE</span>
+            <span class="pill" data-v="informativo">INFORMATIVO</span>
+            <span class="pill" data-v="nostalgico">NOSTÁLGICO</span>
+            <span class="pill" data-v="zueiro">ZUEIRO</span>
+          </div>
         </div>
 
         <!-- conditional: YouTube -->
@@ -486,7 +496,7 @@
     btn.disabled = true; btn.textContent = '⏳ GERANDO…'; skeleton();
 
     var genVoice = (typeof window.getBrandVoice === 'function')
-      ? window.getBrandVoice(activeGen)
+      ? window.getBrandVoice(activeGen, activePlatform)
       : (window.GH_BRAND || 'Você é o redator social da GAMER HUT, loja de jogos em mídia física.');
     var genInfo = window.GH_GENERATIONS && window.GH_GENERATIONS[activeGen];
     var genLabel = genInfo ? genInfo.full : 'Gamer geral';

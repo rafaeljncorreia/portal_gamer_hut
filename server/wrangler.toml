@@ -1,0 +1,19 @@
+# ============================================================
+# Cloudflare Worker — Plataforma de Gestão Gamer Hut
+# Deploy: npx wrangler deploy
+# Secrets (NÃO ficam aqui — usar wrangler secret put):
+#   npx wrangler secret put ANTHROPIC_API_KEY
+#   npx wrangler secret put MONDAY_TOKEN
+# ============================================================
+
+name = "gamerhut-ia"
+main = "worker.js"
+compatibility_date = "2026-07-01"
+
+# Banco D1 — criar com:  npx wrangler d1 create gamerhut
+# Depois colar o database_id retornado abaixo e aplicar o schema:
+#   npx wrangler d1 execute gamerhut --file=schema.sql --remote
+[[d1_databases]]
+binding = "DB"
+database_name = "gamerhut"
+database_id = "COLE_AQUI_O_ID_DO_D1"

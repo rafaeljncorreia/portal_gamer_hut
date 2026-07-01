@@ -49,6 +49,25 @@ Comunicar games como eventos, lançamentos como momentos especiais e mídia fís
 
 O que os bons exemplos têm em comum: emoção primeiro; o jogo é o protagonista; conversa com a comunidade; hype controlado; transformam um anúncio em uma conversa sobre games.
 
+## SINAIS REAIS DE PERFORMANCE (dados próprios — atualizado 30/06/2026)
+Canais: Instagram é a base própria e maior audiência (~106K); TikTok é o
+motor de alcance e descoberta (vídeos passam de 700K views com ~22K
+seguidores). Formatos que JÁ performaram — repita o PADRÃO, não o conteúdo:
+- Hero/capa de AAA nostálgico + "já disponível na loja oficial" — maior
+  hit do TikTok (Metal Gear Solid Δ, ~725K views).
+- Meme/zueiro autodepreciativo da marca ("se ser a melhor loja de mídia
+  física fosse crime") — altíssimo índice de SAVE (200-580 saves).
+- Estante/coleção: prateleiras cheias de mídia física = desejo visual.
+- BTS com a dupla de donos na loja — o rosto humano da marca performa.
+- "VOCÊ CONHECE [JOGO]?" — formato de descoberta para títulos menos óbvios.
+CTA de salvar funciona: meme e estante são salvos para compartilhar.
+
+## OBJEÇÃO DE CONFIANÇA (confirmada pelo destaque fixo "Evite Golpes")
+Parte do público teme golpe / loja falsa (realidade do e-commerce BR).
+Reforce procedência sem ser solicitado: loja oficial, direto do publisher,
+mídia lacrada e original. NUNCA soar como revenda anônima ou preço bom
+demais sem lastro.
+
 ## NOTA SOBRE GERAÇÕES
 A Gamer Hut atende 3 gerações de público (Gen Z, Millennials, Gen X).
 Cada post é feito para UMA geração específica. O contexto geracional
@@ -77,7 +96,7 @@ window.GH_TONES = {
   'zueiro': {
     label: 'ZUEIRO',
     desc: 'Engraçado, meme, debochado',
-    context: 'TOM DE VOZ: ZUEIRO\n- Humor autêntico de gamer, não forçado\n- Referência a meme ou situação que o público reconhece\n- Tom de conversa entre amigos, não de marca\n- Pode quebrar a 4ª parede\n- Emojis com intenção cômica\n- CTA leve: "já garantiu o seu né?", "só na Gamer Hut"\n- EVITE: humor corporativo, piada explicada, forçar trend'
+    context: 'TOM DE VOZ: ZUEIRO (performer comprovado — alto índice de SAVE)\n- Humor autêntico de gamer, não forçado\n- Referência a meme ou situação que o público reconhece\n- Autodepreciação da marca funciona ("se ser a melhor loja fosse crime")\n- Tom de conversa entre amigos, não de marca\n- Pode quebrar a 4ª parede\n- Emojis com intenção cômica\n- CTA leve: "já garantiu o seu né?", "só na Gamer Hut", "salva aí"\n- EVITE: humor corporativo, piada explicada, forçar trend'
   }
 };
 

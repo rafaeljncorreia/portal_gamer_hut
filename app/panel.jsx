@@ -2,7 +2,7 @@
    GAMER HUT — Controls assembly (template-aware fields)
    ============================================================ */
 
-function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS, memeAiLoading, onMemeAiGenerate }){
+function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS }){
   const isCarousel = s.template==='carousel';
   const isImage    = s.template==='image';
   const isReels    = s.template==='reels';
@@ -28,7 +28,7 @@ function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS, memeAiLoa
 
       {isMeme &&
         <CtrlSection title="CONTEÚDO DO MEME">
-          <MemeFields s={s} set={set} memeAiLoading={memeAiLoading} onMemeAiGenerate={onMemeAiGenerate}/>
+          <MemeFields s={s} set={set}/>
         </CtrlSection>}
 
       {(isBlock||isQuiz||isRanking||isArrivals) &&
@@ -532,7 +532,7 @@ function ArrivalsFields({ s, set, setS }){
 }
 
 /* ---- MEME fields ---- */
-function MemeFields({ s, set, memeAiLoading, onMemeAiGenerate }){
+function MemeFields({ s, set }){
   const mode = s.memeMode || 'classic';
   return (
     <>
@@ -610,29 +610,6 @@ function MemeFields({ s, set, memeAiLoading, onMemeAiGenerate }){
         </Field>
       </>}
 
-      {/* GERAR COM IA */}
-      <div style={{ background:GH.bg, border:`1px solid ${GH.lineSoft}`, borderRadius:10, padding:'14px 14px', marginTop:18 }}>
-        <p className="gh-pixel" style={{ margin:'0 0 12px', color:GH.orange, fontSize:10, letterSpacing:'.04em' }}>
-          GERAR COM IA</p>
-        <Field label="Contexto breve">
-          <textarea value={s.memeAiContext||''} onChange={e=>set({ memeAiContext:e.target.value })}
-            placeholder="Ex: Pré-venda do MGS Delta abriu, edição steelbook esgotando rápido"
-            className="gh-mono" style={{ width:'100%', background:GH.panel, color:GH.white,
-              border:`1px solid ${GH.lineSoft}`, borderRadius:8, padding:'11px 13px', fontSize:12,
-              outline:'none', resize:'vertical', minHeight:70, lineHeight:1.5 }}/>
-        </Field>
-        <button onClick={onMemeAiGenerate} disabled={memeAiLoading}
-          className="gh-mono" style={{ cursor: memeAiLoading?'wait':'pointer', width:'100%',
-            padding:'11px 0', borderRadius:8, border:'none', fontSize:12, fontWeight:700,
-            letterSpacing:'.06em', transition:'all .12s',
-            background: memeAiLoading?GH.mut2:GH.orange,
-            color: memeAiLoading?GH.mut:GH.ink }}>
-          {memeAiLoading ? 'GERANDO…' : '⚡ GERAR MEME'}
-        </button>
-        <p className="gh-mono" style={{ margin:'8px 0 0', color:GH.mut2, fontSize:9, lineHeight:1.5, letterSpacing:'.04em' }}>
-          A IA preenche os textos e escolhe o modo automaticamente com base no contexto.
-          Revise e ajuste os campos como preferir.</p>
-      </div>
     </>
   );
 }

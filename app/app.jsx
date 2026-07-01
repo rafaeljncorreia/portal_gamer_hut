@@ -23,8 +23,6 @@ const DEFAULT_STATE = {
   memeTop:'QUANDO VOCÊ VÊ PRÉ-VENDA DE MÍDIA FÍSICA',
   memeBot:'E JÁ ABRE O SITE DA GAMER HUT',
   memeCaption:'EU QUANDO VEM LANÇAMENTO EXCLUSIVO',
-  // MEME AI
-  memeAiContext:'',
   // QUIZ
   quizMode:'pergunta',
   question:'QUAL É O MELHOR JOGO DE 2024?',
@@ -89,13 +87,6 @@ function App(){
   const [busy, setBusy] = useState(false);
   const [vidProg, setVidProg] = useState({ p:0, r:0 });
   const [toast, setToast] = useState(null);
-  const [memeAiLoading, setMemeAiLoading] = useState(false);
-  const [gen, setGen] = useState(function(){
-    try{ return localStorage.getItem('gh-generation') || 'gen-z'; }catch(e){ return 'gen-z'; }
-  });
-  useEffect(function(){
-    try{ localStorage.setItem('gh-generation', gen); }catch(e){}
-  }, [gen]);
   const stageRef = useRef(null);
   const viewRef  = useRef(null);
   const recStopRef = useRef(null);
@@ -182,47 +173,6 @@ function App(){
   };
 
   const flashToast = (msg)=>{ setToast(msg); setTimeout(()=>setToast(null), 2600); };
-
-  async function handleMemeAiGenerate(){
-    var ctx = (s.memeAiContext||'').trim();
-    if(!ctx){ flashToast('Digite um contexto para o meme'); return; }
-    setMemeAiLoading(true);
-    try{
-      var url = (window.GH_CONFIG && window.GH_CONFIG.proxyUrl || '').trim();
-      if(!url){ flashToast('Proxy de IA não configurado'); return; }
-      var genName = (window.GH_GENERATIONS && window.GH_GENERATIONS[gen]) ? window.GH_GENERATIONS[gen].label : 'GEN Z';
-      var brand = (window.getBrandVoice && window.getBrandVoice(gen)) || window.GH_BRAND || '';
-      var prompt = brand + '\n\n---\nTAREFA: Crie um meme para a Gamer Hut sobre o contexto abaixo.\n'+
-        'Geração ativa: '+genName+'\nContexto: '+ctx+'\n\n'+
-        'Responda SOMENTE com JSON:\n'+
-        '{"memeTop":"texto superior (curto, impacto)","memeBot":"texto inferior ou subtexto","memeMode":"classic","memeCaption":"legenda (usado no mode reaction, pode repetir memeBot)"}\n'+
-        'memeMode deve ser "classic", "reaction" ou "dual".';
-      var r = await fetch(url, {
-        method:'POST', headers:{ 'Content-Type':'application/json' },
-        body: JSON.stringify({ prompt:prompt })
-      });
-      var data; try{ data = await r.json(); }catch(e){ throw new Error('Resposta inválida'); }
-      if(!r.ok || (data && data.error)) throw new Error((data&&data.error)||'Erro '+r.status);
-      var text = (data&&data.text)||'';
-      var src = text.replace(/```json|```/g,'').trim();
-      var json; try{ json = JSON.parse(src); }catch(e){
-        var m = src.match(/\{[\s\S]*\}/);
-        if(m){ try{ json = JSON.parse(m[0]); }catch(e2){ throw new Error('Resposta em formato inesperado'); } }
-        else throw new Error('Resposta em formato inesperado');
-      }
-      var patch = {};
-      if(json.memeTop) patch.memeTop = json.memeTop;
-      if(json.memeBot) patch.memeBot = json.memeBot;
-      if(json.memeCaption) patch.memeCaption = json.memeCaption;
-      if(json.memeMode && ['classic','reaction','dual'].indexOf(json.memeMode)>=0) patch.memeMode = json.memeMode;
-      set(patch);
-      flashToast('Meme gerado com IA');
-    }catch(e){
-      flashToast('Erro: '+(e&&e.message||'falha na IA'));
-    }finally{
-      setMemeAiLoading(false);
-    }
-  }
 
   // ---- PNG export ----------------------------------------------------------
   // Build a font-embed CSS once (Google stylesheet is cross-origin, so we fetch
@@ -411,15 +361,14 @@ function App(){
 
   return (
     <div style={{ height:'100vh', display:'flex', flexDirection:'column', background:GH.bg2, overflow:'hidden' }}>
-      <TopBar s={s} dims={dims} tag={tag} busy={busy} isVideoPage={isVideoPage} gen={gen} setGen={setGen}
+      <TopBar s={s} dims={dims} tag={tag} busy={busy} isVideoPage={isVideoPage}
         onExport={exportCurrent} onExportAll={exportAll} onExportVideo={exportVideo}/>
       <div style={{ flex:1, display:'flex', minHeight:0 }}>
         {/* LEFT RAIL */}
         <aside style={{ width:392, flex:'none', background:GH.panel, borderRight:`1px solid ${GH.lineSoft}`,
           overflowY:'auto', overflowX:'hidden' }}>
           <Controls s={s} set={set} tag={tag} onCover={onCover} pageIdx={pageIdx}
-            pickTemplate={pickTemplate} setS={setS} memeAiLoading={memeAiLoading}
-            onMemeAiGenerate={handleMemeAiGenerate}/>
+            pickTemplate={pickTemplate} setS={setS}/>
         </aside>
         {/* PREVIEW */}
         <main ref={viewRef} style={{ flex:1, minWidth:0, position:'relative', display:'grid',
@@ -489,7 +438,7 @@ function GridDots(){
 }
 
 /* ---- top bar ---- */
-function TopBar({ s, dims, tag, busy, isVideoPage, gen, setGen, onExport, onExportAll, onExportVideo }){
+function TopBar({ s, dims, tag, busy, isVideoPage, onExport, onExportAll, onExportVideo }){
   return (
     <header style={{ height:64, flex:'none', display:'flex', alignItems:'center', justifyContent:'space-between',
       padding:'0 22px', background:GH.panel, borderBottom:`1px solid ${GH.lineSoft}` }}>
