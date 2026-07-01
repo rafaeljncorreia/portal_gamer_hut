@@ -4,6 +4,13 @@
 > `~/.claude/plans/precisamos-mudar-de-rota-zesty-hearth.md`. Este arquivo é o
 > **como fazer**, cirúrgico: arquivo → comando → código.
 
+> ⚠️ **1.0 vs v2 — LEIA PRIMEIRO.** O **1.0** (agora) é SEM backend novo — catálogo por
+> snapshot (`catalog.json` + `catalog.js`, já prontos) e geradores catálogo-aware. O sprint
+> ativo é **`sprints/sprint-fase-0-1-opencode.md`** — comece por ele. As seções 2–6 abaixo
+> (Cloudflare D1, wrangler, `/catalog` sync, `/brand`, Supabase) são **v2**, quando houver um
+> backend gerenciado. Os arquivos `server/schema.sql`, `server/wrangler.toml` e as rotas D1 do
+> `server/worker.js` são groundwork de v2 — NÃO usados no 1.0.
+
 ## 0. Contexto em 30 segundos
 
 O "Portal Gamer Hut" (gerador de conteúdo React via CDN) vira uma **plataforma de gestão**:

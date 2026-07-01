@@ -1,71 +1,63 @@
-# SPRINT — Fase 0 + Fase 1 (brief para o OpenCode)
+# SPRINT 1.0 — Geradores catálogo-aware (brief para o OpenCode)
 
-Referências obrigatórias no repo: `HANDOFF-OPENCODE.md` (seções 2 e 3), `server/schema.sql`,
-`server/worker.js`, `brand-voice.js`, `generation-context.js`.
+> **Mudança de rota:** o 1.0 é SEM backend novo (sem Cloudflare D1, sem Supabase, sem wrangler).
+> Meta: versão mínima funcional o mais rápido possível, no stack atual (React via CDN, sem build).
+> O proxy de IA continua EXATAMENTE como está (Cloudflare hardcoded com a API do Claude — não tocar).
+
+## O que já está pronto (feito pelo Claude, NÃO refazer)
+- `catalog.json` — snapshot dos 22 jogos do board Monday de pré-vendas/lançamentos.
+- `catalog.js` — `window.GH_CATALOG` com `.load()`, `.paraDivulgar()`, `.byId()`, e os mapeamentos
+  `geracao_key` (→ GH_GENERATIONS), `tom_sugerido` (→ GH_TONES) e `status` derivado por jogo.
 
 ## Objetivo do sprint
-Deixar a fundação de pé: banco D1 no ar, catálogo lendo o board Monday de verdade, e o cérebro
-de marca versionado editável. Ao fim, `/catalogo` e `/marca` funcionam no front novo.
+Fazer os geradores **entenderem o catálogo**: em vez de digitar `[JOGO]` na mão e escolher tudo,
+o usuário escolhe um jogo da lista e o gerador já vem pré-configurado (geração + tom + nome do jogo),
+usando os dados reais do Monday. É o pulo do gato do 1.0.
 
----
+## Escopo — só `copys.html` e `descricoes.html` (studio/review ficam pra depois)
 
-## PARTE A — Passos do HUMANO (não automatizar; exigem credenciais)
-1. `cd server && npx wrangler d1 create gamerhut` → colar o `database_id` em `server/wrangler.toml`.
-2. `npx wrangler secret put ANTHROPIC_API_KEY` (chave já usada hoje).
-3. `npx wrangler secret put MONDAY_TOKEN` (API token Monday com acesso ao board `18417580003`).
-> Avisar o dev quando A1–A3 estiverem feitos; o OpenCode segue a partir daí.
-
-## PARTE B — OpenCode automatiza
-
-### B1. Aplicar schema + deploy do worker (já escrito, só rodar)
-```bash
-cd server
-npx wrangler d1 execute gamerhut --file=schema.sql --remote
-npx wrangler deploy
+### Passo 1 — carregar o catálogo
+Em `copys.html` e `descricoes.html`, adicionar o script na ordem CORRETA (depois do brand-voice):
+```html
+<script src="config.js"></script>
+<script src="generation-context.js"></script>
+<script src="brand-voice.js"></script>
+<script src="catalog.js"></script>   <!-- NOVO -->
 ```
-Validar: `POST /catalog/sync` → `{"ok":true,"upserts":N}`; `GET /catalog` → produtos com `status`
-derivado. NÃO reescrever `worker.js`/`schema.sql` já existentes — apenas estender (B3).
 
-### B2. Seed do cérebro de marca → `server/seed-brand.sql` (NOVO)
-Gerar INSERTs em `brand_versions` a partir de `brand-voice.js` e `generation-context.js`,
-1 linha por bloco (todos `is_current=1`):
-- `brand:base` ← `GH_BRAND`
-- `tone:hype|informativo|nostalgico|zueiro` ← `GH_TONES[*].context` (label/desc em `meta` JSON)
-- `platform:instagram|tiktok|youtube|feed` ← `GH_PLATFORMS[*].context`
-- `generation:gen-z|millennial|gen-x` ← `GH_GENERATIONS[*].context` (emoji/pctFeed/desc em `meta`)
-Aplicar: `npx wrangler d1 execute gamerhut --file=seed-brand.sql --remote`.
+### Passo 2 — seletor de jogo (novo controle no topo do gerador)
+- Adicionar um `<select id="gamePicker">` (ou lista) preenchido via `GH_CATALOG.load()`.
+- Popular preferencialmente com `GH_CATALOG.paraDivulgar()` (jogos com DIVULGAR = CONFIRMADO);
+  ter um toggle "ver todos" que usa a lista completa.
+- Cada opção mostra: nome + `status_label` + plataformas (ex: "R-Type · À venda · PS5, SW").
 
-### B3. Estender `server/worker.js` — rotas de marca (preservar o resto)
-- `GET /brand` → todos os blocos `is_current=1`.
-- `POST /brand` `{bloco_tipo,bloco_key,label,conteudo,meta}` → transação: `UPDATE brand_versions
-  SET is_current=0 WHERE bloco_tipo=? AND bloco_key=? AND is_current=1;` depois INSERT novo `is_current=1`.
-- Reusar helpers `json()` e CORS já existentes; adicionar as rotas no router do `fetch`.
+### Passo 3 — ao escolher um jogo, pré-configurar o gerador
+No `onchange` do seletor, pegar `var j = GH_CATALOG.byId(value)` e:
+- Se `j.geracao_key`: setar `activeGen = j.geracao_key`, persistir `localStorage 'gh-generation'`,
+  e refletir no switch visual (reusar a lógica de `buildGenSwitch` em `copys.html:259`).
+- Se `j.tom_sugerido`: setar `activeTone` para esse tom e refletir no seletor de tom.
+- Preencher o campo de briefing/tema com o nome do jogo e um resumo do contexto:
+  `nome, plataformas, status_label, janela de divulgação (divulgacao_inicio→fim), pilar_sugerido`.
+- NÃO mudar a assinatura de `getBrandVoice(activeGen, activePlatformCopys, activeTone)` — só alimentá-la.
 
-### B4. Front novo (Vite + React Router)
-```bash
-npm create vite@latest app-web -- --template react
-cd app-web && npm i react-router-dom
-```
-- `.env`: `VITE_API_URL=<url do worker>`. Aposentar `config.js`/`GH_CONFIG`.
-- Tema a partir de `portal.css` (mesma identidade visual).
-- Rotas placeholder: `/radar` `/plano` `/gerar`. Rotas reais neste sprint: `/catalogo` e `/marca`.
+### Passo 4 — injetar contexto do jogo no prompt
+Onde o prompt é montado (`copys.html:~517`, antes do `fetch` ao proxy): concatenar um bloco
+"CONTEXTO DO PRODUTO (fonte: catálogo GH)" com os campos do jogo escolhido, para a IA usar dados
+reais (status de pré-venda, onde vende, datas, pilar). O contrato do proxy segue `POST {prompt}→{text}`.
 
-**`/catalogo`:** `GET /catalog` → tabela read-only. Botão "Sincronizar" → `POST /catalog/sync` → refetch.
-Filtros por `status` (a_venda/pre_venda/nao_vende/aguardando) e `grupo`. Exibir `geracao_alvo`,
-`pilar_sugerido`, janela de divulgação e `divulgar`.
+## Critérios de aceite (DoD)
+- [ ] Abrir `copys.html`: o seletor lista jogos do catálogo (default = os CONFIRMADO pra divulgar).
+- [ ] Escolher "R-Type" → geração vira "Gen X" (primeiro do combo) e tom sugerido "Nostálgico".
+- [ ] Gerar copy → o texto reflete que R-Type está À VENDA (não pré-venda) e cita plataformas reais.
+- [ ] Escolher "Silent Hill Townfall" → status Pré-venda, tom Hype; copy sai coerente.
+- [ ] `descricoes.html` com o mesmo seletor funcionando.
+- [ ] Nada quebrou: geração sem escolher jogo (fluxo antigo) continua igual; proxy `/ai` intacto.
 
-**`/marca`:** lista blocos de `GET /brand`; editar um bloco → `POST /brand` (nova versão). Mostrar que
-a edição cria versão nova sem apagar a anterior.
+## NÃO fazer neste sprint
+- Nada de backend/banco/deploy (Cloudflare, D1, Supabase, wrangler). Isso é v2.
+- Não portar para Vite/rotas. Mantém os HTML atuais.
+- Não integrar radar (RAWG) nem criar tarefas no Monday. Fases futuras.
+- Não alterar regras de marca (ver HANDOFF-OPENCODE.md seção 7).
 
----
-
-## Critérios de aceite (Definition of Done)
-- [ ] `GET /catalog` devolve os jogos do board com `status` derivado correto.
-- [ ] Editar item no board Monday → "Sincronizar" no `/catalogo` → mudança refletida.
-- [ ] `brand_versions` populado pelo seed; `GET /brand` devolve blocos vigentes.
-- [ ] Editar um tom em `/marca` cria linha nova com `is_current=1` e a anterior vira `is_current=0`.
-- [ ] `/ai` continua funcionando igual (regressão): `POST {prompt}→{text}` intacto.
-
-## Não fazer neste sprint
-- Portar geradores (Fase 2), radar (Fase 3), criar tarefas no Monday (Fase 4).
-- Não alterar o contrato `/ai`. Não tocar nas regras de marca (HANDOFF seção 7).
+## Como atualizar o catálogo (enquanto não há sync ao vivo)
+Pedir ao Claude: "re-puxe o board 18417580003 e regere catalog.json". (v2 automatiza via backend.)

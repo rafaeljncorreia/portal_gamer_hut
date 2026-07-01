@@ -11,6 +11,7 @@
 <script src="config.js"></script>
 <script src="generation-context.js"></script>
 <script src="brand-voice.js"></script>
+<script src="catalog.js"></script>
 <style>
   .head{ display:flex; flex-direction:column; gap:18px; margin-bottom:36px; }
   .head h1{ font-size:clamp(40px,7vw,84px); line-height:.9; margin:0; text-wrap:balance; }
@@ -134,6 +135,15 @@
       <!-- form -->
       <section class="panel">
         <h2 class="ptitle">BRIEFING</h2>
+        <div class="field" id="gameField" style="display:none;">
+          <label>Jogo do catálogo <span class="hint">autopreenche geração + tom + contexto</span></label>
+          <select id="gamePicker" class="input" style="cursor:pointer;">
+            <option value="">— Nenhum (briefing livre) —</option>
+          </select>
+          <p style="margin:6px 0 0;font-family:'Space Mono',monospace;font-size:10px;color:var(--mut2);">
+            <label><input type="checkbox" id="showAllGames"/> Ver todos os jogos (não só CONFIRMADOS)</label>
+          </p>
+        </div>
         <div class="field">
           <label>Plataforma</label>
           <div class="pill-group" id="platforms">
@@ -542,6 +552,15 @@
 'Plataforma: '+activePlatform.toUpperCase()+'\n'+
 'Título: '+title+'\n'+
 'Briefing: '+brief+'\n'+
+(selectedGame
+  ? 'CONTEXTO DO PRODUTO (fonte: catálogo GH):\n'+
+    'Nome: '+selectedGame.nome+', Status: '+selectedGame.status_label+
+    ', Plataformas: '+(selectedGame.plataformas||'—')+
+    ', Onde vende: '+(selectedGame.onde_vende||'—')+
+    (selectedGame.data_lancamento ? ', Lançamento: '+selectedGame.data_lancamento : '')+
+    (selectedGame.pilar_sugerido ? ', Pilar: '+selectedGame.pilar_sugerido : '')+
+    ', Geração alvo: '+(selectedGame.geracao_alvo||'—')+'\n'
+  : '')+
 '\n'+platformRules+
 '\nRegras gerais:\n'+
 '- Respeite o contexto geracional ('+genLabel+') — vocabulário, tom, comprimento\n'+
@@ -579,6 +598,72 @@
   });
   document.getElementById('title').addEventListener('keydown', function(e){
     if((e.metaKey||e.ctrlKey)&&e.key==='Enter') generate();
+  });
+
+  // ---- catálogo: seletor de jogo + autopreenchimento ----
+  var gamePicker = document.getElementById('gamePicker');
+  var showAllCb = document.getElementById('showAllGames');
+  var selectedGame = null;
+
+  function populateGamePicker(showAll){
+    gamePicker.innerHTML = '<option value="">— Nenhum (briefing livre) —</option>';
+    if(!window.GH_CATALOG) return;
+    var source = showAll ? (GH_CATALOG._cache || []) : GH_CATALOG.paraDivulgar();
+    source.forEach(function(j){
+      var opt = document.createElement('option');
+      opt.value = j.id;
+      opt.textContent = j.nome + ' · ' + (j.status_label || j.status) + ' · ' + (j.plataformas || '—');
+      gamePicker.appendChild(opt);
+    });
+  }
+
+  if(window.GH_CATALOG){
+    GH_CATALOG.load().then(function(jogos){
+      GH_CATALOG._cache = jogos;
+      document.getElementById('gameField').style.display = 'block';
+      populateGamePicker(false);
+    }).catch(function(){});
+  }
+
+  showAllCb.addEventListener('change', function(){
+    populateGamePicker(showAllCb.checked);
+    if(showAllCb.checked && window.GH_CATALOG && !GH_CATALOG._cache){
+      GH_CATALOG.load().then(function(jogos){
+        GH_CATALOG._cache = jogos;
+        populateGamePicker(true);
+      });
+    }
+  });
+
+  gamePicker.addEventListener('change', function(){
+    var val = gamePicker.value;
+    if(!val || !window.GH_CATALOG){ selectedGame = null; return; }
+    var j = GH_CATALOG.byId(val);
+    if(!j){ selectedGame = null; return; }
+    selectedGame = j;
+
+    if(j.geracao_key && GEN_KEYS.indexOf(j.geracao_key) >= 0){
+      activeGen = j.geracao_key;
+      localStorage.setItem('gh-generation', j.geracao_key);
+      buildGenSwitch();
+    }
+
+    if(j.tom_sugerido){
+      var tomVal = j.tom_sugerido;
+      var toneChips = document.getElementById('toneChips');
+      if(toneChips){
+        activeTone = tomVal;
+        [...toneChips.children].forEach(function(c){
+          c.classList.toggle('on', c.dataset.v === tomVal);
+        });
+      }
+    }
+
+    var brief = j.nome;
+    if(j.plataformas) brief += ' · ' + j.plataformas;
+    if(j.status_label) brief += ' · ' + j.status_label;
+    if(j.pilar_sugerido) brief += ' · Pilar: ' + j.pilar_sugerido;
+    document.getElementById('brief').value = brief;
   });
 
   renderHistory();

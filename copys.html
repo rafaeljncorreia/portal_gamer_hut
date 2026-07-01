@@ -11,6 +11,7 @@
 <script src="config.js"></script>
 <script src="generation-context.js"></script>
 <script src="brand-voice.js"></script>
+<script src="catalog.js"></script>
 <style>
   .head{ display:flex; flex-direction:column; gap:18px; margin-bottom:36px; }
   .head h1{ font-size:clamp(40px,7vw,84px); line-height:.9; margin:0; text-wrap:balance; }
@@ -161,6 +162,15 @@
       <!-- briefing -->
       <section class="panel">
         <h2 class="ptitle">BRIEFING</h2>
+        <div class="field" id="gameField">
+          <label>Jogo do catálogo <span class="hint">autopreenche geração + tom + contexto</span></label>
+          <select id="gamePicker" class="input" style="cursor:pointer;">
+            <option value="">— Nenhum (briefing livre) —</option>
+          </select>
+          <p style="margin:6px 0 0;font-family:'Space Mono',monospace;font-size:10px;color:var(--mut2);">
+            <label><input type="checkbox" id="showAllGames"/> Ver todos os jogos (não só CONFIRMADOS)</label>
+          </p>
+        </div>
         <div class="field">
           <label>Sobre o que é o post? <span class="hint">jogo, plataforma, preço…</span></label>
           <textarea id="brief" class="input" placeholder="Ex: Pré-venda do Metal Gear Solid Δ em mídia física, lacrado, dublado em PT-BR, PS5. R$ 349 com brinde de pôster."></textarea>
@@ -341,6 +351,78 @@
   }
   stBtns.forEach(b=> b.onclick=()=>{ pageCount = Math.max(MIN_PG, Math.min(MAX_PG, pageCount + (+b.dataset.d))); renderPages(); });
   renderPages();
+
+  // ---- catálogo: seletor de jogo + autopreenchimento ----
+  var gamePicker = document.getElementById('gamePicker');
+  var showAllCb = document.getElementById('showAllGames');
+  var selectedGame = null;
+
+  function populateGamePicker(showAll){
+    gamePicker.innerHTML = '<option value="">— Nenhum (briefing livre) —</option>';
+    if(!window.GH_CATALOG) return;
+    var source = showAll ? (GH_CATALOG._cache || []) : GH_CATALOG.paraDivulgar();
+    source.forEach(function(j){
+      var opt = document.createElement('option');
+      opt.value = j.id;
+      opt.textContent = j.nome + ' · ' + (j.status_label || j.status) + ' · ' + (j.plataformas || '—');
+      gamePicker.appendChild(opt);
+    });
+  }
+
+  if(window.GH_CATALOG){
+    GH_CATALOG.load().then(function(jogos){
+      GH_CATALOG._cache = jogos;
+      document.getElementById('gameField').style.display = 'block';
+      populateGamePicker(false);
+    }).catch(function(){
+      // catálogo não carregou, deixa oculto
+    });
+  }
+
+  showAllCb.addEventListener('change', function(){
+    populateGamePicker(showAllCb.checked);
+    if(showAllCb.checked && window.GH_CATALOG && !GH_CATALOG._cache){
+      GH_CATALOG.load().then(function(jogos){
+        GH_CATALOG._cache = jogos;
+        populateGamePicker(true);
+      });
+    }
+  });
+
+  gamePicker.addEventListener('change', function(){
+    var val = gamePicker.value;
+    if(!val || !window.GH_CATALOG){ selectedGame = null; return; }
+    var j = GH_CATALOG.byId(val);
+    if(!j){ selectedGame = null; return; }
+    selectedGame = j;
+
+    // pré-configurar geração
+    if(j.geracao_key && GEN_KEYS.indexOf(j.geracao_key) >= 0){
+      activeGen = j.geracao_key;
+      localStorage.setItem('gh-generation', j.geracao_key);
+      buildGenSwitch();
+    }
+
+    // pré-configurar tom
+    if(j.tom_sugerido){
+      var tomVal = j.tom_sugerido;
+      activeTone = tomVal;
+      [...tonesEl.children].forEach(function(c){
+        c.classList.toggle('on', c.dataset.v === tomVal);
+      });
+    }
+
+    // preencher briefing com contexto do jogo
+    var ctx = j.nome;
+    if(j.plataformas) ctx += ' · ' + j.plataformas;
+    if(j.status_label) ctx += ' · ' + j.status_label;
+    if(j.divulgacao_inicio && j.divulgacao_fim) ctx += ' · Janela: ' + j.divulgacao_inicio + ' a ' + j.divulgacao_fim;
+    if(j.pilar_sugerido) ctx += ' · Pilar: ' + j.pilar_sugerido;
+    if(j.preco) ctx += ' · R$ ' + j.preco;
+    document.getElementById('brief').value = ctx;
+
+    if(typeof refreshBrandtag === 'function') refreshBrandtag();
+  });
 
   // ---- send a copy variation into the Creative Studio (preserves current work) ----
   function sendToStudio(v){
@@ -539,7 +621,18 @@ Inclua também a legenda do feed e hashtags.`
 Categoria do post: ${activeCat.label}
 Tom de voz pedido: ${activeTone}
 ${plat?('Plataforma: '+plat+'\n'):''}${price?('Preço/condição: '+price+'\n'):''}Briefing do post: ${brief}
-
+${selectedGame ? 'CONTEXTO DO PRODUTO (fonte: catálogo GH):\n'+
+  '- Nome: '+selectedGame.nome+'\n'+
+  '- Status: '+selectedGame.status_label+'\n'+
+  '- Plataformas: '+(selectedGame.plataformas||'—')+'\n'+
+  '- Onde vende: '+(selectedGame.onde_vende||'—')+'\n'+
+  '- Data de lançamento: '+(selectedGame.data_lancamento||'—')+'\n'+
+  (selectedGame.data_pre_venda ? '- Pré-venda desde: '+selectedGame.data_pre_venda+'\n' : '')+
+  '- Pilar sugerido: '+(selectedGame.pilar_sugerido||'—')+'\n'+
+  '- Geração alvo: '+(selectedGame.geracao_alvo||'—')+'\n'+
+  '- Exclusividade GH: '+(selectedGame.exclusividade_gh||'—')+'\n'+
+  (selectedGame.divulgacao_inicio ? '- Janela de divulgação: '+selectedGame.divulgacao_inicio+' a '+selectedGame.divulgacao_fim+'\n' : '')
+: ''}
 Regras:
 - PÚBLICO-ALVO (${genLabel}): respeite o contexto geracional acima — vocabulário, tom, comprimento, hooks e CTAs específicos.
 - Comece pelo nome do jogo quando ele for o foco.
