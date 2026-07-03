@@ -4,6 +4,10 @@ import Campanha from './pages/Campanha.jsx'
 import Catalogo from './pages/Catalogo.jsx'
 import Marca from './pages/Marca.jsx'
 import Calendario from './pages/Calendario.jsx'
+import Studio from './pages/Studio.jsx'
+import Downloader from './pages/Downloader.jsx'
+import Review from './pages/Review.jsx'
+import Aprendizado from './pages/Aprendizado.jsx'
 
 const links = [
   { to: '/',         label: 'Campanhas', end: true },
@@ -40,6 +44,10 @@ function App() {
           <Route path="/marca" element={<Marca />} />
           <Route path="/catalogo" element={<Catalogo />} />
           <Route path="/ferramentas/calendario" element={<Calendario />} />
+          <Route path="/ferramentas/studio" element={<Studio />} />
+          <Route path="/ferramentas/downloader" element={<Downloader />} />
+          <Route path="/ferramentas/review" element={<Review />} />
+          <Route path="/ferramentas/aprendizado" element={<Aprendizado />} />
           <Route path="*" element={<Campanhas />} />
         </Routes>
       </div>

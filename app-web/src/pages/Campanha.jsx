@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import * as store from '../lib/campaigns.js'
 import { loadCatalogo, generations, getBrandVoice, gerar } from '../lib/gh.js'
 import VisualPanel from './VisualPanel.jsx'
+import MateriaisPanel from './MateriaisPanel.jsx'
 
 const STEPS = [
   { key: 'brief',      label: 'Brief',      sub: 'conceito da campanha' },
@@ -53,6 +54,14 @@ export default function Campanha() {
     setCamp(c)
     flash('Estratégia salva — próxima etapa: Materiais')
     setActive('materiais')
+  }
+
+  const salvarMateriais = (patch) => {
+    let c = store.update(id, patch)
+    c = store.marcarEstagio(id, 'materiais', true)
+    setCamp(c)
+    flash('Materiais salvos — próxima etapa: Visual')
+    setActive('visual')
   }
 
   const salvarVisual = (patch) => {
@@ -154,6 +163,8 @@ Seja objetivo e prático. Use markdown.`
         ? <EstrategiaPanel camp={camp} onSalvar={salvarEstrategia}
             onGerarIA={gerarSugestaoEstrategia}
             iaGerando={iaGerando} sugestaoIA={sugestaoIA} />
+        : active === 'materiais'
+        ? <MateriaisPanel camp={camp} onSalvar={salvarMateriais} />
         : active === 'visual'
         ? <VisualPanel camp={camp} onSalvar={salvarVisual} />
         : <StubPanel etapa={active} camp={camp} onToggle={() => concluirProvisorio(active)} />}
@@ -429,10 +440,7 @@ function EstrategiaPanel({ camp, onSalvar, onGerarIA, iaGerando, sugestaoIA }) {
 }
 
 function StubPanel({ etapa, camp, onToggle }) {
-  const info = {
-    materiais: { titulo: 'Materiais — conteúdo por canal', fase: 'Fase C',
-      desc: 'Copys e Descrições geradas AQUI dentro, já recebendo produto + geração + pilar + tema do Brief como contexto. Este é o aprofundamento central que aprendemos do TGT Hub.' },
-  }[etapa]
+  const info = {}[etapa]
   if (!info) return null
 
   const feito = camp.progresso[etapa]

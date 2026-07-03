@@ -12,10 +12,10 @@ const FERRAMENTAS = [
   { nome: 'Cérebro de Marca',desc: 'Voz, tons, gerações e plataformas.',        to: '/marca' },
   { nome: 'Copys',           desc: 'Legendas e chamadas na voz da GH.',         href: PORTAL + '/copys.html' },
   { nome: 'Descrições',      desc: 'YT / TikTok / Instagram padronizadas.',     href: PORTAL + '/descricoes.html' },
-  { nome: 'Creative Studio', desc: 'Posts, carrosséis, quizzes, rankings.',     href: PORTAL + '/studio.html' },
-  { nome: 'Downloader',      desc: 'Baixa vídeos p/ usar nas artes.',           href: PORTAL + '/downloader.html' },
-  { nome: 'Review',          desc: 'Revisão antes de publicar.',                href: PORTAL + '/review.html' },
-  { nome: 'Aprendizado',     desc: 'Log de diretrizes aprendidas.',             href: PORTAL + '/aprendizado.html' },
+  { nome: 'Creative Studio', desc: 'Posts, carrosséis, quizzes, rankings.',     to: '/ferramentas/studio' },
+  { nome: 'Downloader',      desc: 'Baixa vídeos p/ usar nas artes.',           to: '/ferramentas/downloader' },
+  { nome: 'Review',          desc: 'Revisão antes de publicar.',                to: '/ferramentas/review' },
+  { nome: 'Aprendizado',     desc: 'Log de diretrizes aprendidas.',             to: '/ferramentas/aprendizado' },
   { nome: 'Calendário',      desc: 'Calendário semanal de conteúdo.',           to: '/ferramentas/calendario' },
 ]
 
