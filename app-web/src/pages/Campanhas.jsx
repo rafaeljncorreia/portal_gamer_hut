@@ -3,15 +3,11 @@ import { useNavigate, Link } from 'react-router-dom'
 import * as store from '../lib/campaigns.js'
 import { generations, tones, platforms } from '../lib/gh.js'
 
-// Geradores legados vivem no portal estático (GitHub Pages). Rotas internas do
-// app-web usam `to`; ferramentas legadas usam `href`. Ver DIRETRIZ §6.
-const PORTAL = 'https://rafaeljncorreia.github.io/portal_gamer_hut'
-
 const FERRAMENTAS = [
   { nome: 'Catálogo',        desc: 'Jogos do board Monday, status derivado.',   to: '/catalogo' },
   { nome: 'Cérebro de Marca',desc: 'Voz, tons, gerações e plataformas.',        to: '/marca' },
-  { nome: 'Copys',           desc: 'Legendas e chamadas na voz da GH.',         href: PORTAL + '/copys.html' },
-  { nome: 'Descrições',      desc: 'YT / TikTok / Instagram padronizadas.',     href: PORTAL + '/descricoes.html' },
+  { nome: 'Copys',           desc: 'Legendas e chamadas na voz da GH (via campanha).',     to: '/', chip: 'via campanha' },
+  { nome: 'Descrições',      desc: 'YT / TikTok / Instagram padronizadas (via campanha).', to: '/', chip: 'via campanha' },
   { nome: 'Creative Studio', desc: 'Posts, carrosséis, quizzes, rankings.',     to: '/ferramentas/studio' },
   { nome: 'Downloader',      desc: 'Baixa vídeos p/ usar nas artes.',           to: '/ferramentas/downloader' },
   { nome: 'Review',          desc: 'Revisão antes de publicar.',                to: '/ferramentas/review' },
@@ -160,7 +156,7 @@ function CampCard({ c, nav, arquivar, desarquivar, excluir }) {
 }
 
 function ToolCard({ f, nav }) {
-  const go = () => { if (f.to) nav(f.to); else window.location.href = f.href }
+  const go = () => { if (f.to) nav(f.to) }
   return (
     <div className="card tool" onClick={go}>
       <div className="th">
@@ -168,7 +164,7 @@ function ToolCard({ f, nav }) {
         <span className="arrow">→</span>
       </div>
       <p>{f.desc}</p>
-      {f.href && <span className="mono" style={{ fontSize: 9, color: 'var(--mut2)', marginTop: 'auto' }}>PORTAL ESTÁTICO</span>}
+      {f.chip && <span className="mono tag tag-orange" style={{ fontSize: 9, marginTop: 'auto', alignSelf: 'flex-start' }}>{f.chip}</span>}
     </div>
   )
 }

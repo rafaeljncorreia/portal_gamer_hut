@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { generations, getBrandVoice, gerar } from '../lib/gh.js'
 
 const PLATAFORMAS = [
@@ -7,13 +7,14 @@ const PLATAFORMAS = [
   { id: 'instagram', label: 'Instagram' },
 ]
 
-export default function MateriaisPanel({ camp, onSalvar }) {
+const ITEM_DEFAULTS = { copy: '', desc: '' }
+
+export default function MateriaisPanel({ camp, onSalvar, onAvancar }) {
   const [aba, setAba] = useState('copy')
   const [infoExtra, setInfoExtra] = useState('')
   const [plataforma, setPlataforma] = useState('instagram')
   const [iaGerando, setIaGerando] = useState(false)
-  const [resultadoCopy, setResultadoCopy] = useState('')
-  const [resultadoDesc, setResultadoDesc] = useState('')
+  const [resultado, setResultado] = useState({ ...ITEM_DEFAULTS })
   const [erro, setErro] = useState('')
 
   const gens = generations()
@@ -27,9 +28,12 @@ export default function MateriaisPanel({ camp, onSalvar }) {
     return parts.join(' · ') || 'nenhum contexto definido'
   }
 
+  const savedCopyCount = camp.materiais?.copys?.length || 0
+  const savedDescCount = camp.materiais?.descricoes?.length || 0
+  const hasAnySaved = savedCopyCount > 0 || savedDescCount > 0
+
   const gerarCopy = async () => {
     setIaGerando(true)
-    setResultadoCopy('')
     setErro('')
     try {
       const brandVoice = getBrandVoice(camp.geracao, '', 'neutro')
@@ -62,7 +66,7 @@ Regras:
 Responda SOMENTE com JSON válido, sem texto fora dele:
 {"variacoes":[{"titulo":"...","legenda":"...","cta":"...","hashtags":["..."]}]}`
       const resposta = await gerar(prompt)
-      setResultadoCopy(resposta)
+      setResultado(prev => ({ ...prev, copy: resposta }))
     } catch (e) {
       setErro('Erro ao gerar: ' + e.message)
     } finally {
@@ -72,7 +76,6 @@ Responda SOMENTE com JSON válido, sem texto fora dele:
 
   const gerarDescricao = async () => {
     setIaGerando(true)
-    setResultadoDesc('')
     setErro('')
     try {
       const brandVoice = getBrandVoice(camp.geracao, plataforma, 'neutro')
@@ -112,7 +115,7 @@ Regras gerais:
 Responda SOMENTE com JSON válido:
 {"texto":"descrição completa formatada para a plataforma","title":"título opcional"}`
       const resposta = await gerar(prompt)
-      setResultadoDesc(resposta)
+      setResultado(prev => ({ ...prev, desc: resposta }))
     } catch (e) {
       setErro('Erro ao gerar: ' + e.message)
     } finally {
@@ -121,7 +124,7 @@ Responda SOMENTE com JSON válido:
   }
 
   const salvar = () => {
-    const texto = aba === 'copy' ? resultadoCopy : resultadoDesc
+    const texto = resultado[aba === 'copy' ? 'copy' : 'desc']
     if (!texto) return
     const novoItem = {
       texto,
@@ -130,24 +133,20 @@ Responda SOMENTE com JSON válido:
       gerado_em: new Date().toISOString(),
     }
     const materiaisAtuais = camp.materiais || {}
-    if (aba === 'copy') {
-      onSalvar({
-        materiais: {
-          ...materiaisAtuais,
-          copys: [...(materiaisAtuais.copys || []), novoItem],
-        }
-      })
-    } else {
-      onSalvar({
-        materiais: {
-          ...materiaisAtuais,
-          descricoes: [...(materiaisAtuais.descricoes || []), novoItem],
-        }
-      })
-    }
+    onSalvar(aba === 'copy' ? {
+      materiais: {
+        ...materiaisAtuais,
+        copys: [...(materiaisAtuais.copys || []), novoItem],
+      }
+    } : {
+      materiais: {
+        ...materiaisAtuais,
+        descricoes: [...(materiaisAtuais.descricoes || []), novoItem],
+      }
+    })
   }
 
-  const resultado = aba === 'copy' ? resultadoCopy : resultadoDesc
+  const textoAtual = resultado[aba === 'copy' ? 'copy' : 'desc']
 
   return (
     <div className="card">
@@ -164,10 +163,12 @@ Responda SOMENTE com JSON válido:
         <div className={'step' + (aba === 'copy' ? ' active' : '')} onClick={() => setAba('copy')} style={{ cursor: 'pointer' }}>
           <span className="badge">01</span>
           <span><span className="lbl">Copy</span><span className="sub">legendas e chamadas</span></span>
+          {savedCopyCount > 0 && <span className="tag tag-green" style={{ marginLeft: 'auto', fontSize: 10 }}>{savedCopyCount}</span>}
         </div>
         <div className={'step' + (aba === 'descricao' ? ' active' : '')} onClick={() => setAba('descricao')} style={{ cursor: 'pointer' }}>
           <span className="badge">02</span>
           <span><span className="lbl">Descrição</span><span className="sub">YT · TikTok · IG</span></span>
+          {savedDescCount > 0 && <span className="tag tag-green" style={{ marginLeft: 'auto', fontSize: 10 }}>{savedDescCount}</span>}
         </div>
       </div>
 
@@ -217,17 +218,89 @@ Responda SOMENTE com JSON válido:
         </div>
       )}
 
-      {resultado && (
-        <div className="alert" style={{ marginTop: 16, whiteSpace: 'pre-wrap', fontSize: 12 }}>
-          <strong>Resultado:</strong><br />{resultado}
-        </div>
+      {textoAtual && (
+        <ResultadoBox texto={textoAtual} />
       )}
 
       <div style={{ marginTop: 20, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-        <button className="btn btn-primary" onClick={salvar} disabled={!resultado}>
-          Salvar nos materiais e seguir →
+        <button className="btn btn-primary" onClick={salvar} disabled={!textoAtual}>
+          Salvar nos materiais
         </button>
+        {hasAnySaved && (
+          <button className="btn btn-primary" onClick={onAvancar}>
+            Seguir para Visual →
+          </button>
+        )}
       </div>
+
+      {hasAnySaved && (
+        <div style={{ marginTop: 24 }}>
+          <div className="mono" style={{ fontSize: 10, color: 'var(--mut)', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 8 }}>
+            Itens salvos ({savedCopyCount + savedDescCount})
+          </div>
+          {camp.materiais?.copys?.map((item, i) => (
+            <div key={'c' + i} className="alert" style={{ fontSize: 11, marginBottom: 6, padding: '8px 12px', borderLeftColor: 'var(--orange)' }}>
+              <span className="tag tag-orange" style={{ marginRight: 6, fontSize: 9 }}>Copy</span>
+              {item.informacao_extra && <span style={{ color: 'var(--mut)' }}>· {item.informacao_extra}</span>}
+            </div>
+          ))}
+          {camp.materiais?.descricoes?.map((item, i) => (
+            <div key={'d' + i} className="alert" style={{ fontSize: 11, marginBottom: 6, padding: '8px 12px', borderLeftColor: 'var(--teal)' }}>
+              <span className="tag tag-teal" style={{ marginRight: 6, fontSize: 9 }}>Desc</span>
+              {item.plataforma && <span style={{ textTransform: 'capitalize' }}>{item.plataforma}</span>}
+              {item.informacao_extra && <span style={{ color: 'var(--mut)' }}> · {item.informacao_extra}</span>}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ResultadoBox({ texto }) {
+  const parsed = useMemo(() => {
+    try { return JSON.parse(texto) }
+    catch { return null }
+  }, [texto])
+
+  if (!parsed) {
+    return (
+      <div className="alert" style={{ marginTop: 16, whiteSpace: 'pre-wrap', fontSize: 12 }}>
+        <strong>Resultado:</strong><br />{texto}
+      </div>
+    )
+  }
+
+  if (parsed.variacoes) {
+    return (
+      <div style={{ marginTop: 16 }}>
+        <div className="mono" style={{ fontSize: 10, color: 'var(--mut)', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 8 }}>Variações</div>
+        {parsed.variacoes.map((v, i) => (
+          <div key={i} style={{ marginBottom: 12, padding: 12, background: 'var(--bg2)', borderRadius: 8, border: '1px solid var(--lineSoft)' }}>
+            <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>{v.titulo}</div>
+            <div style={{ fontSize: 13, lineHeight: 1.5, marginBottom: 8, color: 'var(--fg)' }}>{v.legenda}</div>
+            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', alignItems: 'center' }}>
+              <span className="tag tag-orange" style={{ fontSize: 10 }}>{v.cta}</span>
+              {v.hashtags?.map(h => <span key={h} className="tag tag-gray" style={{ fontSize: 10 }}>{h}</span>)}
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  if (parsed.texto) {
+    return (
+      <div className="alert" style={{ marginTop: 16, fontSize: 12 }}>
+        {parsed.title && <strong style={{ display: 'block', marginBottom: 6 }}>{parsed.title}</strong>}
+        <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>{parsed.texto}</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="alert" style={{ marginTop: 16, whiteSpace: 'pre-wrap', fontSize: 12 }}>
+      <strong>Resultado:</strong><br />{texto}
     </div>
   )
 }

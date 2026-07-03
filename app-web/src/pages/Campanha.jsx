@@ -57,10 +57,14 @@ export default function Campanha() {
   }
 
   const salvarMateriais = (patch) => {
-    let c = store.update(id, patch)
-    c = store.marcarEstagio(id, 'materiais', true)
+    const c = store.update(id, patch)
     setCamp(c)
-    flash('Materiais salvos — próxima etapa: Visual')
+    flash('Materiais salvos')
+  }
+
+  const avancarMateriais = () => {
+    const c = store.marcarEstagio(id, 'materiais', true)
+    setCamp(c)
     setActive('visual')
   }
 
@@ -115,11 +119,6 @@ Seja objetivo e prático. Use markdown.`
     }
   }
 
-  const concluirProvisorio = (etapa) => {
-    const c = store.marcarEstagio(id, etapa, !camp.progresso[etapa])
-    setCamp(c)
-  }
-
   return (
     <>
       <div style={{ marginBottom: 18 }}>
@@ -164,10 +163,10 @@ Seja objetivo e prático. Use markdown.`
             onGerarIA={gerarSugestaoEstrategia}
             iaGerando={iaGerando} sugestaoIA={sugestaoIA} />
         : active === 'materiais'
-        ? <MateriaisPanel camp={camp} onSalvar={salvarMateriais} />
+        ? <MateriaisPanel camp={camp} onSalvar={salvarMateriais} onAvancar={avancarMateriais} />
         : active === 'visual'
         ? <VisualPanel camp={camp} onSalvar={salvarVisual} />
-        : <StubPanel etapa={active} camp={camp} onToggle={() => concluirProvisorio(active)} />}
+        : <StubPanel camp={camp} />}
 
       {toast && <div className="toast">{toast}</div>}
     </>
@@ -439,33 +438,17 @@ function EstrategiaPanel({ camp, onSalvar, onGerarIA, iaGerando, sugestaoIA }) {
   )
 }
 
-function StubPanel({ etapa, camp, onToggle }) {
-  const info = {}[etapa]
-  if (!info) return null
-
-  const feito = camp.progresso[etapa]
-
+function StubPanel({ camp }) {
   return (
-    <div className="card">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-        <h3 style={{ fontSize: 15, margin: 0 }}>{info.titulo}</h3>
-        <span className="tag tag-gray">{info.fase}</span>
-      </div>
-      <p style={{ margin: '0 0 20px', color: 'var(--mut)', fontSize: 13, lineHeight: 1.6 }}>{info.desc}</p>
-
+    <div className="card" style={{ textAlign: 'center', padding: '40px 20px' }}>
+      <p style={{ color: 'var(--mut)', fontSize: 13 }}>Estágio não implementado.</p>
       {(camp.produto_id || camp.geracao || camp.pilar) && (
-        <div className="alert" style={{ fontSize: 12, marginBottom: 20 }}>
+        <div className="alert" style={{ fontSize: 12, marginTop: 16 }}>
           Contexto herdado do Brief:{' '}
           {camp.brief?.produto_nome && <b>{camp.brief.produto_nome}</b>}
           {camp.geracao && <> · geração <b>{generations()[camp.geracao]?.full || camp.geracao}</b></>}
-          {camp.pilar && <> · pilar <b>{camp.pilar}</b></>}
-          {camp.tema && <> · tema <b>{camp.tema}</b></>}
         </div>
       )}
-
-      <button className="btn btn-ghost btn-sm" onClick={onToggle}>
-        {feito ? 'Desmarcar etapa' : 'Marcar como concluída (provisório)'}
-      </button>
     </div>
   )
 }
