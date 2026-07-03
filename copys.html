@@ -145,6 +145,7 @@
       <a class="active" href="copys.html">COPYS</a>
       <a href="descricoes.html">DESCRIÇÕES</a>
       <a href="review.html">REVIEW</a>
+      <a href="aprendizado.html">APRENDIZADO</a>
       <a href="downloader.html">DOWNLOADER</a>
     </nav>
   </header>
@@ -225,6 +226,24 @@
             <button type="button" class="stbtn" data-d="1">+</button>
           </div>
           <p class="stephint">A IA estrutura o texto pensando na <b>capa</b> e em <b id="innerVal">3</b> páginas internas.</p>
+        </div>
+        <div class="field" id="rankField" style="display:none;">
+          <label>Itens do ranking <span class="hint">posições</span></label>
+          <div class="stepper" id="rankStepper">
+            <button type="button" class="stbtn" data-d="-1">−</button>
+            <span class="stval"><b id="rankVal">5</b> itens</span>
+            <button type="button" class="stbtn" data-d="1">+</button>
+          </div>
+          <p class="stephint">Ranking com <b id="rankInnerVal">5</b> posições (1º lugar = destaque).</p>
+        </div>
+        <div class="field" id="arrivalsField" style="display:none;">
+          <label>Novidades da semana <span class="hint">jogos</span></label>
+          <div class="stepper" id="arrivalsStepper">
+            <button type="button" class="stbtn" data-d="-1">−</button>
+            <span class="stval"><b id="arrivalsVal">4</b> jogos</span>
+            <button type="button" class="stbtn" data-d="1">+</button>
+          </div>
+          <p class="stephint"><b id="arrivalsInnerVal">4</b> jogos novos chegando.</p>
         </div>
         <button id="gen" class="btn btn-primary" style="width:100%; justify-content:center; margin-top:4px;">⚡ GERAR COPYS</button>
       </section>
@@ -332,9 +351,13 @@
   const modelsEl = document.getElementById('models');
   let activeModel = 'image';
   const pagesField = document.getElementById('pagesField');
+  const rankField = document.getElementById('rankField');
+  const arrivalsField = document.getElementById('arrivalsField');
   [...modelsEl.children].forEach(el=>{
     el.onclick = ()=>{ activeModel=el.dataset.m; [...modelsEl.children].forEach(c=>c.classList.remove('on')); el.classList.add('on');
-      pagesField.style.display = (activeModel==='carousel') ? 'block' : 'none'; };
+      pagesField.style.display = (activeModel==='carousel') ? 'block' : 'none';
+      rankField.style.display = (activeModel==='ranking') ? 'block' : 'none';
+      arrivalsField.style.display = (activeModel==='arrivals') ? 'block' : 'none'; };
   });
 
   // ---- carousel page count stepper (3–8, includes cover) ----
@@ -351,6 +374,28 @@
   }
   stBtns.forEach(b=> b.onclick=()=>{ pageCount = Math.max(MIN_PG, Math.min(MAX_PG, pageCount + (+b.dataset.d))); renderPages(); });
   renderPages();
+
+  // ---- ranking count stepper (3–6) ----
+  const MIN_RANK=3, MAX_RANK=6;
+  let rankCount = 5;
+  const rankVal = document.getElementById('rankVal');
+  const rankInnerVal = document.getElementById('rankInnerVal');
+  const rankStBtns = document.querySelectorAll('#rankStepper .stbtn');
+  function renderRank(){ rankVal.textContent = rankCount; rankInnerVal.textContent = rankCount;
+    rankStBtns[0].disabled = rankCount<=MIN_RANK; rankStBtns[1].disabled = rankCount>=MAX_RANK; }
+  rankStBtns.forEach(b=> b.onclick=()=>{ rankCount = Math.max(MIN_RANK, Math.min(MAX_RANK, rankCount + (+b.dataset.d))); renderRank(); });
+  renderRank();
+
+  // ---- arrivals count stepper (2–6) ----
+  const MIN_ARR=2, MAX_ARR=6;
+  let arrivalCount = 4;
+  const arrivalsVal = document.getElementById('arrivalsVal');
+  const arrivalsInnerVal = document.getElementById('arrivalsInnerVal');
+  const arrStBtns = document.querySelectorAll('#arrivalsStepper .stbtn');
+  function renderArr(){ arrivalsVal.textContent = arrivalCount; arrivalsInnerVal.textContent = arrivalCount;
+    arrStBtns[0].disabled = arrivalCount<=MIN_ARR; arrStBtns[1].disabled = arrivalCount>=MAX_ARR; }
+  arrStBtns.forEach(b=> b.onclick=()=>{ arrivalCount = Math.max(MIN_ARR, Math.min(MAX_ARR, arrivalCount + (+b.dataset.d))); renderArr(); });
+  renderArr();
 
   // ---- catálogo: seletor de jogo + autopreenchimento ----
   var gamePicker = document.getElementById('gamePicker');
@@ -449,14 +494,22 @@
       patch = { ...patch, template:'quiz', fill:false, ink:'auto', pattern:'8bit', quizMode:'pergunta',
         image:null, eyebrow: 'RESPONDE AÍ', question: titulo, answer:-1, hideOptions:false, titleSize:80 };
     } else if(activeModel==='ranking'){
+      const rankItems = Array.isArray(v.itens) && v.itens.length
+        ? v.itens.map(it=>({ name:(it.nome||'').toUpperCase(), note:(it.tag||'').toUpperCase() }))
+        : [];
       patch = { ...patch, template:'ranking', fill:false, ink:'auto', pattern:'grid', image:null,
-        eyebrow: activeCat.label, title: titulo, titleSize:96 };
+        eyebrow: activeCat.label, title: titulo, titleSize:96,
+        rankCount: rankItems.length || 5, rankItems };
     } else if(activeModel==='arrivals'){
+      const arrivals = Array.isArray(v.itens) && v.itens.length
+        ? v.itens.map(it=>({ name:(it.nome||'').toUpperCase(), console:(it.plataforma||'').toUpperCase(), image:null }))
+        : [];
       patch = { ...patch, template:'arrivals', fill:false, ink:'auto', pattern:'8bit', image:null,
-        eyebrow: activeCat.label, title: titulo || 'NOVIDADES DA SEMANA', titleSize:84 };
+        eyebrow: activeCat.label, title: titulo || 'NOVIDADES DA SEMANA', titleSize:84,
+        arrivalCount: arrivals.length || 4, arrivals };
     } else if(activeModel==='thumb'){
       patch = { ...patch, template:'thumb', fill:false, ink:'auto', pattern:'8bit', image:null,
-        eyebrow: activeCat.label, title: titulo, accentWord:'', subtitle:'',
+        eyebrow: activeCat.label, title: titulo, accentWord: cta ? cta.toUpperCase() : '', subtitle:'',
         badge:'EXCLUSIVO GAMER HUT', priceLabel:'', titleSize:140 };
     } else { // image
       patch = { ...patch, template:'image', fill:false, pattern:'solid', image:null,
@@ -519,12 +572,20 @@
             '<b>'+esc(p.titulo||'')+'</b>'+(p.texto?' — '+esc(p.texto):'')+'</span></div>').join('')+
           '</div>';
       }
+      const hasItens = Array.isArray(v.itens) && v.itens.length;
+      let itensHTML = '';
+      if(hasItens){
+        itensHTML = '<div class="pagesblock"><span class="pblabel">ITENS · '+(activeModel==='ranking'?'RANKING':'NOVIDADES')+'</span>'+
+          v.itens.map((it,idx)=>'<div class="pgrow"><span class="pgn">'+(idx+1)+'</span><span class="pgt"><b>'+
+            esc(it.nome||'')+'</b>'+(it.tag||it.plataforma?' — '+esc(it.tag||it.plataforma):'')+'</span></div>').join('')+
+          '</div>';
+      }
       const c=document.createElement('div'); c.className='copy'; c.style.setProperty('--ac',activeCat.color);
       c.innerHTML =
         '<div class="ch"><span class="vlabel">VARIAÇÃO 0'+(i+1)+'</span>'+
         '<button class="cbtn">COPIAR</button></div>'+
         (v.titulo?'<h3 class="ttl">'+esc(v.titulo)+'</h3>':'')+
-        pagesHTML+
+        pagesHTML+itensHTML+
         (v.legenda?'<p class="body">'+esc(v.legenda)+'</p>':'')+
         (v.cta?'<p class="cta">'+esc(v.cta)+'</p>':'')+
         (tags.length?'<div class="tags">'+tags.map(t=>'<span class="tag2">'+esc(t)+'</span>').join('')+'</div>':'')+
@@ -617,6 +678,10 @@ Crie 2 variações. Em cada variação, estruture o conteúdo seguindo o brandin
 - PÁGINAS INTERNAS (${pageCount-1} no total): uma ideia por página — contexto, diferenciais, destaques, e a ÚLTIMA página com CTA ou informação comercial.
 Cada página interna tem um título curto e um texto de 1 frase curta e direta. Seja conciso.
 Inclua também a legenda do feed e hashtags.`
+: activeModel==='ranking'
+? `Este post é um TOP/RANKING com ${rankCount} itens. Crie um título forte pro ranking + a lista ordenada de itens (do menos pro mais importante, o item 1 é o destaque). Inclua também a legenda do feed e hashtags.`
+: activeModel==='arrivals'
+? `Este post é NOVIDADES DA SEMANA com ${arrivalCount} jogos novos. Crie um título de chamada + a lista dos jogos. Inclua também a legenda do feed e hashtags.`
 : `Crie 3 variações de copy para um post da categoria abaixo, seguindo a Fórmula de copy (gancho → jogo → diferencial → info comercial → CTA que pergunta algo).`}
 Categoria do post: ${activeCat.label}
 Tom de voz pedido: ${activeTone}
@@ -647,6 +712,12 @@ Responda SOMENTE com JSON válido, sem texto fora dele, neste formato exato:
 ${activeModel==='carousel'
 ? `{"variacoes":[{"titulo":"título da CAPA, curto e forte","legenda":"legenda do feed 2-4 frases","cta":"chamada para ação curta","hashtags":["5 a 7 hashtags sem #, sem espaços"],"paginas":[{"titulo":"título da página interna","texto":"1-2 frases"}]}]}
 IMPORTANTE: o array "paginas" deve ter EXATAMENTE ${pageCount-1} itens (as páginas internas, sem contar a capa).`
+: activeModel==='ranking'
+? `{"variacoes":[{"titulo":"título do ranking","legenda":"legenda do feed 2-4 frases","cta":"chamada para ação curta","hashtags":["5 a 7 hashtags sem #, sem espaços"],"itens":[{"nome":"nome do jogo","tag":"tag curta, ex: MAIS VENDIDO"}]}]}
+IMPORTANTE: o array "itens" deve ter EXATAMENTE ${rankCount} itens.`
+: activeModel==='arrivals'
+? `{"variacoes":[{"titulo":"título de chamada","legenda":"legenda do feed 2-4 frases","cta":"chamada para ação curta","hashtags":["5 a 7 hashtags sem #, sem espaços"],"itens":[{"nome":"nome do jogo","plataforma":"ex: PS5"}]}]}
+IMPORTANTE: o array "itens" deve ter EXATAMENTE ${arrivalCount} itens.`
 : `{"variacoes":[{"titulo":"chamada curta","legenda":"legenda de 2-4 frases","cta":"chamada para ação curta","hashtags":["5 a 7 hashtags sem #, sem espaços"]}]}`}`;
 
     try{

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Aprendizado Contínuo · Portal Gamer Hut</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,800;0,900;1,900&family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="portal.css"/>
+<script src="config.js"></script>
+<script src="generation-context.js"></script>
+<script src="brand-voice.js"></script>
+<style>
+  .head{ display:flex; flex-direction:column; gap:18px; margin-bottom:36px; }
+  .head h1{ font-size:clamp(40px,7vw,84px); line-height:.9; margin:0; text-wrap:balance; }
+  .head p{ margin:0; max-width:64ch; color:#cfc9c1; font-size:clamp(15px,2vw,19px); line-height:1.6; }
+  .layout{ display:grid; grid-template-columns:1.5fr 1fr; gap:22px; align-items:start; }
+  @media (max-width:960px){ .layout{ grid-template-columns:1fr; } }
+  .panel{ background:var(--panel); border:1px solid var(--lineSoft); border-radius:18px; padding:26px 26px 28px; }
+  .panel .ptitle{ font-family:'Press Start 2P',monospace; font-size:12px; color:var(--orange); margin:0 0 20px; }
+  .field{ margin-bottom:18px; }
+  .field label{ display:flex; align-items:center; justify-content:space-between; gap:10px;
+    font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--mut); margin-bottom:9px; }
+  .field label .hint{ letter-spacing:.04em; color:var(--mut2); text-transform:none; }
+  .input, textarea.input{ width:100%; background:var(--bg); color:var(--white); border:1px solid var(--lineSoft);
+    border-radius:10px; padding:13px 15px; font-size:15px; font-family:'Space Grotesk',sans-serif; outline:none;
+    transition:border-color .14s; }
+  .input:focus, textarea.input:focus{ border-color:var(--orange); }
+  textarea.input{ resize:vertical; min-height:60px; line-height:1.5; }
+  .chat-log{ display:flex; flex-direction:column; gap:14px; min-height:300px; max-height:520px; overflow-y:auto; margin-bottom:14px; padding-right:4px; }
+  .msg{ background:var(--bg); border:1px solid var(--lineSoft); border-radius:14px; padding:14px 16px; animation:pop .28s ease both; }
+  .msg.user{ border-left:3px solid var(--blue); margin-left:30px; }
+  .msg.ai{ border-left:3px solid var(--orange); margin-right:30px; }
+  @keyframes pop{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:none; } }
+  .msg .mh{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:8px; }
+  .msg .mrole{ font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.12em; color:var(--mut); }
+  .msg .mbody{ font-size:14px; line-height:1.62; color:#d7d1c9; white-space:pre-wrap; }
+  .msg .mbody p{ margin:0 0 8px; }
+  .chat-input{ display:flex; gap:10px; }
+  .chat-input textarea{ flex:1; margin-bottom:0; }
+  .chat-input button{ flex:none; cursor:pointer; font-family:'Space Mono',monospace; font-size:12px; font-weight:700;
+    letter-spacing:.06em; color:var(--ink); background:var(--orange); border:none; border-radius:9px; padding:13px 18px;
+    transition:filter .13s, transform .12s; white-space:nowrap; }
+  .chat-input button:hover{ filter:brightness(1.08); transform:translateY(-1px); }
+  .chat-input button:disabled{ opacity:.5; cursor:wait; filter:none; transform:none; }
+  .empty{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+    text-align:center; color:var(--mut); padding:40px 20px; }
+  .empty .ic{ width:52px; height:52px; border-radius:14px; border:1px solid var(--lineSoft); display:grid;
+    place-items:center; color:var(--orange); font-size:22px; }
+  .empty p{ margin:0; font-family:'Space Mono',monospace; font-size:12px; line-height:1.6; max-width:34ch; }
+  .skl{ height:14px; border-radius:6px; background:linear-gradient(90deg,#221e1b 0%,#2c2723 50%,#221e1b 100%);
+    background-size:200% 100%; animation:shimmer 1.5s linear infinite; }
+  @keyframes shimmer{ to{ background-position:-200% 0; } }
+  .err{ background:rgba(226,59,46,.08); border:1px solid rgba(226,59,46,.4); border-left:3px solid #E23B2E;
+    border-radius:12px; padding:12px 15px; font-family:'Space Mono',monospace; font-size:12px; line-height:1.6; color:#e7b4ad; }
+  .err b{ color:#fff; }
+  .diretriz-list{ display:flex; flex-direction:column; gap:10px; min-height:200px; }
+  .diretriz-card{ background:var(--bg); border:1px solid var(--lineSoft); border-left:3px solid var(--orange);
+    border-radius:12px; padding:12px 14px; animation:pop .28s ease both; }
+  .diretriz-card .dc-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; }
+  .diretriz-card .dc-pill{ font-family:'Space Mono',monospace; font-size:9px; font-weight:700; letter-spacing:.08em;
+    color:var(--orange); border:1px solid rgba(232,100,60,.3); background:rgba(232,100,60,.08);
+    padding:3px 8px; border-radius:6px; display:inline-block; }
+  .diretriz-card .dc-label{ font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14px; color:var(--white);
+    margin:0 0 6px; }
+  .diretriz-card .dc-body{ font-size:13px; line-height:1.55; color:#b7b1a9; }
+  .diretriz-card .dc-actions{ display:flex; gap:8px; margin-top:10px; }
+  .diretriz-card .dc-btn{ cursor:pointer; font-family:'Space Mono',monospace; font-size:10px; font-weight:700;
+    letter-spacing:.06em; border:none; border-radius:7px; padding:7px 12px; transition:all .13s; }
+  .diretriz-card .dc-btn.confirm{ background:var(--green); color:var(--ink); }
+  .diretriz-card .dc-btn.confirm:hover{ filter:brightness(1.1); }
+  .diretriz-card .dc-btn.dismiss{ background:transparent; color:var(--mut); border:1px solid var(--lineSoft); }
+  .diretriz-card .dc-btn.dismiss:hover{ color:#E23B2E; border-color:#E23B2E; }
+  .diretriz-card .dc-btn.archive{ background:transparent; color:var(--mut); border:1px solid var(--lineSoft); }
+  .diretriz-card .dc-btn.archive:hover{ color:#E23B2E; border-color:#E23B2E; }
+  .diretriz-card.applied{ opacity:.55; border-left-color:var(--green); }
+  .diretriz-card.applied .dc-pill{ color:var(--green); border-color:rgba(46,157,91,.3); background:rgba(46,157,91,.08); }
+  .diretriz-card.dismissed{ opacity:.4; }
+  .diretriz-card.dismissed .dc-pill{ color:var(--mut2); border-color:var(--lineSoft); }
+  .diretriz-card .dc-del{ cursor:pointer; font-family:'Space Mono',monospace; font-size:11px;
+    color:var(--mut2); background:none; border:none; padding:2px 4px; }
+  .diretriz-card .dc-del:hover{ color:#E23B2E; }
+  .diretriz-list-foot{ margin-top:18px; display:flex; gap:10px; flex-wrap:wrap; }
+  .status{ font-family:'Space Mono',monospace; font-size:10px; line-height:1.6; }
+
+  .diretriz-card.inline{ margin-top:10px; }
+  .diretriz-card.inline .dc-actions{ margin-top:8px; }
+</style>
+</head>
+<body>
+  <div class="dots"></div>
+
+  <header class="nav">
+    <a class="brand" href="index.html">
+      <img src="assets/logo-white.png" alt="Gamer Hut"/>
+      <span class="tag">
+        <span class="pixel t1" style="display:block;">APRENDIZADO</span>
+        <span class="mono t2" style="display:block;">CHAT + DIRETRIZES</span>
+      </span>
+    </a>
+    <nav class="links">
+      <a href="index.html">PORTAL</a>
+      <a href="studio.html">CREATIVE STUDIO</a>
+      <a href="copys.html">COPYS</a>
+      <a href="descricoes.html">DESCRIÇÕES</a>
+      <a href="review.html">REVIEW</a>
+      <a class="active" href="aprendizado.html">APRENDIZADO</a>
+      <a href="downloader.html">DOWNLOADER</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div class="head">
+      <span class="eyebrow">Aprendizado contínuo · Gamer Hut</span>
+      <h1 class="display">Aprendizado</h1>
+      <p>Converse com a IA sobre o que funcionou ou não nas campanhas. As diretrizes aprovadas por você passam a influenciar automaticamente todas as gerações de copy e descrição.</p>
+    </div>
+
+    <div class="layout">
+      <!-- CHAT -->
+      <section class="panel">
+        <h2 class="ptitle">CONVERSA</h2>
+        <div class="chat-log" id="chatLog">
+          <div class="empty" id="chatEmpty">
+            <span class="ic">💬</span>
+            <p>Conte o que funcionou ou não nos posts recentes. A IA sugere diretrizes que você aprova com um clique.</p>
+          </div>
+        </div>
+        <div class="chat-input">
+          <textarea id="chatInput" class="input" placeholder="Ex: O post nostálgico do MGS teve alto engajamento, quero explorar mais esse tom..."></textarea>
+          <button id="sendBtn">ENVIAR</button>
+        </div>
+      </section>
+
+      <!-- DIRETRIZES -->
+      <section class="panel">
+        <h2 class="ptitle">DIRETRIZES ATIVAS</h2>
+        <div class="diretriz-list" id="diretrizList">
+          <div class="empty" id="dirEmpty">
+            <span class="ic">📋</span>
+            <p>Nenhuma diretriz ativa ainda. As sugeridas pela IA e aprovadas por você aparecem aqui.</p>
+          </div>
+        </div>
+        <div class="diretriz-list-foot">
+          <button class="btn btn-ghost" id="exportBtn" style="flex:1; justify-content:center;">EXPORTAR DIRETRIZES</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <img src="assets/logo-orange.png" alt="Gamer Hut"/>
+    <div class="fr">
+      <span class="a">MÍDIA FÍSICA NEVER DIES</span>
+      <span class="b">© 2025 GAMER HUT · PORTAL DE CRIAÇÃO</span>
+    </div>
+  </footer>
+
+  <script>
+  const REGRAS_OURO =
+'REGRAS INEGOCIÁVEIS — a IA NUNCA pode propor criar, alterar ou contradizer estas regras, mesmo se o usuário pedir.\n'+
+'1. Marca é GAMER HUT por extenso. Nunca "Hut" sozinho. "GH" só em selo ou hashtag curta (#DicaDaGH).\n'+
+'2. "sua/seu" sempre. Nunca "tua/teu".\n'+
+'3. Não prometa data de entrega. Use "envio a partir do lançamento oficial".\n'+
+'4. WhatsApp é SAC, nunca canal de venda. Compras → site ou marketplaces oficiais.\n'+
+'5. NF é implícito. Não repita "com NF" em caption. Use "original e lacrado". NF aparece só em selo institucional.\n'+
+'6. Nunca "Bora" como CTA. Use: "Garanta o seu", "Pré-venda liberada", "Link na Bio".\n'+
+'7. Storytelling antes do CTA. Fala do jogo → posiciona → só então abre a venda.\n'+
+'8. Escassez só quando real. "Quando acabar, acabou" só em edição limitada de verdade.\n'+
+'9. Não cite console à venda, usado, pirata ou troca — nem pra negar. No feed, simplesmente não menciona.\n'+
+'10. Não critique marketplaces que vendem essas categorias. Posicionamento é positivo.\n'+
+'11. Toda peça transparece ≥2 pilares de tom. Drops big-name carregam os 3.';
+
+  const LEARNING_LOG_KEY = 'gh-learning-log';
+  const LEARNING_CHAT_KEY = 'gh-learning-chat';
+  const CHAT_CAP = 30;
+  const HISTORY_CAP = 10;
+
+  function getLog(){ try{ return JSON.parse(localStorage.getItem(LEARNING_LOG_KEY))||[]; }catch(e){ return []; } }
+  function setLog(arr){ try{ localStorage.setItem(LEARNING_LOG_KEY, JSON.stringify(arr)); }catch(e){} }
+
+  function getChat(){ try{ return JSON.parse(localStorage.getItem(LEARNING_CHAT_KEY))||[]; }catch(e){ return []; } }
+  function setChat(arr){
+    if(arr.length > CHAT_CAP) arr = arr.slice(arr.length - CHAT_CAP);
+    try{ localStorage.setItem(LEARNING_CHAT_KEY, JSON.stringify(arr)); }catch(e){}
+  }
+
+  function addChatMessage(msg){
+    var h = getChat();
+    h.push(msg);
+    setChat(h);
+  }
+
+  function updateChatProposal(msgIdx, proposalIdx, status){
+    var h = getChat();
+    if(!h[msgIdx] || !h[msgIdx].proposals || !h[msgIdx].proposals[proposalIdx]) return;
+    h[msgIdx].proposals[proposalIdx].status = status;
+    setChat(h);
+  }
+
+  function esc(s){ return String(s||'').replace(/[&<>]/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[m]; }); }
+
+  function genId(){ return 'lg_'+Date.now()+'_'+Math.random().toString(36).slice(2,8); }
+
+  function extractGuidelineProposals(text){
+    var results = [];
+    var regex = /```gh-diretriz\s*([\s\S]*?)```/g;
+    var match;
+    while((match = regex.exec(text)) !== null){
+      try{
+        var obj = JSON.parse(match[1].trim());
+        if(obj && (obj.action === 'create' || obj.action === 'archive')){
+          results.push(obj);
+        }
+      }catch(e){}
+    }
+    return results;
+  }
+
+  var chatLog = document.getElementById('chatLog');
+  var chatEmpty = document.getElementById('chatEmpty');
+  var chatInput = document.getElementById('chatInput');
+  var sendBtn = document.getElementById('sendBtn');
+  var diretrizList = document.getElementById('diretrizList');
+  var dirEmpty = document.getElementById('dirEmpty');
+  var exportBtn = document.getElementById('exportBtn');
+
+  function renderChat(){
+    var h = getChat();
+    chatLog.innerHTML = '';
+    if(!h.length){
+      chatLog.appendChild(chatEmpty);
+      return;
+    }
+    h.forEach(function(msg, msgIdx){
+      var div = document.createElement('div');
+      div.className = 'msg ' + msg.role;
+      var html = '<div class="mh"><span class="mrole">'+(msg.role==='ai'?'ASSISTENTE':'VOCÊ')+'</span></div>'+
+        '<div class="mbody">'+esc(msg.text).replace(/\n/g,'<br>')+'</div>';
+      div.innerHTML = html;
+      // proposals
+      if(msg.proposals && msg.proposals.length){
+        msg.proposals.forEach(function(prop, pIdx){
+          var card = document.createElement('div');
+          card.className = 'diretriz-card inline';
+          if(prop.status === 'applied') card.classList.add('applied');
+          else if(prop.status === 'dismissed') card.classList.add('dismissed');
+          if(prop.action === 'create' && prop.status === 'pending'){
+            card.innerHTML =
+              '<div class="dc-head"><span class="dc-pill">'+
+                esc(prop.bloco_tipo||'')+':'+esc(prop.bloco_key||'')+
+              '</span></div>'+
+              '<div class="dc-label">'+esc(prop.label||'')+'</div>'+
+              '<div class="dc-body">'+esc(prop.conteudo||'')+'</div>'+
+              '<div class="dc-actions">'+
+                '<button class="dc-btn confirm" data-action="apply">CRIAR DIRETRIZ</button>'+
+                '<button class="dc-btn dismiss" data-action="dismiss">IGNORAR</button>'+
+              '</div>';
+          } else if(prop.action === 'archive' && prop.status === 'pending'){
+            card.innerHTML =
+              '<div class="dc-head"><span class="dc-pill">ARQUIVAR</span></div>'+
+              '<div class="dc-body">Arquivar diretriz <b>'+esc(prop.guidelineId||'')+'</b>: '+
+                esc(prop.reason||'')+'</div>'+
+              '<div class="dc-actions">'+
+                '<button class="dc-btn confirm" data-action="apply">ARQUIVAR</button>'+
+                '<button class="dc-btn dismiss" data-action="dismiss">MANTER</button>'+
+              '</div>';
+          } else if(prop.status === 'applied'){
+            card.innerHTML =
+              '<div class="dc-head"><span class="dc-pill">✓ '+
+                (prop.action==='create'?'CRIADA':'ARQUIVADA')+
+              '</span></div>'+
+              '<div class="dc-body" style="color:var(--mut2);">'+
+                esc(prop.action==='create' ? (prop.label||'') : ('Arquivado: '+(prop.guidelineId||'')))+
+              '</div>';
+          } else if(prop.status === 'dismissed'){
+            card.innerHTML =
+              '<div class="dc-head"><span class="dc-pill" style="color:var(--mut2);border-color:var(--lineSoft);">✕ IGNORADA</span></div>';
+          }
+          // bind buttons
+          card.querySelectorAll('[data-action]').forEach(function(btn){
+            btn.onclick = function(){
+              var action = btn.dataset.action;
+              if(action === 'apply'){
+                if(prop.action === 'create'){
+                  // save new guideline
+                  var log = getLog();
+                  log.push({
+                    id: genId(),
+                    bloco_tipo: prop.bloco_tipo,
+                    bloco_key: prop.bloco_key,
+                    label: prop.label,
+                    conteudo: prop.conteudo,
+                    meta: prop.meta || {},
+                    is_current: 1,
+                    criado_em: new Date().toISOString(),
+                    criado_por: 'owner'
+                  });
+                  setLog(log);
+                } else if(prop.action === 'archive'){
+                  // soft-delete guideline
+                  var log = getLog();
+                  var found = false;
+                  log.forEach(function(l){
+                    if(l.id === prop.guidelineId && l.is_current === 1){
+                      l.is_current = 0;
+                      found = true;
+                    }
+                  });
+                  if(found) setLog(log);
+                }
+              }
+              updateChatProposal(msgIdx, pIdx, action === 'apply' ? 'applied' : 'dismissed');
+              renderChat();
+              renderDiretrizes();
+            };
+          });
+          div.appendChild(card);
+        });
+      }
+      chatLog.appendChild(div);
+    });
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  function renderDiretrizes(){
+    var log = getLog();
+    var ativas = log.filter(function(l){ return l.is_current === 1; });
+    diretrizList.innerHTML = '';
+    if(!ativas.length){
+      diretrizList.appendChild(dirEmpty);
+      return;
+    }
+    ativas.forEach(function(l){
+      var card = document.createElement('div');
+      card.className = 'diretriz-card';
+      card.innerHTML =
+        '<div class="dc-head">'+
+          '<span class="dc-pill">'+esc(l.bloco_tipo)+':'+esc(l.bloco_key||'')+'</span>'+
+          '<button class="dc-del" data-id="'+esc(l.id)+'">✕ ARQUIVAR</button>'+
+        '</div>'+
+        '<div class="dc-label">'+esc(l.label)+'</div>'+
+        '<div class="dc-body">'+esc(l.conteudo)+'</div>';
+      card.querySelector('.dc-del').onclick = function(){
+        var log2 = getLog();
+        log2.forEach(function(item){
+          if(item.id === l.id && item.is_current === 1) item.is_current = 0;
+        });
+        setLog(log2);
+        renderDiretrizes();
+      };
+      diretrizList.appendChild(card);
+    });
+  }
+
+  // ---- send message ----
+  async function sendMessage(){
+    var text = chatInput.value.trim();
+    if(!text) return;
+    chatInput.value = '';
+    sendBtn.disabled = true;
+    sendBtn.textContent = '⏳ PENSANDO…';
+
+    // add user message to chat
+    addChatMessage({ role:'user', text:text, ts:new Date().toISOString(), proposals:[] });
+    renderChat();
+
+    // build prompt
+    var voice = (typeof window.getBrandVoice === 'function')
+      ? window.getBrandVoice() : (window.GH_BRAND || '');
+    var log = getLog();
+    var ativas = log.filter(function(l){ return l.is_current === 1; });
+    var chat = getChat();
+    var recentHistory = chat.slice(-HISTORY_CAP);
+    var historyText = recentHistory.map(function(m){
+      return (m.role==='user'?'Usuário':'Assistente') + ': ' + (m.text||'');
+    }).join('\n');
+
+    var prompt = REGRAS_OURO + '\n\n' + voice +
+      '\n\n---\nDIRETRIZES ATIVAS ATUAIS:\n' +
+      (ativas.length ? ativas.map(function(l,i){
+        return (i+1)+'. ['+l.id+'] ['+l.bloco_tipo+':'+l.bloco_key+'] '+l.label+' — '+l.conteudo;
+      }).join('\n') : '(nenhuma)') +
+      '\n\n---\nHISTÓRICO DA CONVERSA:\n' + historyText +
+      '\n\n---\nINSTRUÇÃO: Você é o assistente de aprendizado contínuo da Gamer Hut. Discuta com o dono da loja o que funcionou ou não nas campanhas recentes. Quando fizer sentido, proponha UMA diretriz nova (criar) ou UM arquivamento de diretriz existente, usando o formato:\n' +
+      '```gh-diretriz\n{"action":"create","bloco_tipo":"tone","bloco_key":"hype","label":"título curto","conteudo":"texto completo da diretriz","meta":{}}\n```\n' +
+      'ou\n```gh-diretriz\n{"action":"archive","guidelineId":"lg_...","reason":"motivo do arquivamento"}\n```\n' +
+      'Nunca proponha algo que viole as REGRAS INEGOCIÁVEIS. Responda de forma natural e conversacional.\n\n' +
+      'MENSAGEM DO USUÁRIO: ' + text;
+
+    try{
+      var aiText = await aiComplete(prompt);
+      var proposals = extractGuidelineProposals(aiText);
+      addChatMessage({ role:'ai', text:aiText, ts:new Date().toISOString(), proposals:proposals });
+    }catch(e){
+      addChatMessage({ role:'ai', text:'Desculpe, ocorreu um erro ao processar sua mensagem: '+(e&&e.message||'erro de conexão'), ts:new Date().toISOString(), proposals:[] });
+    }
+    renderChat();
+    sendBtn.disabled = false;
+    sendBtn.textContent = 'ENVIAR';
+  }
+
+  sendBtn.onclick = sendMessage;
+  chatInput.addEventListener('keydown', function(e){
+    if((e.metaKey||e.ctrlKey)&&e.key==='Enter'){ e.preventDefault(); sendMessage(); }
+  });
+  chatInput.addEventListener('input', function(){
+    sendBtn.disabled = !chatInput.value.trim();
+  });
+  sendBtn.disabled = true;
+
+  // ---- AI completion (same pattern as other pages) ----
+  async function aiComplete(prompt){
+    if(typeof window.claude !== 'undefined' && window.claude.complete){
+      return await window.claude.complete(prompt);
+    }
+    var url = ((window.GH_CONFIG && window.GH_CONFIG.proxyUrl) || '').trim();
+    if(!url){
+      throw new Error('Servidor de IA não configurado.');
+    }
+    var r = await fetch(url, {
+      method:'POST', headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({ prompt:prompt })
+    });
+    var data; try{ data = await r.json(); }catch(e){ throw new Error('Resposta inválida do servidor de IA.'); }
+    if(!r.ok || (data && data.error)){ throw new Error((data && data.error) || ('Erro '+r.status+' do servidor.')); }
+    return (data && data.text) || '';
+  }
+
+  // ---- EXPORT ----
+  exportBtn.onclick = function(){
+    var log = getLog();
+    var payload = { brand_versions: log.map(function(l){
+      return {
+        client_id: l.id,
+        bloco_tipo: l.bloco_tipo,
+        bloco_key: l.bloco_key,
+        label: l.label,
+        conteudo: l.conteudo,
+        meta: l.meta,
+        is_current: l.is_current,
+        criado_em: l.criado_em,
+        criado_por: l.criado_por
+      };
+    })};
+    var blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+    var dataStr = new Date().toISOString().slice(0,10);
+    var a = document.createElement('a');
+    a.download = 'gamerhut-diretrizes-aprendizado-'+dataStr+'.json';
+    a.href = URL.createObjectURL(blob);
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 5000);
+  };
+
+  renderChat();
+  renderDiretrizes();
+  </script>
+</body>
+</html>

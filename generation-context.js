@@ -46,6 +46,10 @@ O QUE FECHA A VENDA: escassez REAL (não fake) + estética do objeto +
 prova social ("a comunidade já garantiu"). Storytelling 1-2 linhas antes
 do CTA. Senso de "quando acabar, acabou" — verdadeiro, nunca inventado.
 
+DADO REAL (TikTok, 02/07/2026): Gen Z é 41% de quem ASSISTE, mas só 12%
+de quem vira SEGUIDOR — a conversão desse público é o gargalo real, não
+o alcance. Fortaleça sempre o CTA de "segue"/"salva", não só de compra.
+
 Vocabulário oficial:
 - USE: drop, steelbook, comunidade, hype, raro, edição limitada, vibe,
   coleção, pré-venda, press start, corre, já garantiu, exclusivo
@@ -98,6 +102,16 @@ OBJEÇÕES REAIS (rebata no texto, sem citar a objeção):
 O QUE FECHA A VENDA: diferencial técnico explícito do remaster + gatilho
 nostálgico honesto + argumento de permanência da biblioteca. Mostre que
 houve curadoria, não só estoque.
+
+DADO REAL (TikTok, 02/07/2026): Millennial é o público que MAIS converte
+em seguidor (25-44 anos = 65.6% dos seguidores, vs 41% desse recorte
+apenas assistindo). É o público mais rentável do canal — priorize.
+
+DADO REAL (YouTube, 02/07/2026): o canal é quase inteiramente Millennial
+— 25-44 anos = 77.5% da audiência (35-44 sozinho já é 45.9%). Gen Z é
+irrelevante no YouTube (3%). Se o objetivo é falar com Millennial, o
+YouTube é o canal mais eficiente hoje — mas ainda pequeno (448 inscritos,
+grande espaço pra crescer com esse público específico).
 
 Vocabulário oficial:
 - USE: nostalgia, clássico, remaster, remasterizado, versão definitiva,
@@ -152,6 +166,10 @@ OBJEÇÕES REAIS (rebata no texto, sem citar a objeção):
 O QUE FECHA A VENDA: procedência inquestionável + ficha técnica precisa
 + autoridade (publisher oficial parceiro) + ausência total de pressão.
 O produto fala por si — o texto só comprova.
+
+DADO REAL (TikTok, 02/07/2026): Gen X (45+) é só ~7% de quem assiste mas
+sobe para ~22% dos seguidores — pequeno em volume, mas o público que
+mais fica quando decide seguir. Não é prioridade de alcance, é de retenção.
 
 Vocabulário oficial:
 - USE: versão definitiva, lacrado, original, curadoria, legado,

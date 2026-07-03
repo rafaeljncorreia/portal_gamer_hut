@@ -138,5 +138,22 @@ window.getBrandVoice = function(generation, platform, tone){
   if(gen) result += '\n\n---\n' + gen.context.trim();
   if(plt) result += '\n\n---\n' + plt.context.trim();
   if(tn)  result += '\n\n---\n' + tn.context.trim();
+  var learned = window.getActiveLearningLog ? window.getActiveLearningLog(generation, platform, tone) : [];
+  if(learned.length){
+    result += '\n\n---\nDIRETRIZES APRENDIDAS (validadas pelo dono da loja — aplicar com a MESMA prioridade do restante deste guia):\n' +
+      learned.map(function(l){ return '- ['+l.bloco_tipo+':'+l.bloco_key+'] '+l.label+' — '+l.conteudo; }).join('\n');
+  }
   return result;
+};
+
+window.getActiveLearningLog = function(generation, platform, tone){
+  var raw; try{ raw = JSON.parse(localStorage.getItem('gh-learning-log'))||[]; }catch(e){ raw=[]; }
+  return raw.filter(function(l){
+    if(!l || l.is_current!==1) return false;
+    if(l.bloco_tipo==='brand') return true;
+    if(l.bloco_tipo==='generation') return !l.bloco_key || l.bloco_key===generation;
+    if(l.bloco_tipo==='tone')       return !l.bloco_key || l.bloco_key===tone;
+    if(l.bloco_tipo==='platform')   return !l.bloco_key || l.bloco_key===platform;
+    return false;
+  });
 };

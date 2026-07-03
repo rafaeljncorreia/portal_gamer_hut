@@ -454,6 +454,10 @@ function TopBar({ s, dims, tag, busy, isVideoPage, onExport, onExportAll, onExpo
       <div style={{ display:'flex', alignItems:'center', gap:12 }}>
         <span className="gh-mono" style={{ color:GH.mut, fontSize:11, letterSpacing:'.08em' }}>
           {dims.w}×{dims.h} · {dims.ratio}</span>
+        <a href="aprendizado.html" className="gh-mono" style={{ color:GH.mut, fontSize:11, letterSpacing:'.08em',
+          textDecoration:'none', padding:'6px 10px', borderRadius:7, transition:'color .14s' }}
+          onMouseOver={e=>e.target.style.color=GH.orange} onMouseOut={e=>e.target.style.color=GH.mut}>
+          APRENDIZADO</a>
         <span className="gh-mono" style={{ display:'inline-flex', alignItems:'center', gap:7, color:tag.color,
           fontSize:11, fontWeight:700, border:`1px solid ${tag.color}`, padding:'6px 11px', borderRadius:7 }}>
           <span style={{ width:9, height:9, borderRadius:'50%', background:tag.color }}/>{tag.label}</span>
