@@ -1,32 +1,30 @@
 import { Routes, Route, NavLink } from 'react-router-dom'
+import Campanhas from './pages/Campanhas.jsx'
+import Campanha from './pages/Campanha.jsx'
 import Catalogo from './pages/Catalogo.jsx'
 import Marca from './pages/Marca.jsx'
-import Placeholder from './pages/Placeholder.jsx'
-
-const API = import.meta.env.VITE_API_URL || ''
 
 const links = [
-  { to: '/catalogo', label: 'Catálogo' },
+  { to: '/',         label: 'Campanhas', end: true },
   { to: '/marca',    label: 'Marca' },
-  { to: '/radar',    label: 'Radar' },
-  { to: '/plano',    label: 'Plano' },
-  { to: '/gerar',    label: 'Gerar' },
+  { to: '/catalogo', label: 'Catálogo' },
 ]
 
 function App() {
   return (
     <>
       <nav className="nav">
-        <div className="brand">
-          <span className="display" style={{ color:'var(--orange)', fontSize:18 }}>GH</span>
+        <NavLink to="/" className="brand">
+          <span className="display" style={{ color: 'var(--orange)', fontSize: 18 }}>GH</span>
           <div className="tag">
-            <div className="t1">Plataforma de Gestão</div>
-            <div className="t2">Portal Gamer Hut</div>
+            <div className="t1">Gamer Hut</div>
+            <div className="t2">PLATAFORMA DE GESTÃO</div>
           </div>
-        </div>
+        </NavLink>
         <div className="links">
           {links.map(l => (
-            <NavLink key={l.to} to={l.to} className={({ isActive }) => isActive ? 'active' : ''}>
+            <NavLink key={l.to} to={l.to} end={l.end}
+              className={({ isActive }) => isActive ? 'active' : ''}>
               {l.label}
             </NavLink>
           ))}
@@ -35,19 +33,18 @@ function App() {
 
       <div className="wrap">
         <Routes>
-          <Route path="/" element={<Catalogo api={API} />} />
-          <Route path="/catalogo" element={<Catalogo api={API} />} />
-          <Route path="/marca" element={<Marca api={API} />} />
-          <Route path="/radar" element={<Placeholder name="Radar de Lançamentos" eta="Fase 3" />} />
-          <Route path="/plano" element={<Placeholder name="Planejamento Editorial" eta="Fase 4" />} />
-          <Route path="/gerar" element={<Placeholder name="Geração de Conteúdo" eta="Fase 2" />} />
+          <Route path="/" element={<Campanhas />} />
+          <Route path="/campanha/:id" element={<Campanha />} />
+          <Route path="/marca" element={<Marca />} />
+          <Route path="/catalogo" element={<Catalogo />} />
+          <Route path="*" element={<Campanhas />} />
         </Routes>
       </div>
 
       <footer className="foot">
-        <span className="pixel" style={{ fontSize:10, color:'var(--orange)' }}>GAMER HUT</span>
+        <span className="pixel" style={{ fontSize: 10, color: 'var(--orange)' }}>GAMER HUT</span>
         <div className="fr">
-          <span className="b">Plataforma de Gestão · Fase 1</span>
+          <span className="b">Plataforma de Gestão · campaign-centric</span>
         </div>
       </footer>
     </>

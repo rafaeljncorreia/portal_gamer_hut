@@ -1,5 +1,11 @@
 # Portal Gamer Hut — Contexto do Projeto
 
+> ⭐ **Diretriz de arquitetura:** [`DIRETRIZ-PLATAFORMA.md`](DIRETRIZ-PLATAFORMA.md).
+> O portal está virando **campaign-centric** (modelo derivado do TGT Hub): a campanha
+> orquestra as ferramentas via pipeline Brief → Estratégia → Materiais → Visual. A virada
+> acontece no `app-web` (Vite), single-client GH, persistência localStorage-first. Leia a
+> diretriz antes de mexer na estrutura.
+
 ## Goal
 Construir o **Portal Gamer Hut** como plataforma de criação de conteúdo para a Gamer Hut, implementando features incrementalmente com foco inicial no **switch geracional (Gen Z/Millennial/Gen X)** nos módulos de Copy e Creative Studio.
 
