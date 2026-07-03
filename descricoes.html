@@ -119,6 +119,7 @@
       <a href="copys.html">COPYS</a>
       <a class="active" href="descricoes.html">DESCRIÇÕES</a>
       <a href="review.html">REVIEW</a>
+      <a href="aprendizado.html">APRENDIZADO</a>
       <a href="downloader.html">DOWNLOADER</a>
     </nav>
   </header>
@@ -466,8 +467,10 @@
     var plat = activePlatform;
     var patch = {};
     if(plat === 'youtube'){
+      var kw = document.getElementById('ytKeywords').value.trim();
+      var firstKw = kw ? kw.split(',')[0].trim().toUpperCase() : '';
       patch = { template:'thumb', tagId:'review', fill:false, ink:'auto', pattern:'8bit',
-        eyebrow:'ANÁLISE COMPLETA', title:titulo, accentWord:'', subtitle:'', badge:'EXCLUSIVO GAMER HUT',
+        eyebrow:'ANÁLISE COMPLETA', title:titulo, accentWord:firstKw, subtitle:'', badge:'EXCLUSIVO GAMER HUT',
         priceLabel:'', titleSize:140 };
     } else if(plat === 'tiktok'){
       patch = { template:'reels', tagId:'noticias', fill:true, pattern:'8bit', format:'stories',
