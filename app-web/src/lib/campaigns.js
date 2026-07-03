@@ -35,7 +35,6 @@ function novoId() {
   return 'c_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
 }
 
-/** Lista campanhas (mais recentes primeiro). `incluirArquivadas=false` filtra as arquivadas. */
 export function list(incluirArquivadas = false) {
   const arr = readAll().sort((a, b) => (b.atualizada_em || '').localeCompare(a.atualizada_em || ''))
   return incluirArquivadas ? arr : arr.filter(c => c.estado !== 'arquivada')
@@ -45,7 +44,6 @@ export function get(id) {
   return readAll().find(c => c.id === id) || null
 }
 
-/** Cria uma campanha nova (rascunho) e devolve o objeto criado. */
 export function create({ nome = '', tema = '', produto_id = null, geracao = null, pilar = null } = {}) {
   const agora = new Date().toISOString()
   const c = {
@@ -60,7 +58,14 @@ export function create({ nome = '', tema = '', produto_id = null, geracao = null
     pilar,
     progresso: { brief: false, estrategia: false, materiais: false, visual: false },
     brief: {},
-    estrategia: {},
+    estrategia: {
+      canais: [],
+      janela_inicio: '',
+      janela_fim: '',
+      dias_semana: [],
+      frequencia: '1x',
+      observacoes: '',
+    },
     materiais: {},
     visual: {},
   }
@@ -68,7 +73,6 @@ export function create({ nome = '', tema = '', produto_id = null, geracao = null
   return c
 }
 
-/** Aplica um patch superficial na campanha e carimba atualizada_em. Devolve a campanha nova. */
 export function update(id, patch) {
   const arr = readAll()
   const i = arr.findIndex(c => c.id === id)
@@ -80,7 +84,6 @@ export function update(id, patch) {
     progresso: { ...atual.progresso, ...(patch.progresso || {}) },
     atualizada_em: new Date().toISOString(),
   }
-  // Deriva o estado automaticamente a partir do progresso (sem sobrescrever "arquivada").
   if (atual.estado !== 'arquivada' && !patch.estado) {
     const feitos = ESTAGIOS.filter(e => merged.progresso[e]).length
     merged.estado = feitos === 0 ? 'rascunho' : feitos === ESTAGIOS.length ? 'concluida' : 'em_andamento'
@@ -90,7 +93,6 @@ export function update(id, patch) {
   return merged
 }
 
-/** Marca um estágio como concluído (ou não) e recalcula o estado. */
 export function marcarEstagio(id, estagio, feito = true) {
   return update(id, { progresso: { [estagio]: feito } })
 }
@@ -111,7 +113,6 @@ export function remove(id) {
   writeAll(readAll().filter(c => c.id !== id))
 }
 
-/** Progresso da campanha: { feitos, total, pct, proximo }. */
 export function progressoDe(c) {
   if (!c) return { feitos: 0, total: ESTAGIOS.length, pct: 0, proximo: 'brief' }
   const feitos = ESTAGIOS.filter(e => c.progresso && c.progresso[e]).length
