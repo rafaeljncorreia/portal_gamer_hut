@@ -60,10 +60,7 @@
     // Carrega e cacheia o snapshot. Retorna Promise<array de jogos enriquecidos>.
     load: function () {
       if (CACHE) return Promise.resolve(CACHE);
-      // DIVERGE da cópia raiz de propósito: no app-web (Vite, servido na raiz) o
-      // caminho precisa ser absoluto, senão rotas aninhadas (/campanha/:id)
-      // resolvem 'catalog.json' contra a rota e caem no fallback SPA. Ver DIRETRIZ §6.
-      return fetch('/catalog.json')
+      return fetch('/portal_gamer_hut/catalog.json')
         .then(function (r) { return r.json(); })
         .then(function (data) {
           CACHE = (data.jogos || []).map(enrich);
