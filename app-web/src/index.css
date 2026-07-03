@@ -112,6 +112,15 @@ img{ display:block; }
   font-size:13px; resize:vertical; }
 .form-group textarea:focus{ outline:none; border-color:var(--orange); }
 
+textarea{ width:100%; min-height:100px; background:var(--bg2); color:var(--white);
+  border:1px solid var(--lineSoft); border-radius:8px; padding:12px; font-family:'Space Grotesk',sans-serif;
+  font-size:13px; resize:vertical; line-height:1.6; }
+textarea:focus{ outline:none; border-color:var(--orange); }
+select{ cursor:pointer; }
+details summary{ cursor:pointer; user-select:none; }
+details summary:focus{ outline:none; }
+pre{ margin:0; font-family:'Space Grotesk',sans-serif; }
+
 .toast{ position:fixed; bottom:24px; right:24px; z-index:100; background:var(--green);
   color:var(--ink); padding:12px 20px; border-radius:10px; font-family:'Space Mono',monospace;
   font-size:12px; font-weight:700; animation:slideUp .3s ease; }

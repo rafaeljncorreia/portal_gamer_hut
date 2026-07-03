@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import * as store from '../lib/campaigns.js'
 import { generations, tones, platforms } from '../lib/gh.js'
@@ -16,6 +16,7 @@ const FERRAMENTAS = [
   { nome: 'Downloader',      desc: 'Baixa vídeos p/ usar nas artes.',           href: PORTAL + '/downloader.html' },
   { nome: 'Review',          desc: 'Revisão antes de publicar.',                href: PORTAL + '/review.html' },
   { nome: 'Aprendizado',     desc: 'Log de diretrizes aprendidas.',             href: PORTAL + '/aprendizado.html' },
+  { nome: 'Calendário',      desc: 'Calendário semanal de conteúdo.',           to: '/ferramentas/calendario' },
 ]
 
 export default function Campanhas() {

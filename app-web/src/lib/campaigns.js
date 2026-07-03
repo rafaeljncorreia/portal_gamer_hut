@@ -67,7 +67,10 @@ export function create({ nome = '', tema = '', produto_id = null, geracao = null
       observacoes: '',
     },
     materiais: {},
-    visual: {},
+    visual: {
+      notas: '',
+      atualizado_em: '',
+    },
   }
   writeAll([c, ...readAll()])
   return c

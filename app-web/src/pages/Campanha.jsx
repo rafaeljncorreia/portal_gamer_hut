@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import * as store from '../lib/campaigns.js'
 import { loadCatalogo, generations, getBrandVoice, gerar } from '../lib/gh.js'
+import VisualPanel from './VisualPanel.jsx'
 
 const STEPS = [
   { key: 'brief',      label: 'Brief',      sub: 'conceito da campanha' },
@@ -18,7 +19,6 @@ const inputStyle = {
 
 export default function Campanha() {
   const { id } = useParams()
-  const nav = useNavigate()
   const [camp, setCamp] = useState(() => store.get(id))
   const [active, setActive] = useState(() => store.progressoDe(store.get(id)).proximo || 'brief')
   const [catalogo, setCatalogo] = useState([])
@@ -53,6 +53,13 @@ export default function Campanha() {
     setCamp(c)
     flash('Estratégia salva — próxima etapa: Materiais')
     setActive('materiais')
+  }
+
+  const salvarVisual = (patch) => {
+    let c = store.update(id, patch)
+    c = store.marcarEstagio(id, 'visual', true)
+    setCamp(c)
+    flash('Visual concluído — campanha finalizada!')
   }
 
   const gerarSugestaoEstrategia = async (dadosAtuais) => {
@@ -147,6 +154,8 @@ Seja objetivo e prático. Use markdown.`
         ? <EstrategiaPanel camp={camp} onSalvar={salvarEstrategia}
             onGerarIA={gerarSugestaoEstrategia}
             iaGerando={iaGerando} sugestaoIA={sugestaoIA} />
+        : active === 'visual'
+        ? <VisualPanel camp={camp} onSalvar={salvarVisual} />
         : <StubPanel etapa={active} camp={camp} onToggle={() => concluirProvisorio(active)} />}
 
       {toast && <div className="toast">{toast}</div>}
@@ -328,7 +337,7 @@ function EstrategiaPanel({ camp, onSalvar, onGerarIA, iaGerando, sugestaoIA }) {
       <div className="alert" style={{ fontSize: 12, marginBottom: 20 }}>
         Contexto do Brief:{' '}
         {camp.brief?.produto_nome && <b>{camp.brief.produto_nome}</b>}
-        {camp.geracao && <> · geração <b>{camp.geracao}</b></>}
+        {camp.geracao && <> · geração <b>{generations()[camp.geracao]?.full || camp.geracao}</b></>}
         {camp.pilar && <> · pilar <b>{camp.pilar}</b></>}
         {camp.tema && <> · tema <b>{camp.tema}</b></>}
         {camp.brief?.angulo && <> · {camp.brief.angulo}</>}
@@ -421,13 +430,10 @@ function EstrategiaPanel({ camp, onSalvar, onGerarIA, iaGerando, sugestaoIA }) {
 
 function StubPanel({ etapa, camp, onToggle }) {
   const info = {
-    estrategia: { titulo: 'Estratégia — plano de divulgação', fase: 'Fase B',
-      desc: 'Canais (Instagram / TikTok / YouTube), formatos, cadência e datas cruzando a janela de divulgação do produto com o calendário semanal.' },
     materiais: { titulo: 'Materiais — conteúdo por canal', fase: 'Fase C',
       desc: 'Copys e Descrições geradas AQUI dentro, já recebendo produto + geração + pilar + tema do Brief como contexto. Este é o aprofundamento central que aprendemos do TGT Hub.' },
-    visual: { titulo: 'Visual — peças & KV', fase: 'Fase D',
-      desc: 'Creative Studio (posts, carrosséis, capas) como o estágio final, herdando o contexto da campanha.' },
   }[etapa]
+  if (!info) return null
 
   const feito = camp.progresso[etapa]
 
@@ -443,7 +449,7 @@ function StubPanel({ etapa, camp, onToggle }) {
         <div className="alert" style={{ fontSize: 12, marginBottom: 20 }}>
           Contexto herdado do Brief:{' '}
           {camp.brief?.produto_nome && <b>{camp.brief.produto_nome}</b>}
-          {camp.geracao && <> · geração <b>{camp.geracao}</b></>}
+          {camp.geracao && <> · geração <b>{generations()[camp.geracao]?.full || camp.geracao}</b></>}
           {camp.pilar && <> · pilar <b>{camp.pilar}</b></>}
           {camp.tema && <> · tema <b>{camp.tema}</b></>}
         </div>

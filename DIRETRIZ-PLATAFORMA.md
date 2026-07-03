@@ -101,11 +101,11 @@ Herdada e mantida entre as duas frentes:
 ## 8. Roadmap faseado (cada fase usável)
 
 - **A — Esqueleto + diretriz:** store `campaigns.js`, ponte `gh.js`, home
-  `Campanhas.jsx` (3 seções), nav/rotas, Catálogo/Marca sem Worker. ✅ em curso.
-- **B — Pipeline:** `/campanha/:id`, Brief funcional, progresso X/4, "Continuar".
-- **C — Materiais:** Copys + Descrições dentro do M3 com o contexto do Brief.
-- **D — Estratégia + Visual:** M2 com canais/calendário; M4 com o Studio.
-- **E — Polimento:** Marca completa, ferramentas avulsas restantes, refino visual.
+  `Campanhas.jsx` (3 seções), nav/rotas, Catálogo/Marca sem Worker. ✅
+- **B — Pipeline:** `/campanha/:id`, Brief funcional, progresso X/4, "Continuar". ✅
+- **C — Materiais:** Copys + Descrições dentro do M3 com o contexto do Brief. ⬜ (pendente)
+- **D — Estratégia + Visual:** M2 com canais/calendário + geração IA; M4 com Studio link. ✅
+- **E — Polimento:** Marca como brand-guidelines completo, Calendário avulso, CSS polish. ✅
 
 ## 9. O que NÃO fazer
 

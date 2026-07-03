@@ -52,12 +52,12 @@ Construir o **Portal Gamer Hut** como plataforma de criação de conteúdo para 
 - Monday.com: **apenas read-only**
 - Roteiros de vídeo: formato **texto markdown estruturado**
 
-## Roadmap (Sprints)
-1. ✅ **Switch Geracional** — Copys + Studio (concluído)
-2. ⬜ **Descrições Padronizadas (YT/TikTok/Insta) + Meme Generator IA**
-3. ⬜ **Títulos SEO + Roteiros de Vídeo**
-4. ⬜ **Integração Monday.com**
-5. ⬜ **Studio Brandbook Compliant + Polimento/Supabase**
+## Roadmap (app-web campaign-centric — ver DIRETRIZ-PLATAFORMA.md)
+1. ✅ **Fase A** — Esqueleto + diretriz (campaigns.js, gh.js, home 3 seções)
+2. ✅ **Fase B** — Pipeline Brief funcional (progresso X/4, Continuar)
+3. ⬜ **Fase C** — Materiais (Copys + Descrições dentro do M3)
+4. ✅ **Fase D** — Estratégia (canais/calendário/IA) + Visual (Studio link)
+5. ✅ **Fase E** — Polimento (Marca brand-guidelines, Calendário, CSS**
 
 ## Decisões Tomadas
 - Switch geracional primeiro no `copys.html` (maior valor imediato — IA usa contexto)

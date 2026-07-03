@@ -3,11 +3,13 @@ import Campanhas from './pages/Campanhas.jsx'
 import Campanha from './pages/Campanha.jsx'
 import Catalogo from './pages/Catalogo.jsx'
 import Marca from './pages/Marca.jsx'
+import Calendario from './pages/Calendario.jsx'
 
 const links = [
   { to: '/',         label: 'Campanhas', end: true },
   { to: '/marca',    label: 'Marca' },
   { to: '/catalogo', label: 'Catálogo' },
+  { to: '/ferramentas/calendario', label: 'Calendário' },
 ]
 
 function App() {
@@ -37,6 +39,7 @@ function App() {
           <Route path="/campanha/:id" element={<Campanha />} />
           <Route path="/marca" element={<Marca />} />
           <Route path="/catalogo" element={<Catalogo />} />
+          <Route path="/ferramentas/calendario" element={<Calendario />} />
           <Route path="*" element={<Campanhas />} />
         </Routes>
       </div>
