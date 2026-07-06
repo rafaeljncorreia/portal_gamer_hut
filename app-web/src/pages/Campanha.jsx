@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import * as store from '../lib/campaigns.js'
 import { loadCatalogo, generations } from '../lib/gh.js'
+import Estrategia from './stages/Estrategia.jsx'
+import Materiais from './stages/Materiais.jsx'
 
 const STEPS = [
   { key: 'brief',      label: 'Brief',      sub: 'conceito da campanha' },
@@ -35,14 +37,29 @@ export default function Campanha() {
   }
 
   const p = store.progressoDe(camp)
+  const produto = catalogo.find(j => j.id === camp.produto_id) || null
   const flash = (msg) => { setToast(msg); setTimeout(() => setToast(''), 2500) }
+  const ORDEM = ['brief', 'estrategia', 'materiais', 'visual']
 
   const salvarBrief = (patch) => {
-    let c = store.update(id, patch)
-    c = store.marcarEstagio(id, 'brief', true)
+    store.update(id, patch)
+    const c = store.marcarEstagio(id, 'brief', true)
     setCamp(c)
     flash('Brief salvo — alimenta os próximos estágios')
     setActive('estrategia')
+  }
+
+  // Update genérico usado pelos estágios Estratégia/Materiais. opts.done marca o
+  // estágio ATIVO e avança para o próximo.
+  const onUpdate = (patch, opts = {}) => {
+    let c = store.update(id, patch)
+    if (opts.done !== undefined) c = store.marcarEstagio(id, active, opts.done)
+    setCamp(c)
+    flash('Salvo')
+    if (opts.done) {
+      const nxt = ORDEM[ORDEM.indexOf(active) + 1]
+      if (nxt) setActive(nxt)
+    }
   }
 
   const concluirProvisorio = (etapa) => {
@@ -89,8 +106,9 @@ export default function Campanha() {
       </div>
 
       {/* Painel do estágio ativo */}
-      {active === 'brief'
-        ? <BriefPanel camp={camp} catalogo={catalogo} onSalvar={salvarBrief} />
+      {active === 'brief' ? <BriefPanel camp={camp} catalogo={catalogo} onSalvar={salvarBrief} />
+        : active === 'estrategia' ? <Estrategia camp={camp} produto={produto} onUpdate={onUpdate} />
+        : active === 'materiais' ? <Materiais camp={camp} produto={produto} onUpdate={onUpdate} />
         : <StubPanel etapa={active} camp={camp} onToggle={() => concluirProvisorio(active)} />}
 
       {toast && <div className="toast">{toast}</div>}
