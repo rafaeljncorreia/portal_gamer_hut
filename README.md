@@ -1,62 +1,52 @@
-# Gamer Hut · Creative Studio
+# Portal Gamer Hut — Plataforma de Gestão de Conteúdo
 
-Gerador de criativos para o Instagram da Gamer Hut. Roda 100% no navegador
-(React + Babel via CDN), sem build.
+Portal interno de gestão e geração de conteúdo da Gamer Hut
+([`gamerhut.com.br`](https://gamerhut.com.br) · `@gamerhut.store`).
+Aplica automaticamente o tom de voz e identidade visual da marca, segmentando
+por geração (Gen Z, Millennial, Gen X).
 
-## Como rodar
+Arquitetura **campaign-centric**: a campanha orquestra as ferramentas via pipeline
+Brief → Estratégia → Materiais → Visual.
 
-Por causa do carregamento de módulos `.jsx`, sirva a pasta por um servidor
-estático (abrir o arquivo direto via `file://` pode bloquear os scripts):
+## Stack
+
+- **Portal estático** (HTML + vanilla JS + CDN, React 18 via Babel standalone) — GitHub Pages
+- **app-web** (Vite + React Router v7) — plataforma campaign-centric (em desenvolvimento)
+- **Cloudflare Worker** — proxy da Anthropic API
+- Persistência: `localStorage`
+
+## Módulos
+
+| Módulo | Descrição |
+|--------|-----------|
+| Copys | Geração de copy com switch geracional (Gen Z / Millennial / Gen X) |
+| Creative Studio | Design de peças visuais (carrossel, post blocado, quiz, ranking, reels) |
+| IA Proxy | Geração de texto via Cloudflare Worker + Anthropic API |
+
+## Documentação
+
+| Arquivo | Conteúdo |
+|---------|----------|
+| [`AGENT-PLAYBOOK.md`](AGENT-PLAYBOOK.md) | Brandbook completo: 10 regras, 5 sentimentos, playbook geracional |
+| [`sprints/SPRINT-INDEX.md`](sprints/SPRINT-INDEX.md) | Sprint ativo, histórico e pendentes |
+| [`docs/INDEX.md`](docs/INDEX.md) | Mapa completo da documentação |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Diagrama da pipeline e ordem de carregamento |
+| [`DIRETRIZ-PLATAFORMA.md`](DIRETRIZ-PLATAFORMA.md) | Visão campaign-centric detalhada |
+
+## Brandbook
+
+A identidade visual e tom de voz são definidos no brandbook oficial:
+[`gamer-hut.vercel.app`](https://gamer-hut.vercel.app) (26 stages).
+O arquivo [`AGENT-PLAYBOOK.md`](AGENT-PLAYBOOK.md) é um resumo curado para consulta rápida.
+
+## Como rodar localmente
 
 ```bash
-# Python
-python3 -m http.server 8080
-# ou Node
-npx serve .
+python -m http.server 8080
+# Abrir http://localhost:8080
 ```
 
-Depois abra `http://localhost:8080`.
+## Repositório
 
-## Modelos disponíveis
-
-- **Carrossel** — 3–5 páginas sequenciais (capa + conteúdo). Inclui o tipo de
-  página **Vídeo**: card horizontal 16:9 com trailer tocando e **exportação em
-  vídeo** (canvas + MediaRecorder, com áudio).
-- **Post blocado** — tipografia forte sobre cor sólida.
-- **Post c/ imagem** — imagem em destaque + texto e etiqueta de preço.
-- **Quiz** — modo *Pergunta* (opções A–D, resposta destacável) e *Esse ou
-  Aquele* (dois painéis + divisor).
-- **Top / Ranking** — lista numerada (top da semana / mais vendidos).
-- **Capa de Reels** — 9:16 com guia de safe zone 4:5.
-
-### Formato Feed / Stories
-
-**Post blocado**, **Quiz** e **Top / Ranking** têm um seletor de **FORMATO** no
-topo do painel: alterna entre **Feed 4:5 (1080×1350)** e **Stories 9:16
-(1080×1920)**. O conteúdo se reequilibra automaticamente no formato vertical.
-
-## Tags de categoria
-
-Cada tag define a cor de destaque e o selo (Notícias, Pré-venda, Restoque,
-Lançamento, Preview, Trailer, Review, Quiz). Adicionar/editar tags em
-`app/data.jsx` faz o app inteiro se adaptar.
-
-## Estrutura
-
-```
-index.html        # shell + fontes + ordem de carregamento dos scripts
-app/data.jsx      # tokens de design, tags, templates, padrões de fundo
-app/preview.jsx   # renderizadores de cada modelo + compositor de vídeo (canvas)
-app/controls.jsx  # controles atômicos do painel (inputs, drops, steppers)
-app/panel.jsx     # montagem do painel por modelo
-app/app.jsx       # shell do app, escala, export PNG e export de vídeo
-assets/           # logotipos e marcas (PNG)
-```
-
-## Exportação
-
-- **PNG** — render off-screen em resolução nativa (html-to-image).
-- **Vídeo** (apenas página de vídeo do carrossel) — grava o quadro da marca com
-  o trailer tocando; sai em MP4 ou WebM conforme o navegador.
-
-> Observação: vídeos enviados ficam só na sessão (não são salvos ao recarregar).
+- **GitHub:** `github.com/rafaeljncorreia/portal_gamer_hut`
+- **Pages:** `rafaeljncorreia.github.io/portal_gamer_hut`
