@@ -6,7 +6,7 @@
 <title>Media Downloader · Portal Gamer Hut</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,800;0,900;1,900&family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Red+Hat+Display:wght@300;400;500;600;700;800;900&family=Press+Start+2P&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="portal.css"/>
 <style>
 
@@ -40,12 +40,12 @@
   display: flex; align-items: center; justify-content: center;
   font-size: 22px; flex-shrink: 0;
 }
-.offline-title { font-family: 'Archivo', sans-serif; font-weight: 900; font-size: clamp(24px,4vw,40px); line-height: 1; }
-.offline-sub { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--mut); margin-top: 6px; }
+.offline-title { font-family: 'Russo One', sans-serif; font-weight: 900; font-size: clamp(24px,4vw,40px); line-height: 1; }
+.offline-sub { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--mut); margin-top: 6px; }
 
 .os-tabs { display: flex; gap: 8px; margin-bottom: 28px; }
 .os-tab {
-  font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: .06em;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .06em;
   padding: 10px 20px; border-radius: 9px; cursor: pointer;
   border: 1px solid var(--lineSoft); color: var(--mut); background: transparent;
   transition: all .14s;
@@ -69,11 +69,11 @@
 }
 .step-body { flex: 1; }
 .step-body strong { display: block; font-size: 15px; font-weight: 600; margin-bottom: 6px; }
-.step-body p { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--mut); line-height: 1.7; margin: 0; }
+.step-body p { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--mut); line-height: 1.7; margin: 0; }
 .step-body .cmd {
   display: block; background: var(--panel2); border: 1px solid var(--lineSoft);
   border-radius: 7px; padding: 10px 13px; margin-top: 10px;
-  font-family: 'Space Mono', monospace; font-size: 12px; color: var(--white);
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--white);
   letter-spacing: .04em; cursor: pointer; position: relative;
   transition: border-color .14s;
 }
@@ -86,7 +86,7 @@
 
 .retry-btn {
   display: flex; align-items: center; gap: 10px;
-  font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; letter-spacing: .04em;
+  font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; letter-spacing: .04em;
   padding: 14px 22px; border-radius: 10px; cursor: pointer; border: none;
   background: var(--orange); color: var(--ink); transition: filter .14s, transform .12s;
 }
@@ -95,7 +95,7 @@
 .note-box {
   background: rgba(46,157,91,.07); border: 1px solid rgba(46,157,91,.25);
   border-radius: 10px; padding: 14px 16px; margin-top: 20px;
-  font-family: 'Space Mono', monospace; font-size: 11px; color: var(--green); line-height: 1.7;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--green); line-height: 1.7;
 }
 .note-box strong { color: #5ddb8a; }
 
@@ -115,19 +115,19 @@
   display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
   padding-bottom: 20px; margin-bottom: 22px; border-bottom: 1px solid var(--lineSoft);
 }
-.dep-pill { display: flex; align-items: center; gap: 7px; font-family: 'Space Mono', monospace; font-size: 11px; color: var(--mut); }
+.dep-pill { display: flex; align-items: center; gap: 7px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--mut); }
 .dep-pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--mut); transition: background .3s; }
 .dep-pill .dot.ok  { background: var(--green); box-shadow: 0 0 6px var(--green); }
 .dep-pill .dot.err { background: #e84040; }
 .dep-pill strong   { color: var(--white); font-size: 11px; }
 .dep-version { font-size: 10px; color: var(--mut2); }
 .upd-btn {
-  margin-left: auto; font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .06em;
+  margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .06em;
   color: var(--mut); background: transparent; border: 1px solid var(--lineSoft);
   border-radius: 7px; padding: 6px 11px; cursor: pointer; transition: all .14s;
 }
 .upd-btn:hover { color: var(--orange); border-color: var(--orange); }
-.upd-toast { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--green); display: none; }
+.upd-toast { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--green); display: none; }
 .upd-toast.show { display: block; }
 .upd-toast.err  { color: #e84040; }
 
@@ -137,7 +137,7 @@
   display: flex; align-items: center; gap: 7px;
   background: var(--panel2); border: 1px solid var(--lineSoft);
   border-radius: 100px; padding: 5px 14px 5px 9px;
-  font-family: 'Space Mono', monospace; font-size: 11px; color: var(--mut); transition: all .15s;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--mut); transition: all .15s;
 }
 .plat-badge.active-plat { border-color: var(--orange); color: var(--orange); background: rgba(232,100,60,.08); }
 .plat-icon { width: 18px; height: 18px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; }
@@ -147,20 +147,20 @@
 
 /* ── Fields ──────────────────────────────────────────────────────── */
 .field-label {
-  font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .12em;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .12em;
   text-transform: uppercase; color: var(--mut); margin-bottom: 8px; display: block;
 }
 .url-wrap { position: relative; margin-bottom: 18px; }
 .url-wrap input {
   width: 100%; background: var(--panel2); border: 1px solid var(--lineSoft);
-  border-radius: 10px; color: var(--white); font-family: 'Space Mono', monospace;
+  border-radius: 10px; color: var(--white); font-family: 'JetBrains Mono', monospace;
   font-size: 13px; padding: 13px 14px; outline: none; transition: border-color .15s;
 }
 .url-wrap input:focus { border-color: var(--orange); }
 .url-wrap input::placeholder { color: var(--mut2); }
 .detected-tag {
   position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-  font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .06em;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .06em;
   padding: 3px 8px; border-radius: 100px; display: none;
 }
 .detected-tag.show { display: block; }
@@ -176,10 +176,10 @@
 .preview-card.show { display: flex; }
 .preview-card img { width: 68px; height: 44px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
 .preview-title { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
-.preview-meta  { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--mut); }
+.preview-meta  { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--mut); }
 
 .plat-note {
-  font-family: 'Space Mono', monospace; font-size: 11px; color: var(--mut);
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--mut);
   background: rgba(244,241,236,.04); border: 1px solid var(--lineSoft);
   border-radius: 8px; padding: 10px 13px; margin-bottom: 16px; line-height: 1.6; display: none;
 }
@@ -188,7 +188,7 @@
 .mode-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
 .mode-btn {
   background: var(--panel2); border: 1px solid var(--lineSoft); border-radius: 10px;
-  color: var(--mut); font-family: 'Space Mono', monospace; font-size: 12px;
+  color: var(--mut); font-family: 'JetBrains Mono', monospace; font-size: 12px;
   padding: 12px; cursor: pointer; text-align: center; transition: all .15s;
 }
 .mode-btn:hover  { border-color: var(--orange); color: var(--white); }
@@ -198,7 +198,7 @@
 .qual-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
 .qual-chip {
   background: var(--panel2); border: 1px solid var(--lineSoft); border-radius: 7px;
-  color: var(--mut); font-family: 'Space Mono', monospace; font-size: 11px;
+  color: var(--mut); font-family: 'JetBrains Mono', monospace; font-size: 11px;
   padding: 7px 14px; cursor: pointer; transition: all .15s;
 }
 .qual-chip:hover  { border-color: var(--orange); color: var(--white); }
@@ -208,7 +208,7 @@
 .browser-row { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 22px; }
 .br-btn {
   background: var(--panel2); border: 1px solid var(--lineSoft); border-radius: 7px;
-  color: var(--mut); font-family: 'Space Mono', monospace; font-size: 11px;
+  color: var(--mut); font-family: 'JetBrains Mono', monospace; font-size: 11px;
   padding: 7px 12px; cursor: pointer; transition: all .15s;
 }
 .br-btn:hover  { border-color: var(--orange); color: var(--white); }
@@ -216,7 +216,7 @@
 
 .dl-btn {
   width: 100%; padding: 15px; background: var(--orange); border: none; border-radius: 10px;
-  color: var(--ink); font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700;
+  color: var(--ink); font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700;
   letter-spacing: .06em; cursor: pointer; transition: filter .14s, transform .12s;
 }
 .dl-btn:hover    { filter: brightness(1.08); transform: translateY(-1px); }
@@ -227,33 +227,33 @@
 .prog-box { display: none; }
 .prog-box.show { display: block; }
 .prog-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.prog-label { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--mut); letter-spacing: .06em; }
-.prog-pct   { font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 28px; color: var(--orange); }
+.prog-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--mut); letter-spacing: .06em; }
+.prog-pct   { font-family: 'Russo One', sans-serif; font-weight: 900; font-size: 28px; color: var(--orange); }
 .prog-track { background: var(--panel2); border-radius: 100px; height: 5px; overflow: hidden; margin-bottom: 14px; }
 .prog-fill  { height: 100%; background: var(--orange); border-radius: 100px; width: 0%; transition: width .4s ease; }
 .log-box {
   background: var(--panel2); border: 1px solid var(--lineSoft); border-radius: 8px;
   padding: 11px 13px; max-height: 110px; overflow-y: auto;
-  font-family: 'Space Mono', monospace; font-size: 10px; color: var(--mut);
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--mut);
   line-height: 1.7; white-space: pre-wrap; word-break: break-all;
 }
 .done-msg {
   display: none; flex-direction: column; align-items: center; gap: 10px;
   background: rgba(46,157,91,.08); border: 1px solid rgba(46,157,91,.3);
   border-radius: 10px; padding: 16px; margin-top: 14px;
-  font-family: 'Space Mono', monospace; font-size: 12px; color: var(--green); text-align: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--green); text-align: center;
 }
 .done-msg.show { display: flex; }
 .open-folder-btn {
   background: var(--green); border: none; border-radius: 7px; color: var(--ink);
-  font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
   padding: 8px 18px; cursor: pointer; transition: filter .14s;
 }
 .open-folder-btn:hover { filter: brightness(1.1); }
 .err-msg {
   display: none; background: rgba(232,64,64,.08); border: 1px solid rgba(232,64,64,.3);
   border-radius: 10px; padding: 14px; margin-top: 14px;
-  font-family: 'Space Mono', monospace; font-size: 10px; color: #e84040;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #e84040;
   line-height: 1.6; white-space: pre-wrap; word-break: break-word;
 }
 .err-msg.show { display: block; }
@@ -261,9 +261,9 @@
 /* ── Sidebar ─────────────────────────────────────────────────────── */
 .info-card { background: var(--panel); border: 1px solid var(--lineSoft); border-radius: 14px; padding: 20px; margin-bottom: 14px; }
 .info-card h4 { font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--orange); margin: 0 0 12px; letter-spacing: .04em; }
-.info-card ul { margin: 0; padding: 0; list-style: none; font-family: 'Space Mono', monospace; font-size: 11px; color: var(--mut); line-height: 1.9; }
+.info-card ul { margin: 0; padding: 0; list-style: none; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--mut); line-height: 1.9; }
 .info-card ul li::before { content: '→ '; color: var(--orange); }
-.folder-path { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--mut); line-height: 1.6; }
+.folder-path { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--mut); line-height: 1.6; }
 .folder-path strong { color: var(--white); }
 
 /* ── Checking overlay ────────────────────────────────────────────── */
@@ -274,7 +274,7 @@
   animation: spin .8s linear infinite; margin: 0 auto 20px;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-#checking-screen p { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--mut); }
+#checking-screen p { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--mut); }
 </style>
 </head>
 <body>
@@ -284,19 +284,17 @@
   <a class="brand" href="index.html">
     <img src="assets/logo-white.png" alt="Gamer Hut"/>
     <span class="tag">
-      <span class="pixel t1">PORTAL</span>
-      <span class="mono t2">ECOSSISTEMA DE CRIAÇÃO</span>
+      <span class="pixel t1" style="display:block;">DOWNLOADER</span>
+      <span class="mono t2" style="display:block;">MÍDIA PARA CRIATIVOS</span>
     </span>
   </a>
   <nav class="links">
     <a href="index.html">PORTAL</a>
-    <a href="studio.html">CREATIVE STUDIO</a>
-    <a href="copys.html">COPYS</a>
-    <a href="descricoes.html">DESCRIÇÕES</a>
-      <a href="review.html">REVIEW</a>
-      <a href="aprendizado.html">APRENDIZADO</a>
-      <a class="active" href="downloader.html">DOWNLOADER</a>
-    </nav>
+    <a href="criar.html">CRIAR</a>
+    <a href="review.html">REVIEW</a>
+    <a href="aprendizado.html">APRENDIZADO</a>
+    <a class="active" href="downloader.html">DOWNLOADER</a>
+  </nav>
 </header>
 
 <section class="page-hero">

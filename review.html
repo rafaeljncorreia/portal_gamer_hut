@@ -6,7 +6,7 @@
 <title>Review de Criativos · Portal Gamer Hut</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,800;0,900;1,900&family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Red+Hat+Display:wght@300;400;500;600;700;800;900&family=Press+Start+2P&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="portal.css"/>
 <style>
   .head{ display:flex; flex-direction:column; gap:20px; margin-bottom:42px; }
@@ -22,37 +22,37 @@
   .panel{ background:var(--panel); border:1px solid var(--lineSoft); border-radius:18px; padding:26px 26px 28px; }
   .panel .ptitle{ font-family:'Press Start 2P',monospace; font-size:12px; color:var(--teal); margin:0 0 20px; }
   .field{ margin-bottom:18px; }
-  .field label{ display:block; font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.14em;
+  .field label{ display:block; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em;
     text-transform:uppercase; color:var(--mut); margin-bottom:8px; }
 
   .drop{ border:1.5px dashed var(--line); border-radius:14px; background:var(--bg); min-height:188px;
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; text-align:center; padding:24px; }
   .drop .ic{ width:54px; height:54px; border-radius:14px; border:1px solid var(--lineSoft);
     display:grid; place-items:center; color:var(--teal); font-size:24px; }
-  .drop .t{ font-family:'Space Mono',monospace; font-size:13px; color:var(--mut); letter-spacing:.06em; }
-  .drop .s{ font-family:'Space Mono',monospace; font-size:11px; color:var(--mut2); letter-spacing:.06em; }
+  .drop .t{ font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--mut); letter-spacing:.06em; }
+  .drop .s{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--mut2); letter-spacing:.06em; }
 
   textarea.input{ width:100%; background:var(--bg); color:var(--white); border:1px solid var(--lineSoft);
-    border-radius:10px; padding:13px 15px; font-size:15px; font-family:'Space Grotesk',sans-serif; outline:none;
+    border-radius:10px; padding:13px 15px; font-size:15px; font-family:'Red Hat Display',sans-serif; outline:none;
     resize:vertical; min-height:92px; line-height:1.5; }
 
   .report{ display:flex; flex-direction:column; }
   .crit{ display:flex; align-items:center; gap:16px; padding:15px 0; border-top:1px solid var(--lineSoft); }
   .crit:first-of-type{ border-top:none; }
-  .crit .cl{ flex:none; width:140px; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15px; color:var(--white); }
+  .crit .cl{ flex:none; width:140px; font-family:'Red Hat Display',sans-serif; font-weight:600; font-size:15px; color:var(--white); }
   .crit .bar{ flex:1; height:10px; border-radius:6px; overflow:hidden; background:#221e1b; }
   .crit .bar i{ display:block; height:100%; border-radius:6px; background:linear-gradient(90deg,#2c2723,#3a332d);
     background-size:200% 100%; animation:shimmer 1.6s linear infinite; }
   @keyframes shimmer{ to{ background-position:-200% 0; } }
   .crit .sc{ flex:none; width:42px; text-align:right; font-family:'Press Start 2P',monospace; font-size:11px; color:var(--mut2); }
   .lock{ margin-top:22px; padding-top:20px; border-top:1px solid var(--lineSoft);
-    display:flex; align-items:center; gap:12px; color:var(--mut); font-family:'Space Mono',monospace; font-size:12px; line-height:1.5; }
+    display:flex; align-items:center; gap:12px; color:var(--mut); font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.5; }
   .lock .b{ width:34px; height:34px; flex:none; border-radius:9px; border:1px solid var(--lineSoft);
     display:grid; place-items:center; color:var(--orange); font-size:15px; }
 
   .note{ margin-top:30px; display:flex; gap:12px; align-items:flex-start; background:var(--panel);
     border:1px solid var(--lineSoft); border-left:3px solid var(--orange); border-radius:12px; padding:16px 18px; }
-  .note p{ margin:0; color:var(--mut); font-family:'Space Mono',monospace; font-size:12px; line-height:1.7; }
+  .note p{ margin:0; color:var(--mut); font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.7; }
   .note .w{ color:var(--white); }
 
   .gen-switch{ display:flex; gap:8px; margin-bottom:18px; }
@@ -61,129 +61,195 @@
   .gen-btn:hover{ border-color:var(--mut); }
   .gen-btn.on{ background:var(--panel2); color:var(--white); border-color:var(--orange); box-shadow:0 0 0 1px var(--orange); }
   .gen-btn .gen-emoji{ font-size:16px; display:block; margin-bottom:2px; }
-  .gen-btn .gen-label{ font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.06em; }
-  .gen-btn .gen-sub{ font-family:'Space Mono',monospace; font-size:8px; letter-spacing:.08em; color:var(--mut2); display:block; margin-top:2px; }
+  .gen-btn .gen-label{ font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.06em; }
+  .gen-btn .gen-sub{ font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.08em; color:var(--mut2); display:block; margin-top:2px; }
   .gen-btn.on .gen-sub{ color:var(--mut); }
 
   .axis-cards{ display:flex; flex-direction:column; gap:10px; margin:14px 0; }
   .axis-card{ background:var(--panel); border:1px solid var(--lineSoft); border-left:3px solid var(--orange);
     border-radius:10px; padding:12px 14px; }
-  .axis-card .axis-label{ font-family:'Space Mono',monospace; font-size:10px; font-weight:700;
+  .axis-card .axis-label{ font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:700;
     letter-spacing:.1em; color:var(--orange); display:block; margin-bottom:6px; }
   .axis-card p{ margin:0; color:#cfc9c1; font-size:13px; line-height:1.6; }
 
   .pill-group{ display:flex; gap:8px; flex-wrap:wrap; }
-  .pill{ cursor:pointer; font-family:'Space Mono',monospace; font-size:12px; font-weight:700; letter-spacing:.04em;
+  .pill{ cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; letter-spacing:.04em;
     padding:9px 14px; border-radius:8px; background:var(--bg); color:var(--white); border:1px solid var(--lineSoft);
     transition:all .13s; user-select:none; }
   .pill:hover{ border-color:var(--mut); }
   .pill.on{ background:var(--blue); color:#fff; border-color:var(--blue); }
-  .field .hint{ font-family:'Space Mono',monospace; font-size:9px; letter-spacing:.04em; color:var(--mut2); text-transform:none; }
+  .field .hint{ font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.04em; color:var(--mut2); text-transform:none; }
+  /* --- PUXAR DO FLUXO dropdown --- */
+  .flow-dropdown{ position:absolute; top:100%; left:0; right:0; z-index:30; margin-top:6px;
+    background:var(--panel2); border:1px solid var(--lineSoft); border-radius:12px;
+    max-height:280px; overflow-y:auto; box-shadow:0 8px 30px rgba(0,0,0,0.6); }
+  .flow-item{ padding:12px 14px; cursor:pointer; border-bottom:1px solid var(--lineSoft);
+    display:flex; flex-direction:column; gap:3px; transition:background .1s; }
+  .flow-item:last-child{ border-bottom:none; }
+  .flow-item:hover{ background:var(--bg); }
+  .flow-item-title{ font-family:'Red Hat Display',sans-serif; font-size:13px; color:var(--white); line-height:1.4; }
+  .flow-item-meta{ font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--mut2); letter-spacing:.08em; }
+  .flow-empty{ padding:24px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--mut2); }
+  /* --- Chat panel --- */
+  .chat-toggle{ position:fixed; bottom:28px; right:28px; z-index:100; cursor:pointer;
+    width:54px; height:54px; border-radius:50%; background:var(--orange); color:var(--ink);
+    border:none; font-size:22px; box-shadow:0 4px 20px rgba(232,100,60,0.35);
+    display:grid; place-items:center; transition:transform .12s, filter .12s; }
+  .chat-toggle:hover{ transform:scale(1.06); filter:brightness(1.08); }
+  .chat-panel{ position:fixed; bottom:92px; right:28px; z-index:99; width:380px; height:520px;
+    background:var(--panel); border:1px solid var(--lineSoft); border-radius:16px;
+    display:none; flex-direction:column; box-shadow:0 8px 40px rgba(0,0,0,0.5);
+    overflow:hidden; }
+  .chat-header{ display:flex; align-items:center; justify-content:space-between;
+    padding:14px 16px; border-bottom:1px solid var(--lineSoft); flex:none; }
+  .chat-header .chtitle{ font-family:'Press Start 2P',monospace; font-size:9px; color:var(--orange); letter-spacing:.04em; }
+  .chat-close{ cursor:pointer; background:none; border:none; color:var(--mut); font-size:16px; padding:0; }
+  .chat-close:hover{ color:var(--white); }
+  .chat-messages{ flex:1; overflow-y:auto; padding:12px 14px; display:flex; flex-direction:column; gap:10px; }
+  .chat-msg{ max-width:88%; padding:10px 14px; border-radius:12px; font-size:13px; line-height:1.6; word-wrap:break-word; white-space:pre-wrap; }
+  .chat-msg.user{ align-self:flex-end; background:var(--orange); color:var(--ink); border-bottom-right-radius:4px; }
+  .chat-msg.ia{ align-self:flex-start; background:var(--bg2); color:var(--white);
+    border:1px solid var(--lineSoft); border-bottom-left-radius:4px; }
+  .chat-msg.ia.loading{ opacity:.5; font-size:11px; }
+  .chat-input-row{ display:flex; align-items:flex-end; gap:8px; padding:10px 14px;
+    border-top:1px solid var(--lineSoft); background:var(--bg2); flex:none; }
+  .chat-input-row textarea{ flex:1; background:var(--bg); border:1px solid var(--lineSoft);
+    border-radius:8px; padding:10px 12px; font-family:'Red Hat Display',sans-serif; font-size:13px;
+    color:var(--white); outline:none; resize:none; min-height:40px; max-height:120px; line-height:1.5; }
+  .chat-input-row textarea:focus{ border-color:var(--orange); }
+  .chat-input-row button{ cursor:pointer; background:var(--orange); color:var(--ink); border:none;
+    border-radius:8px; width:38px; height:38px; display:grid; place-items:center; font-size:18px;
+    flex:none; transition:filter .12s; }
+  .chat-input-row button:hover{ filter:brightness(1.1); }
+  .chat-welcome{ text-align:center; color:var(--mut2); font-family:'JetBrains Mono',monospace;
+    font-size:10px; padding:20px 14px; line-height:1.7; }
+  @media (max-width:560px){
+    .chat-panel{ width:92vw; right:4vw; bottom:76px; height:460px; }
+    .chat-toggle{ right:16px; bottom:16px; width:48px; height:48px; font-size:18px; }
+  }
 </style>
 <script src="config.js"></script>
 <script src="generation-context.js"></script>
 <script src="brand-voice.js"></script>
 </head>
 <body>
-  <div class="dots"></div>
+<div class="dots"></div>
 
-  <header class="nav">
-    <a class="brand" href="index.html">
-      <img src="assets/logo-white.png" alt="Gamer Hut"/>
-      <span class="tag">
-        <span class="pixel t1" style="display:block;">REVIEW</span>
-        <span class="mono t2" style="display:block;">ANÁLISE DE CRIATIVOS</span>
-      </span>
-    </a>
-    <nav class="links">
-      <a href="index.html">PORTAL</a>
-      <a href="studio.html">CREATIVE STUDIO</a>
-      <a href="copys.html">COPYS</a>
-      <a href="descricoes.html">DESCRIÇÕES</a>
-      <a class="active" href="review.html">REVIEW</a>
-      <a href="aprendizado.html">APRENDIZADO</a>
-      <a href="downloader.html">DOWNLOADER</a>
-    </nav>
-  </header>
+<header class="nav">
+  <a class="brand" href="index.html">
+    <img src="assets/logo-white.png" alt="Gamer Hut"/>
+    <span class="tag">
+      <span class="pixel t1" style="display:block;">REVIEW</span>
+      <span class="mono t2" style="display:block;">APROVAÇÃO DE COPYS</span>
+    </span>
+  </a>
+  <nav class="links">
+    <a href="index.html">PORTAL</a>
+    <a href="criar.html">CRIAR</a>
+    <a class="active" href="review.html">REVIEW</a>
+    <a href="aprendizado.html">APRENDIZADO</a>
+    <a href="downloader.html">DOWNLOADER</a>
+  </nav>
+</header>
 
-  <main class="wrap">
-    <div class="head">
-      <h1 class="display">Review de Criativos</h1>
-      <p>Envie a imagem e o texto do criativo e receba uma análise antes de publicar. Esta é uma prévia da
-        interface — a revisão automática será conectada em seguida.</p>
-    </div>
+<main class="wrap">
+  <div class="head">
+    <h1 class="display">Review de Criativos</h1>
+    <p>Envie a imagem e o texto do criativo e receba uma análise com score, feedback e sugestões de melhoria antes de publicar.</p>
+  </div>
 
-    <div class="layout">
-      <!-- input mock -->
-      <section class="panel">
-        <h2 class="ptitle">ENVIAR CRIATIVO</h2>
-        <div class="field">
-          <label>Imagem do criativo</label>
-          <div class="drop" id="imageDrop">
-            <input type="file" id="imageFile" accept="image/png,image/jpeg" style="display:none"/>
-            <span class="ic" id="dropIcon">↑</span>
-            <span class="t" id="dropText">Arraste a imagem aqui</span>
-            <span class="s">PNG · JPG · até 1080×1350</span>
-          </div>
-        </div>
-        <div class="field">
-          <label>Texto / legenda</label>
-          <textarea class="input" id="copyText" placeholder="Cole aqui a copy que vai junto com o criativo..."></textarea>
-        </div>
-        <div class="field">
-          <label>Geração <span class="hint">público-alvo da peça</span></label>
-          <div class="gen-switch" id="genSwitch"></div>
-        </div>
-        <div class="field">
-          <label>Tom de voz <span class="hint">como essa peça foi escrita</span></label>
-          <div class="pill-group" id="toneChips">
-            <span class="pill on" data-v="hype">HYPE</span>
-            <span class="pill" data-v="informativo">INFORMATIVO</span>
-            <span class="pill" data-v="nostalgico">NOSTÁLGICO</span>
-            <span class="pill" data-v="zueiro">ZUEIRO</span>
-          </div>
-        </div>
-        <div class="field">
-          <label>Plataforma <span class="hint">onde vai publicar</span></label>
-          <div class="pill-group" id="platformChips">
-            <span class="pill on" data-v="instagram">INSTAGRAM</span>
-            <span class="pill" data-v="tiktok">TIKTOK</span>
-            <span class="pill" data-v="youtube">YOUTUBE</span>
-            <span class="pill" data-v="feed">FEED</span>
-          </div>
-        </div>
-        <button class="btn btn-primary" id="reviewBtn" style="width:100%; justify-content:center; margin-top:6px;">🔍 REVISAR CRIATIVO</button>
-      </section>
+  <div class="layout">
+    <section class="panel">
+      <h2 class="ptitle">ENVIAR CRIATIVO</h2>
 
-      <!-- report mock -->
-      <section class="panel report">
-        <h2 class="ptitle" style="color:var(--orange);">RELATÓRIO</h2>
-        <div class="crit"><span class="cl">Clareza</span><span class="bar"><i style="width:78%;"></i></span><span class="sc">··</span></div>
-        <div class="crit"><span class="cl">Contraste</span><span class="bar"><i style="width:64%;"></i></span><span class="sc">··</span></div>
-        <div class="crit"><span class="cl">Tom de voz</span><span class="bar"><i style="width:88%;"></i></span><span class="sc">··</span></div>
-        <div class="crit"><span class="cl">Identidade</span><span class="bar"><i style="width:72%;"></i></span><span class="sc">··</span></div>
-        <div class="crit"><span class="cl">Chamada (CTA)</span><span class="bar"><i style="width:55%;"></i></span><span class="sc">··</span></div>
-        <div class="lock">
-          <span class="b">⚿</span>
-          <span>A análise entra no ar quando a revisão automática for conectada. Por enquanto, isto é um placeholder visual.</span>
+      <div class="field" style="position:relative;">
+        <label>Fluxo de criação</label>
+        <button id="pullFlowBtn" class="btn btn-ghost" style="width:100%;justify-content:center;font-size:12px;">⬇ PUXAR DO FLUXO</button>
+        <div id="flowDropdown" class="flow-dropdown" style="display:none;"></div>
+      </div>
+
+      <div class="field">
+        <label>Imagem do criativo</label>
+        <div class="drop" id="imageDrop">
+          <input type="file" id="imageFile" accept="image/png,image/jpeg" style="display:none"/>
+          <span class="ic" id="dropIcon">↑</span>
+          <span class="t" id="dropText">Arraste a imagem aqui</span>
+          <span class="s">PNG · JPG · até 1080×1350</span>
         </div>
-      </section>
-    </div>
+      </div>
+      <div class="field">
+        <label>Texto / legenda</label>
+        <textarea class="input" id="copyText" placeholder="Cole aqui a copy que vai junto com o criativo..."></textarea>
+      </div>
+      <div class="field">
+        <label>Geração <span class="hint">público-alvo da peça</span></label>
+        <div class="gen-switch" id="genSwitch"></div>
+      </div>
+      <div class="field">
+        <label>Tom de voz <span class="hint">como essa peça foi escrita</span></label>
+        <div class="pill-group" id="toneChips">
+          <span class="pill on" data-v="hype">HYPE</span>
+          <span class="pill" data-v="informativo">INFORMATIVO</span>
+          <span class="pill" data-v="nostalgico">NOSTÁLGICO</span>
+          <span class="pill" data-v="zueiro">ZUEIRO</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Plataforma <span class="hint">onde vai publicar</span></label>
+        <div class="pill-group" id="platformChips">
+          <span class="pill on" data-v="instagram">INSTAGRAM</span>
+          <span class="pill" data-v="tiktok">TIKTOK</span>
+          <span class="pill" data-v="youtube">YOUTUBE</span>
+          <span class="pill" data-v="feed">FEED</span>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="reviewBtn" style="width:100%; justify-content:center; margin-top:6px;">🔍 REVISAR CRIATIVO</button>
+    </section>
 
-    <div class="note">
-      <span style="color:var(--orange);">●</span>
-      <p>Próximo passo: enviar <span class="w">imagem + texto</span> para análise e devolver um relatório com
-        pontos de melhoria. <a href="index.html" style="color:var(--orange);">← Voltar ao portal</a></p>
-    </div>
-  </main>
+    <section class="panel report">
+      <h2 class="ptitle" style="color:var(--orange);">RELATÓRIO</h2>
+      <div class="crit"><span class="cl">Clareza</span><span class="bar"><i style="width:78%;"></i></span><span class="sc">··</span></div>
+      <div class="crit"><span class="cl">Contraste</span><span class="bar"><i style="width:64%;"></i></span><span class="sc">··</span></div>
+      <div class="crit"><span class="cl">Tom de voz</span><span class="bar"><i style="width:88%;"></i></span><span class="sc">··</span></div>
+      <div class="crit"><span class="cl">Identidade</span><span class="bar"><i style="width:72%;"></i></span><span class="sc">··</span></div>
+      <div class="crit"><span class="cl">Chamada (CTA)</span><span class="bar"><i style="width:55%;"></i></span><span class="sc">··</span></div>
+      <div class="lock">
+        <span class="b">⚿</span>
+        <span>A análise entra no ar quando a revisão automática for conectada. Por enquanto, isto é um placeholder visual.</span>
+      </div>
+    </section>
+  </div>
 
-  <footer class="foot">
-    <img src="assets/logo-orange.png" alt="Gamer Hut"/>
-    <div class="fr">
-      <span class="a">MÍDIA FÍSICA NEVER DIES</span>
-      <span class="b">© 2025 GAMER HUT · PORTAL DE CRIAÇÃO</span>
-    </div>
-  </footer>
+  <div class="note">
+    <span style="color:var(--orange);">●</span>
+    <p>Use o <span class="w">PUXAR DO FLUXO</span> para trazer copys pendentes ou clique em REVISAR CRIATIVO para analisar manualmente. <a href="index.html" style="color:var(--orange);">← Voltar ao portal</a></p>
+  </div>
+</main>
+
+<button class="chat-toggle" id="chatToggle" title="Falar com o Revisor IA">💬</button>
+
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-header">
+    <span class="chtitle">REVISOR IA</span>
+    <button class="chat-close" id="chatClose">✕</button>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="chat-welcome">Pergunte sobre a revisão atual.<br/>Ex: "Por que essa nota?", "Sugira uma versão melhor"</div>
+  </div>
+  <div class="chat-input-row">
+    <textarea id="chatInput" placeholder="Pergunte sobre a revisão..." rows="1"></textarea>
+    <button id="chatSend">→</button>
+  </div>
+</div>
+
+<footer class="foot">
+  <img src="assets/logo-orange.png" alt="Gamer Hut"/>
+  <div class="fr">
+    <span class="a">MÍDIA FÍSICA NEVER DIES</span>
+    <span class="b">© 2025 GAMER HUT · PORTAL DE CRIAÇÃO</span>
+  </div>
+</footer>
+
 <script>
 var activeImage = null;
 var dropEl = document.getElementById('imageDrop');
@@ -358,6 +424,15 @@ async function reviewCreative(){
     '  "reescrita": "versão melhorada respeitando os 3 eixos declarados"\n' +
     '}';
 
+  window._lastReviewContext = {
+    copy: copy,
+    score: null,
+    feedback: 'Aguardando análise...',
+    tone: toneLabel,
+    platform: platLabel,
+    gen: genLabel
+  };
+
   try{
     var text = await aiComplete(prompt);
     var data = extractJSON(text);
@@ -414,11 +489,26 @@ function renderReport(data){
   });
 
   var badge = data.aprovado
-    ? '<span style="color:#2ecc71;font-family:\'Space Mono\',monospace;font-size:12px;font-weight:700;">✓ APROVADO</span>'
-    : '<span style="color:#E23B2E;font-family:\'Space Mono\',monospace;font-size:12px;font-weight:700;">✗ REVISAR ANTES DE PUBLICAR</span>';
+    ? '<span style="color:#2ecc71;font-family:\'JetBrains Mono\',monospace;font-size:12px;font-weight:700;">✓ APROVADO</span>'
+    : '<span style="color:#E23B2E;font-family:\'JetBrains Mono\',monospace;font-size:12px;font-weight:700;">✗ REVISAR ANTES DE PUBLICAR</span>';
 
   var pontos = (data.pontos||[]).map(function(p){ return '<li>'+esc(p)+'</li>'; }).join('');
   var melhorias = (data.melhorias||[]).map(function(m){ return '<li>'+esc(m)+'</li>'; }).join('');
+
+  var feedbackParts = [];
+  if(data.feedbackGeracao) feedbackParts.push(data.feedbackGeracao);
+  if(data.feedbackTom) feedbackParts.push(data.feedbackTom);
+  if(data.feedbackPlataforma) feedbackParts.push(data.feedbackPlataforma);
+  var feedbackStr = feedbackParts.join(' | ');
+
+  window._lastReviewContext = {
+    copy: document.getElementById('copyText').value.trim(),
+    score: data.scoreGeral,
+    feedback: feedbackStr || (data.resumo || ''),
+    tone: toneLabel,
+    platform: platLabel,
+    gen: genLabel
+  };
 
   var html = '<div style="width:100%">'+
     '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">'+
@@ -429,11 +519,11 @@ function renderReport(data){
     '<p style="margin:0 0 14px;color:var(--white);font-size:14px;line-height:1.6;">'+esc(data.resumo||'')+'</p>';
 
   if(pontos){
-    html += '<p style="color:var(--mut);font-family:\'Space Mono\',monospace;font-size:10px;letter-spacing:.1em;margin:0 0 6px;">✓ PONTOS FORTES</p>'+
+    html += '<p style="color:var(--mut);font-family:\'JetBrains Mono\',monospace;font-size:10px;letter-spacing:.1em;margin:0 0 6px;">✓ PONTOS FORTES</p>'+
       '<ul style="margin:0 0 14px;padding-left:18px;color:#cfc9c1;font-size:13px;line-height:1.7;">'+pontos+'</ul>';
   }
   if(melhorias){
-    html += '<p style="color:var(--mut);font-family:\'Space Mono\',monospace;font-size:10px;letter-spacing:.1em;margin:0 0 6px;">⚠ MELHORIAS SUGERIDAS</p>'+
+    html += '<p style="color:var(--mut);font-family:\'JetBrains Mono\',monospace;font-size:10px;letter-spacing:.1em;margin:0 0 6px;">⚠ MELHORIAS SUGERIDAS</p>'+
       '<ul style="margin:0 0 18px;padding-left:18px;color:#cfc9c1;font-size:13px;line-height:1.7;">'+melhorias+'</ul>';
   }
 
@@ -448,11 +538,11 @@ function renderReport(data){
   if(axisCards) html += axisCards;
 
   if(data.reescrita){
-    html += '<p style="color:var(--mut);font-family:\'Space Mono\',monospace;font-size:10px;letter-spacing:.1em;margin:0 0 8px;">✍ VERSÃO MELHORADA</p>'+
+    html += '<p style="color:var(--mut);font-family:\'JetBrains Mono\',monospace;font-size:10px;letter-spacing:.1em;margin:0 0 8px;">✍ VERSÃO MELHORADA</p>'+
       '<div id="reescritaBox" style="background:var(--bg);border:1px solid var(--lineSoft);border-left:3px solid var(--orange);'+
         'border-radius:10px;padding:14px 16px;font-size:14px;line-height:1.6;color:var(--white);white-space:pre-wrap;">'+
         esc(data.reescrita)+'</div>'+
-      '<button id="copyReescritaBtn" style="margin-top:10px;cursor:pointer;font-family:\'Space Mono\',monospace;'+
+      '<button id="copyReescritaBtn" style="margin-top:10px;cursor:pointer;font-family:\'JetBrains Mono\',monospace;'+
         'font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--ink);background:var(--orange);'+
         'border:none;border-radius:7px;padding:9px 14px;">COPIAR VERSÃO MELHORADA</button>';
   }
@@ -470,6 +560,161 @@ function renderReport(data){
     };
   }
 }
+
+// --- PUXAR DO FLUXO ---
+var pullFlowBtn = document.getElementById('pullFlowBtn');
+var flowDropdown = document.getElementById('flowDropdown');
+
+pullFlowBtn.addEventListener('click', function(e){
+  e.stopPropagation();
+  var queue = JSON.parse(localStorage.getItem('gh-review-queue') || '[]');
+  if(flowDropdown.style.display === 'block'){
+    flowDropdown.style.display = 'none';
+    return;
+  }
+  if(!queue.length){
+    flowDropdown.innerHTML = '<div class="flow-empty">Nenhum item na fila</div>';
+    flowDropdown.style.display = 'block';
+    return;
+  }
+  var html = queue.map(function(item, i){
+    var preview = item.text ? item.text.substring(0, 50) + (item.text.length > 50 ? '…' : '') : '(sem copy)';
+    var title = item.title || preview;
+    var plat = (item.platform || '—').toUpperCase();
+    var g = (item.gen || '').replace('gen-', '').toUpperCase();
+    return '<div class="flow-item" data-idx="'+i+'">'+
+      '<span class="flow-item-title">'+esc(title)+'</span>'+
+      '<span class="flow-item-meta">'+plat+' · '+g+'</span>'+
+      '</div>';
+  }).join('');
+  flowDropdown.innerHTML = html;
+  flowDropdown.style.display = 'block';
+
+  flowDropdown.querySelectorAll('.flow-item').forEach(function(el){
+    el.onclick = function(){
+      var idx = parseInt(el.dataset.idx);
+      loadFromQueue(idx);
+      flowDropdown.style.display = 'none';
+    };
+  });
+});
+
+document.addEventListener('click', function(e){
+  if(flowDropdown.style.display !== 'none' && !flowDropdown.contains(e.target) && e.target !== pullFlowBtn){
+    flowDropdown.style.display = 'none';
+  }
+});
+
+function loadFromQueue(idx){
+  var queue = JSON.parse(localStorage.getItem('gh-review-queue') || '[]');
+  var item = queue[idx];
+  if(!item) return;
+  document.getElementById('copyText').value = item.text || '';
+  if(item.gen && GEN_KEYS.indexOf(item.gen) !== -1){
+    activeGen = item.gen;
+    localStorage.setItem('gh-generation', item.gen);
+    document.querySelectorAll('#genSwitch .gen-btn').forEach(function(c){ c.classList.remove('on'); });
+    var genBtns = document.querySelectorAll('#genSwitch .gen-btn');
+    var genIdx = GEN_KEYS.indexOf(item.gen);
+    if(genBtns[genIdx]) genBtns[genIdx].classList.add('on');
+  }
+  if(item.tone){
+    activeTone = item.tone;
+    [...toneChipsEl.children].forEach(function(c){ c.classList.remove('on'); });
+    var tm = toneChipsEl.querySelector('[data-v="'+item.tone+'"]');
+    if(tm) tm.classList.add('on');
+  }
+  if(item.platform){
+    activePlatformReview = item.platform;
+    [...platformChipsEl.children].forEach(function(c){ c.classList.remove('on'); });
+    var pm = platformChipsEl.querySelector('[data-v="'+item.platform+'"]');
+    if(pm) pm.classList.add('on');
+  }
+  queue.splice(idx, 1);
+  localStorage.setItem('gh-review-queue', JSON.stringify(queue));
+  textarea.dispatchEvent(new Event('input'));
+}
+
+// --- Chat IA ---
+var chatToggle = document.getElementById('chatToggle');
+var chatPanel = document.getElementById('chatPanel');
+var chatClose = document.getElementById('chatClose');
+var chatMessages = document.getElementById('chatMessages');
+var chatInput = document.getElementById('chatInput');
+var chatSend = document.getElementById('chatSend');
+var chatHistory = [];
+
+chatToggle.addEventListener('click', function(){
+  var isOpen = chatPanel.style.display !== 'none';
+  chatPanel.style.display = isOpen ? 'none' : 'flex';
+});
+chatClose.addEventListener('click', function(){
+  chatPanel.style.display = 'none';
+});
+
+chatSend.addEventListener('click', sendChat);
+chatInput.addEventListener('keydown', function(e){
+  if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendChat(); }
+});
+
+function addChatMsg(role, text){
+  var div = document.createElement('div');
+  div.className = 'chat-msg ' + role;
+  div.textContent = text;
+  if(chatMessages.querySelector('.chat-welcome')){
+    chatMessages.innerHTML = '';
+  }
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+async function sendChat(){
+  var msg = chatInput.value.trim();
+  if(!msg) return;
+  chatInput.value = '';
+  chatInput.style.height = 'auto';
+  addChatMsg('user', msg);
+  chatHistory.push({ role: 'user', text: msg });
+
+  var loadingEl = document.createElement('div');
+  loadingEl.className = 'chat-msg ia loading';
+  loadingEl.textContent = '⏳ pensando…';
+  chatMessages.appendChild(loadingEl);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+
+  try{
+    var ctx = window._lastReviewContext || { copy: '(nenhuma copy em análise)', score: null, feedback: 'Ainda não foi feita nenhuma revisão.', tone: '—', platform: '—', gen: '—' };
+    var scoreStr = ctx.score !== null && ctx.score !== undefined ? ctx.score + '/100' : 'Ainda não revisado';
+    var systemPrompt = 'VOCÊ É UM REVISOR DE COPYS DA GAMER HUT.\n\n' +
+      'Contexto atual da revisão:\n' +
+      '--- COPY EM REVISÃO ---\n' + ctx.copy + '\n\n' +
+      '--- SCORE ---\n' + scoreStr + '\n\n' +
+      '--- FEEDBACK ---\n' + (ctx.feedback || 'Nenhum feedback ainda') + '\n\n' +
+      '--- TOM: ' + ctx.tone + ' | PLATAFORMA: ' + ctx.platform + ' | GERAÇÃO: ' + ctx.gen + '\n\n' +
+      'O usuário pode perguntar sobre a análise, pedir explicações, sugerir alternativas, etc. ' +
+      'Responda em português natural, direto e útil. Não use formatação especial. Se ainda não há revisão, seja um assistente geral de copys.';
+
+    var conversation = chatHistory.map(function(m){
+      return (m.role === 'user' ? 'Usuário: ' : 'Assistente: ') + m.text;
+    }).join('\n\n');
+
+    var prompt = systemPrompt + '\n\n' + conversation;
+    var answer = await aiComplete(prompt);
+    loadingEl.remove();
+    addChatMsg('ia', answer);
+    chatHistory.push({ role: 'ia', text: answer });
+  }catch(e){
+    loadingEl.remove();
+    addChatMsg('ia', '❌ ' + (e.message || 'Erro de conexão'));
+    chatHistory.push({ role: 'ia', text: '❌ Erro: ' + (e.message || 'conexão') });
+  }
+}
+
+// Auto-resize chat input
+chatInput.addEventListener('input', function(){
+  chatInput.style.height = 'auto';
+  chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+});
 </script>
 </body>
 </html>

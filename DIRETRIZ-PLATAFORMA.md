@@ -93,8 +93,8 @@ Nada do que já funciona é jogado fora. Os módulos de dados são IIFEs globais
 
 Herdada e mantida entre as duas frentes:
 - Tema escuro (`--bg #0B0B0A`), **acento laranja `--orange #E8643C`**.
-- Tipografia: **Archivo** (display 900), **Space Grotesk** (texto),
-  **Space Mono** (rótulos/mono), **Press Start 2P** (pixel/eyebrow).
+- Tipografia: **Russo One** (display 400), **Red Hat Display** (texto),
+  **JetBrains Mono** (rótulos/mono), **Press Start 2P** (pixel/eyebrow).
 - Seções numeradas (`01`, `02`, `03`), eyebrow com traço, cards com barra
   de acento no topo, tags monoespaçadas.
 

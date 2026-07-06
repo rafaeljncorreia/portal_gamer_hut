@@ -6,7 +6,7 @@
 <title>Portal Gamer Hut</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,800;0,900;1,900&family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Red+Hat+Display:wght@300;400;500;600;700;800;900&family=Press+Start+2P&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="portal.css"/>
 <style>
   /* ---- hero ---- */
@@ -27,7 +27,7 @@
     flex-wrap:wrap; margin-bottom:30px; }
   .tools-head h2{ font-family:'Press Start 2P',monospace; font-weight:400; font-size:clamp(14px,2vw,20px);
     color:var(--white); margin:0; letter-spacing:.02em; }
-  .tools-head .cnt{ font-family:'Space Mono',monospace; font-size:12px; color:var(--mut); letter-spacing:.12em; }
+  .tools-head .cnt{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--mut); letter-spacing:.12em; }
   .grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; }
 
   .card{ position:relative; display:flex; flex-direction:column; min-height:300px;
@@ -36,12 +36,12 @@
   .card::before{ content:''; position:absolute; top:0; left:0; right:0; height:5px; background:var(--ac); }
   .card:hover{ transform:translateY(-5px); border-color:var(--ac); background:#1b1815; }
   .card .ix{ font-family:'Press Start 2P',monospace; font-size:13px; color:var(--ac); }
-  .card h3{ font-family:'Archivo',sans-serif; font-weight:900; letter-spacing:-.02em;
+  .card h3{ font-family:'Russo One',sans-serif; font-weight:900; letter-spacing:-.02em;
     font-size:clamp(26px,3vw,34px); line-height:.96; margin:22px 0 0; text-wrap:balance; }
   .card p{ margin:14px 0 0; color:#b7b1a9; font-size:15px; line-height:1.55; }
   .card .foot-row{ margin-top:auto; padding-top:24px; display:flex; align-items:center;
     justify-content:space-between; gap:14px; }
-  .card .arrow{ font-family:'Archivo',sans-serif; font-weight:900; font-size:26px; color:var(--ac);
+  .card .arrow{ font-family:'Russo One',sans-serif; font-weight:900; font-size:26px; color:var(--ac);
     transition:transform .16s; }
   .card:hover .arrow{ transform:translateX(5px); }
 </style>
@@ -59,9 +59,7 @@
     </a>
     <nav class="links">
       <a class="active" href="index.html">PORTAL</a>
-      <a href="studio.html">CREATIVE STUDIO</a>
-      <a href="copys.html">COPYS</a>
-      <a href="descricoes.html">DESCRIÇÕES</a>
+      <a href="criar.html">CRIAR</a>
       <a href="review.html">REVIEW</a>
       <a href="aprendizado.html">APRENDIZADO</a>
       <a href="downloader.html">DOWNLOADER</a>
@@ -73,11 +71,10 @@
     <div class="inner">
       <span class="eyebrow">Central de criativos · Gamer Hut</span>
       <h1 class="display">PORTAL <span class="alt">GAMER HUT</span></h1>
-      <p class="lead">O hub onde a marca cria, escreve e revisa tudo num só lugar. Gere os criativos no
-        estúdio, produza as copys com IA na voz da loja e revise antes de publicar — mídia física never dies.</p>
+      <p class="lead">O hub onde a marca cria, revisa e evolui todos os conteúdos num fluxo único. Escolha o tipo de conteúdo, configure o tom e a geração, e produza copys, descrições, artes visuais e roteiros com IA — tudo num lugar só. Mídia física never dies.</p>
       <div class="cta">
-        <a class="btn btn-primary" href="studio.html">ABRIR CREATIVE STUDIO →</a>
-        <a class="btn btn-ghost" href="copys.html">CRIAR COPYS</a>
+        <a class="btn btn-primary" href="criar.html">CRIAR CONTEÚDO →</a>
+        <a class="btn btn-ghost" href="review.html">VER REVIEW</a>
       </div>
     </div>
   </section>
@@ -85,53 +82,50 @@
   <main class="wrap">
     <div class="tools-head">
       <h2>FERRAMENTAS</h2>
-      <span class="cnt">03 MÓDULOS</span>
+      <span class="cnt">04 MÓDULOS</span>
     </div>
     <div class="grid">
 
-      <a class="card" href="studio.html" style="--ac:var(--orange);">
+      <a class="card" href="criar.html" style="--ac:var(--orange);">
         <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
           <span class="ix">01</span>
           <span class="status" style="color:var(--green);"><span class="dot"></span>ATIVO</span>
         </div>
-        <h3>Creative Studio</h3>
-        <p>Gere posts blocados, carrosséis, quizzes, rankings, novidades da semana, thumbnails de YouTube e
-          capas de Reels — exportando PNG e vídeo no padrão da marca.</p>
+        <h3>Criação Unificada</h3>
+        <p>Copys, descrições, artes visuais e roteiros num fluxo único de 4 passos. Escolha o tipo de conteúdo, configure o tom e a geração, e produza com IA — tudo numa página só.</p>
         <div class="foot-row">
-          <span class="mono" style="font-size:11px; letter-spacing:.1em; color:var(--mut);">ABRIR ESTÚDIO</span>
+          <span class="mono" style="font-size:11px; letter-spacing:.1em; color:var(--mut);">CRIAR AGORA</span>
           <span class="arrow">→</span>
         </div>
       </a>
 
-      <a class="card" href="copys.html" style="--ac:var(--blue);">
+      <a class="card" href="review.html" style="--ac:var(--teal);">
         <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
           <span class="ix">02</span>
-          <span class="status" style="color:var(--green);"><span class="dot"></span>ATIVO</span>
-        </div>
-        <h3>Criação de Copys</h3>
-        <p>Escreva legendas, títulos e chamadas com uma IA treinada na voz da Gamer Hut. Direto da ideia
-          para o texto pronto de publicar, com variações por tom e categoria.</p>
-        <div class="foot-row">
-          <span class="mono" style="font-size:11px; letter-spacing:.1em; color:var(--mut);">VER PRÉVIA</span>
-          <span class="arrow">→</span>
-        </div>
-      </a>
-
-      <a class="card" href="descricoes.html" style="--ac:var(--orange);">
-        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
-          <span class="ix">03</span>
           <span class="status" style="color:var(--green);"><span class="dot"></span>NOVO</span>
         </div>
-        <h3>Descrições Padronizadas</h3>
-        <p>Gere descrições otimizadas para YouTube, TikTok e Instagram — cada plataforma com seu formato,
-          tom e regras específicas. Switch geracional incluso.</p>
+        <h3>Review de Copys</h3>
+        <p>Revise copys com score de IA, feedback detalhado e sugestões de reescrita. Agora com chat integrado para discutir a análise com o revisor IA.</p>
         <div class="foot-row">
-          <span class="mono" style="font-size:11px; letter-spacing:.1em; color:var(--mut);">CRIAR DESCRIÇÃO</span>
+          <span class="mono" style="font-size:11px; letter-spacing:.1em; color:var(--mut);">ABRIR REVIEW</span>
           <span class="arrow">→</span>
         </div>
       </a>
 
-      <a class="card" href="downloader.html" style="--ac:var(--violet);">
+      <a class="card" href="aprendizado.html" style="--ac:var(--violet);">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+          <span class="ix">03</span>
+          <span class="status" style="color:var(--green);"><span class="dot"></span>ATIVO</span>
+        </div>
+        <h3>Aprendizado da Marca</h3>
+        <p>Gerencie as diretrizes que alimentam a voz da marca. Adicione, aprove ou rejeite aprendizados que a IA incorpora automaticamente nas criações.</p>
+        <div class="foot-row">
+          <span class="mono" style="font-size:11px; letter-spacing:.1em; color:var(--mut);">VER DIRETRIZES</span>
+          <span class="arrow">→</span>
+        </div>
+      </a>
+
+      <a class="card" href="downloader.html" style="--ac:var(--blue);">
         <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
           <span class="ix">04</span>
           <span class="status" style="color:var(--green);"><span class="dot"></span>ATIVO</span>

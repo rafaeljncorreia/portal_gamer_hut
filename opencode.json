@@ -1,0 +1,8 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "server": {
+    "port": 4096,
+    "hostname": "127.0.0.1"
+  },
+  "customInstructions": "Antes de commitar, rode scripts/check-doc-consistency.ps1. Ao editar config.js, generation-context.js, brand-voice.js ou catalog.json na raiz, rode scripts/sync-brand-brain.ps1."
+}

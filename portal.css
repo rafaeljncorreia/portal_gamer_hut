@@ -12,12 +12,12 @@
 *{ box-sizing:border-box; }
 html,body{ margin:0; padding:0; background:var(--bg); color:var(--white); }
 body{
-  font-family:'Space Grotesk',system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+  font-family:'Red Hat Display',system-ui,sans-serif; -webkit-font-smoothing:antialiased;
   min-height:100vh; display:flex; flex-direction:column;
 }
-.display{ font-family:'Archivo',sans-serif; font-weight:900; letter-spacing:-.02em; }
+.display{ font-family:'Russo One',sans-serif; font-weight:400; letter-spacing:-.01em; }
 .pixel{ font-family:'Press Start 2P',monospace; font-weight:400; }
-.mono{ font-family:'Space Mono',monospace; }
+.mono{ font-family:'JetBrains Mono',monospace; }
 a{ color:inherit; text-decoration:none; }
 img{ display:block; }
 
@@ -40,7 +40,7 @@ img{ display:block; }
 .nav .brand .tag .t1{ font-size:11px; letter-spacing:.02em; color:var(--white); }
 .nav .brand .tag .t2{ font-size:9px; letter-spacing:.18em; color:var(--mut); margin-top:3px; }
 .nav .links{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-.nav .links a{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.08em; color:var(--mut);
+.nav .links a{ font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.08em; color:var(--mut);
   padding:8px 13px; border-radius:8px; border:1px solid transparent; transition:all .14s; white-space:nowrap; }
 .nav .links a:hover{ color:var(--white); border-color:var(--lineSoft); }
 .nav .links a.active{ color:var(--ink); background:var(--orange); border-color:var(--orange); font-weight:700; }
@@ -56,11 +56,11 @@ img{ display:block; }
 .foot img{ height:30px; width:auto; opacity:.92; }
 .foot .fr{ display:flex; flex-direction:column; gap:6px; align-items:flex-end; text-align:right; }
 .foot .fr .a{ font-family:'Press Start 2P',monospace; font-size:10px; color:var(--orange); letter-spacing:.04em; }
-.foot .fr .b{ font-family:'Space Mono',monospace; font-size:10px; color:var(--mut); letter-spacing:.12em; }
+.foot .fr .b{ font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--mut); letter-spacing:.12em; }
 
 /* ---------- buttons ---------- */
 .btn{ display:inline-flex; align-items:center; gap:10px; cursor:pointer; border:none;
-  font-family:'Space Mono',monospace; font-size:13px; font-weight:700; letter-spacing:.04em;
+  font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; letter-spacing:.04em;
   padding:14px 22px; border-radius:10px; transition:transform .12s, filter .12s; }
 .btn:hover{ transform:translateY(-1px); }
 .btn-primary{ background:var(--orange); color:var(--ink); }
@@ -70,10 +70,10 @@ img{ display:block; }
 .btn:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
 
 /* ---------- pill / chips ---------- */
-.eyebrow{ display:inline-flex; align-items:center; gap:16px; font-family:'Space Mono',monospace;
+.eyebrow{ display:inline-flex; align-items:center; gap:16px; font-family:'JetBrains Mono',monospace;
   font-size:13px; font-weight:700; letter-spacing:.28em; text-transform:uppercase; color:var(--orange); }
 .eyebrow::before{ content:''; width:46px; height:3px; background:currentColor; display:block; }
-.status{ display:inline-flex; align-items:center; gap:8px; font-family:'Space Mono',monospace;
+.status{ display:inline-flex; align-items:center; gap:8px; font-family:'JetBrains Mono',monospace;
   font-size:10px; font-weight:700; letter-spacing:.1em; padding:6px 11px; border-radius:7px;
   border:1px solid currentColor; }
 .status .dot{ width:8px; height:8px; border-radius:50%; background:currentColor; }
