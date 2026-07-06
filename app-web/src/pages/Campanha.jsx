@@ -15,7 +15,7 @@ const STEPS = [
 const inputStyle = {
   width: '100%', background: 'var(--bg2)', color: 'var(--white)',
   border: '1px solid var(--lineSoft)', borderRadius: 8, padding: '10px 12px',
-  fontFamily: 'Space Grotesk, sans-serif', fontSize: 13,
+  fontFamily: "'Red Hat Display', sans-serif", fontSize: 13,
 }
 
 export default function Campanha() {
@@ -261,7 +261,7 @@ function StubPanel({ etapa, camp, onToggle }) {
 function Field({ label, children }) {
   return (
     <div>
-      <label style={{ display: 'block', fontFamily: 'Space Mono, monospace', fontSize: 10,
+      <label style={{ display: 'block',   fontFamily: "'JetBrains Mono', monospace", fontSize: 10,
         letterSpacing: '.08em', color: 'var(--mut)', marginBottom: 6, textTransform: 'uppercase' }}>
         {label}
       </label>

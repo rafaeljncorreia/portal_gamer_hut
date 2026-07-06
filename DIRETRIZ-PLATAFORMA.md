@@ -36,7 +36,7 @@ Mapeado dos estágios M1–M4 do TGT Hub, traduzido para a Gamer Hut:
 |------------------|--------------------------------------|-------------------------------------------------------|
 | **Brief**        | conceito da campanha (a FONTE)       | catálogo (jogo) + geração-alvo + pilar + tema         |
 | **Estratégia**   | plano de divulgação                  | canais (IG/TikTok/YT) + `calendario-semanal.json` + janela de divulgação do produto |
-| **Materiais**    | conteúdo por canal                   | **Copys + Descrições** rodando com o contexto do Brief |
+| **Materiais**    | conteúdo por canal                   | **Conteúdo para arte (template) + Descrições + Roteiros** rodando com o contexto do Brief |
 | **Visual**       | peças / KV                           | **Creative Studio** (`app/*.jsx`)                     |
 
 O **Brief é a fonte**: produto (do catálogo), geração-alvo, pilar e tema. Esse
@@ -60,7 +60,7 @@ O modelo de dados **espelha o schema D1** (`server/schema.sql`: `plan_items`,
 campanha { id, nome, tema, estado, criada_em, atualizada_em,
            produto_id, geracao, pilar,
            progresso:{brief,estrategia,materiais,visual},
-           brief{}, estrategia{}, materiais{}, visual{} }
+            brief{}, estrategia{}, materiais:{ itens[] }, visual{} }
 ```
 
 Proxy de IA **mantido como está**: `window.GH_CONFIG.proxyUrl`
@@ -81,7 +81,7 @@ Nada do que já funciona é jogado fora. Os módulos de dados são IIFEs globais
 | `generation-context.js` (`GH_GENERATIONS`) | contexto geracional do Brief/Materiais + página Marca |
 | `brand-voice.js` (`GH_BRAND`, `GH_TONES`, `GH_PLATFORMS`, `getBrandVoice`) | voz da marca em toda geração + página Marca |
 | `calendario-semanal.json`   | cadência/datas na Estratégia                          |
-| `copys.html` / `descricoes.html` (lógica de prompt) | portadas para o estágio Materiais |
+| `promptArte` + `promptRoteiro` + `promptDescricao` (em `prompts.js`) | portados do legado para o estágio Materiais |
 | `app/*.jsx` (Creative Studio) | estágio Visual                                       |
 
 > **Nota de dívida técnica (v2):** os 5 arquivos ficam duplicados entre a raiz
@@ -103,7 +103,7 @@ Herdada e mantida entre as duas frentes:
 - **A — Esqueleto + diretriz:** store `campaigns.js`, ponte `gh.js`, home
   `Campanhas.jsx` (3 seções), nav/rotas, Catálogo/Marca sem Worker. ✅ em curso.
 - **B — Pipeline:** `/campanha/:id`, Brief funcional, progresso X/4, "Continuar".
-- **C — Materiais:** Copys + Descrições dentro do M3 com o contexto do Brief.
+- **C — Materiais:** Conteúdo para arte (template) + Descrições + Roteiros dentro do M3 com o contexto do Brief.
 - **D — Estratégia + Visual:** M2 com canais/calendário; M4 com o Studio.
 - **E — Polimento:** Marca completa, ferramentas avulsas restantes, refino visual.
 

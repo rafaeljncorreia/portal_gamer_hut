@@ -81,7 +81,7 @@ export default function Campanhas() {
         )}
 
         <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginTop: 18,
-          fontFamily: 'Space Mono, monospace', fontSize: 11, color: 'var(--mut)', cursor: 'pointer' }}>
+          fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: 'var(--mut)', cursor: 'pointer' }}>
           <input type="checkbox" checked={showArquivadas} onChange={e => setShowArquivadas(e.target.checked)} />
           mostrar arquivadas
         </label>

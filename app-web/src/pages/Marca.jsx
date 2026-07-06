@@ -53,7 +53,7 @@ function BrandBlock({ b }) {
         </span>
         <strong style={{ fontSize: 14 }}>{b.label}</strong>
       </div>
-      <pre style={{ margin: 0, fontFamily: 'Space Grotesk, sans-serif', fontSize: 13, lineHeight: 1.65,
+      <pre style={{ margin: 0, fontFamily: "'Red Hat Display', sans-serif", fontSize: 13, lineHeight: 1.65,
         whiteSpace: 'pre-wrap', color: 'var(--mut)' }}>{mostrado}</pre>
       {longo && (
         <button className="btn btn-ghost btn-sm" style={{ marginTop: 12 }} onClick={() => setOpen(o => !o)}>

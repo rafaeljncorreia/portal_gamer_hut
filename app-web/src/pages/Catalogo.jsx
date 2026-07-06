@@ -42,7 +42,7 @@ export default function Catalogo() {
           ))}
         </select>
         <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8,
-          fontFamily: 'Space Mono, monospace', fontSize: 11, color: 'var(--mut)' }}>
+          fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: 'var(--mut)' }}>
           <input type="checkbox" checked={soDivulgar} onChange={e => setSoDivulgar(e.target.checked)} />
           só divulgar (CONFIRMADO)
         </label>

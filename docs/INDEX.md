@@ -28,7 +28,7 @@
 |---------|--------|
 | `sprints/SPRINT-INDEX.md` | Ao definir o que fazer — sprint ativo, histórico e pendentes |
 | `sprints/TEMPLATE.md` | Ao criar uma nova sprint |
-| `sprints/[ATIVO].md` | Durante a sprint atual (ex: `DOC-SPRINT-0.md`) |
+| `sprints/[ATIVO].md` | Durante a sprint atual (ver `sprints/SPRINT-INDEX.md`) |
 
 ## 🔵 Ler Sob Demanda
 
@@ -59,7 +59,7 @@
 |---------|--------|
 | `src/lib/gh.js` | Ponte React-friendly para os globais `window.GH_*` |
 | `src/lib/campaigns.js` | Store de campanhas (localStorage, chave `gh-campaigns`) |
-| `src/lib/prompts.js` | Construtores de prompt para IA (copy, descrição, estratégia) |
+| `src/lib/prompts.js` | Construtores de prompt para IA (arte/template, descrição, roteiro, estratégia) |
 | `src/pages/Campanhas.jsx` | Home — lista de campanhas |
 | `src/pages/Campanha.jsx` | Pipeline de uma campanha (Brief → Estratégia → Materiais → Visual) |
 | `src/pages/Catalogo.jsx` | Catálogo de jogos |

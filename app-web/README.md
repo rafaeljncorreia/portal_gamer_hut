@@ -1,8 +1,33 @@
-# React + Vite
+# app-web — Plataforma Campaign-Centric Gamer Hut
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicação Vite + React Router v7 do portal de gestão de conteúdo da
+[Gamer Hut](https://gamerhut.com.br). Arquitetura **campaign-centric**:
+a campanha orquestra as ferramentas via pipeline Brief → Estratégia → Materiais → Visual.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Vite 6 + React 18 + React Router v7
+- Persistência: `localStorage` (chave `gh-campaigns`)
+- IA Proxy: Cloudflare Worker (`POST {prompt} → {text}`)
+- Cérebro de marca: scripts em `public/` carregados como `<script>` na ordem `config.js` → `generation-context.js` → `brand-voice.js` → `catalog.js`
+
+## Rotas
+
+| Rota | Componente | Função |
+|------|-----------|--------|
+| `/` | `Campanhas` | Workspace — lista de campanhas |
+| `/campanha/:id` | `Campanha` | Pipeline de 4 estágios |
+| `/marca` | `Marca` | Cérebro de marca (leitura) |
+| `/catalogo` | `Catalogo` | Catálogo de jogos (filtros) |
+
+## Rodar localmente
+
+```bash
+npm run dev
+```
+
+## Build
+
+```bash
+npm run build   # gera dist/
+```

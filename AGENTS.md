@@ -4,7 +4,7 @@
 > pipeline campaign-centric (Brief → Estratégia → Materiais → Visual).
 > **Brandbook:** [`gamer-hut.vercel.app`](https://gamer-hut.vercel.app) (vivo, 26 stages).
 > Resumo curado para IA em [`AGENT-PLAYBOOK.md`](AGENT-PLAYBOOK.md).
-> **Sprint ativo:** [`sprints/DOC-SPRINT-1.md`](sprints/DOC-SPRINT-1.md).
+> **Sprint ativo:** ver tabela em [`sprints/SPRINT-INDEX.md`](sprints/SPRINT-INDEX.md).
 
 ## 1. IDENTIDADE
 

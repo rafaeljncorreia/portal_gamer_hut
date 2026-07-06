@@ -98,9 +98,10 @@ Brief  ──►  Estratégia  ──►  Materiais  ──►  Visual
   │              │               │               │
   ▼              ▼               ▼               ▼
 Conceito      Plano de       Conteúdo por     Peças / KV
-da campa-     divulgação     canal (Copys,    (Creative
-nha (fonte)   (canais +      Descrições)      Studio)
-              calendário)
+da campa-     divulgação     canal (Conteúdo  (Creative
+nha (fonte)   (canais +      para arte +     Studio)
+              calendário)    Descrições +
+                             Roteiros)
 ```
 
 ### Store (`app-web/src/lib/campaigns.js`)
@@ -120,7 +121,7 @@ nha (fonte)   (canais +      Descrições)      Studio)
   progresso:    { brief: bool, estrategia: bool, materiais: bool, visual: bool },
   brief:        {},            // contexto do Brief
   estrategia:   {},            // plano de divulgação
-  materiais:    {},            // conteúdo gerado
+  materiais:    { itens: [] }, // conteúdo gerado (post/roteiro com campos, descricao, roteiro)
   visual:       {}             // arte/KV gerada
 }
 ```
@@ -131,7 +132,7 @@ para que a migração v2 (D1 como backend) seja trivial — basta trocar `localS
 ### Princípio campaign-centric
 
 Nenhuma ferramenta gera conteúdo "no vácuo". O contexto do Brief (produto, geração, pilar, tema)
-é injetado nos prompts de geração dos estágios seguintes via `prompts.js`.
+é injetado nos prompts de geração dos estágios seguintes via `prompts.js` (`promptArte`, `promptDescricao`, `promptRoteiro`, `promptEstrategia`).
 
 ---
 

@@ -63,7 +63,7 @@ export default function Estrategia({ camp, produto, onUpdate }) {
         </div>
       )}
 
-      <label style={{ display: 'block', fontFamily: 'Space Mono, monospace', fontSize: 10,
+      <label style={{ display: 'block', fontFamily: "'JetBrains Mono', monospace", fontSize: 10,
         letterSpacing: '.08em', color: 'var(--mut)', marginBottom: 8, textTransform: 'uppercase' }}>
         Canais
       </label>
@@ -91,12 +91,12 @@ export default function Estrategia({ camp, produto, onUpdate }) {
 
       {plano && (
         <div className="card" style={{ background: 'var(--bg2)', marginBottom: 16 }}>
-          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'Space Grotesk, sans-serif',
+          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontFamily: "'Red Hat Display', sans-serif",
             fontSize: 13, lineHeight: 1.6, color: 'var(--white)' }}>{plano}</pre>
         </div>
       )}
 
-      <label style={{ display: 'block', fontFamily: 'Space Mono, monospace', fontSize: 10,
+      <label style={{ display: 'block', fontFamily: "'JetBrains Mono', monospace", fontSize: 10,
         letterSpacing: '.08em', color: 'var(--mut)', marginBottom: 6, textTransform: 'uppercase' }}>
         Notas / ajustes manuais
       </label>
