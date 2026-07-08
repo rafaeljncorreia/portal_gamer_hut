@@ -181,6 +181,9 @@ export default function Materiais({ camp, produto, onUpdate }) {
   const [loadingArte, setLoadingArte] = useState(false)
   const [erroArte, setErroArte] = useState('')
 
+  // Confirm dialog (replaces native confirm() for testability)
+  const [showConfirmStudio, setShowConfirmStudio] = useState(false)
+
   // Section 3
   const [descricao, setDescricao] = useState(null)
   const [loadingDesc, setLoadingDesc] = useState(false)
@@ -267,7 +270,7 @@ export default function Materiais({ camp, produto, onUpdate }) {
     setCampos(merged)
   }
 
-  const handleMontarArte = () => {
+  function salvarEIrStudio() {
     const state = {
       template, tagId,
       pattern: '8bit', fill: true, ink: 'auto', format: 'feed',
@@ -298,11 +301,21 @@ export default function Materiais({ camp, produto, onUpdate }) {
       bLabel: campos.bLabel || '',
       vsWord: campos.vsWord || 'OU',
     }
-    if (localStorage.getItem('gh-studio')) {
-      if (!confirm('Já existe um rascunho no Creative Studio. Substituir?')) return
-    }
     localStorage.setItem('gh-studio', JSON.stringify(state))
     window.open('/studio.html', '_blank')
+  }
+
+  const handleMontarArte = () => {
+    if (localStorage.getItem('gh-studio')) {
+      setShowConfirmStudio(true)
+      return
+    }
+    salvarEIrStudio()
+  }
+
+  const handleConfirmarStudio = (ok) => {
+    setShowConfirmStudio(false)
+    if (ok) salvarEIrStudio()
   }
 
   const handleGerarDesc = async () => {
@@ -626,6 +639,27 @@ export default function Materiais({ camp, produto, onUpdate }) {
           </button>
         )}
       </div>
+
+      {/* ─── Confirm Studio (substitui native confirm()) ─── */}
+      {showConfirmStudio && (
+        <div style={{
+          position:'fixed', inset:0, zIndex:200,
+          display:'flex', alignItems:'center', justifyContent:'center',
+          background:'rgba(11,11,10,0.78)', backdropFilter:'blur(4px)',
+        }}>
+          <div className="card" style={{ maxWidth:400, width:'90vw', textAlign:'center' }}>
+            <strong style={{ display:'block', fontSize:15, marginBottom:16 }}>
+              Já existe um rascunho no Creative Studio. Substituir?
+            </strong>
+            <div style={{ display:'flex', gap:10, justifyContent:'center' }}>
+              <button className="btn btn-ghost btn-sm"
+                onClick={() => handleConfirmarStudio(false)}>Cancelar</button>
+              <button className="btn btn-primary btn-sm"
+                onClick={() => handleConfirmarStudio(true)}>Substituir</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

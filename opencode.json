@@ -4,5 +4,10 @@
     "port": 4096,
     "hostname": "127.0.0.1"
   },
-  "customInstructions": "Antes de commitar, rode scripts/check-doc-consistency.ps1. Ao editar config.js, generation-context.js, brand-voice.js ou catalog.json na raiz, rode scripts/sync-brand-brain.ps1."
+  "plugin": [
+    ["@vymalo/opencode-browser", {
+      "port": 4517,
+      "groups": ["page", "control", "debug"]
+    }]
+  ]
 }

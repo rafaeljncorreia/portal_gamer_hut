@@ -7,13 +7,18 @@
    ============================================================ */
 import { getBrandVoice, generations } from './gh.js'
 
-/** Extrai o primeiro objeto JSON de uma resposta (tolera ```json e ruído). */
+/** Extrai o primeiro objeto JSON de uma resposta (tolera ```json, ruído e multiline). */
 export function extractJSON(text) {
   if (!text) return null
-  const t = String(text).replace(/```json|```/g, '').trim()
+  let t = String(text).replace(/```json|```/g, '').trim()
+  // Tenta dar parse direto
   try { return JSON.parse(t) } catch { /* segue */ }
+  // Isola o primeiro { … } completo
   const s = t.indexOf('{'), e = t.lastIndexOf('}')
-  if (s >= 0 && e > s) { try { return JSON.parse(t.slice(s, e + 1)) } catch { /* segue */ } }
+  if (s >= 0 && e > s) t = t.slice(s, e + 1)
+  // Sanitiza quebras de linha dentro de strings (AI às vezes gera JSON multi-linha inválido)
+  const sanitized = t.replace(/\n\s*/g, '')
+  try { return JSON.parse(sanitized) } catch { /* segue */ }
   return null
 }
 
@@ -182,9 +187,10 @@ Regras:
 - CTA final claro alinhado ao pilar da marca
 ${ctxCampos ? '- Referencie os campos de conteúdo da arte no roteiro para manter coerência visual\n' : ''}
 - Se houver descricao_video, otimize para descoberta na plataforma (SEO YouTube, trending TikTok)
+- IMPORTANTE: JSON deve ser UMA ÚNICA LINHA — use \\n dentro das strings para representar quebras de linha
 
-Responda SOMENTE com JSON válido, sem texto fora dele, neste formato exato:
-{"gancho":"chamada inicial (0-3s)","cenas":[{"cena":1,"descricao":"o que aparece na tela","fala":"texto narrado","tempo":"5s"}],"cta_final":"última chamada","duracao":"30s","descricao_video":"descrição otimizada para a plataforma"}`
+Responda SOMENTE com JSON válido em UMA ÚNICA LINHA, sem texto fora dele, neste formato exato:
+{"gancho":"texto","cenas":[{"cena":1,"descricao":"texto","fala":"texto","tempo":"5s"}],"cta_final":"texto","duracao":"30s","descricao_video":"texto"}`
 }
 
 /** Prompt de ESTRATÉGIA (plano de divulgação em markdown, não JSON). */
