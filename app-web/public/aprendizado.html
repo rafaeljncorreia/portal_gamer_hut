@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Diretrizes da Marca · Portal Gamer Hut</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Red+Hat+Display:wght@300;400;500;600;700;800;900&family=Press+Start+2P&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="portal.css"/>
+<script src="config.js"></script>
+<script src="generation-context.js"></script>
+<script src="brand-voice.js"></script>
+<style>
+  .head{ display:flex; flex-direction:column; gap:18px; margin-bottom:36px; }
+  .head h1{ font-size:clamp(40px,7vw,84px); line-height:.9; margin:0; text-wrap:balance; }
+  .head p{ margin:0; max-width:64ch; color:#cfc9c1; font-size:clamp(15px,2vw,19px); line-height:1.6; }
+  .panel{ background:var(--panel); border:1px solid var(--lineSoft); border-radius:18px; padding:26px; }
+  .panel .ptitle{ font-family:'Press Start 2P',monospace; font-size:12px; color:var(--orange); margin:0 0 20px; }
+  .field{ margin-bottom:18px; }
+  .field label{ display:flex; align-items:center; justify-content:space-between; gap:10px;
+    font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--mut); margin-bottom:9px; }
+  .field label .hint{ letter-spacing:.04em; color:var(--mut2); text-transform:none; }
+  .input, textarea.input{ width:100%; background:var(--bg); color:var(--white); border:1px solid var(--lineSoft);
+    border-radius:10px; padding:13px 15px; font-size:15px; font-family:'Red Hat Display',sans-serif; outline:none;
+    transition:border-color .14s; }
+  .input:focus, textarea.input:focus{ border-color:var(--orange); }
+  textarea.input{ resize:vertical; min-height:60px; line-height:1.5; }
+
+  .filter-group{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+  .filter-btn{ cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;
+    letter-spacing:.06em; padding:8px 14px; border-radius:8px; background:var(--bg); color:var(--white);
+    border:1px solid var(--lineSoft); transition:all .13s; user-select:none; }
+  .filter-btn:hover{ border-color:var(--mut); }
+  .filter-btn.on{ background:var(--orange); color:var(--ink); border-color:var(--orange); }
+
+  .diretriz-list{ display:flex; flex-direction:column; gap:10px; min-height:120px; }
+  .empty{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+    text-align:center; color:var(--mut); padding:40px 20px; }
+  .empty .ic{ width:52px; height:52px; border-radius:14px; border:1px solid var(--lineSoft); display:grid;
+    place-items:center; color:var(--orange); font-size:22px; }
+  .empty p{ margin:0; font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.6; max-width:34ch; }
+  .diretriz-card{ background:var(--bg); border:1px solid var(--lineSoft); border-left:3px solid var(--orange);
+    border-radius:12px; padding:12px 14px; animation:pop .28s ease both; }
+  .diretriz-card.archived{ border-left-color:var(--mut2); opacity:.5; }
+  .diretriz-card.archived .dc-pill{ color:var(--mut2); border-color:var(--lineSoft); background:transparent; }
+  @keyframes pop{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:none; } }
+  .diretriz-card .dc-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; }
+  .diretriz-card .dc-pill{ font-family:'JetBrains Mono',monospace; font-size:9px; font-weight:700; letter-spacing:.08em;
+    color:var(--orange); border:1px solid rgba(232,100,60,.3); background:rgba(232,100,60,.08);
+    padding:3px 8px; border-radius:6px; display:inline-block; }
+  .diretriz-card .dc-label{ font-family:'Red Hat Display',sans-serif; font-weight:600; font-size:14px; color:var(--white);
+    margin:0 0 6px; }
+  .diretriz-card .dc-body{ font-size:13px; line-height:1.55; color:#b7b1a9; }
+  .diretriz-card .dc-actions{ display:flex; gap:8px; margin-top:10px; }
+  .diretriz-card .dc-btn{ cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:700;
+    letter-spacing:.06em; border:none; border-radius:7px; padding:7px 12px; transition:all .13s; }
+  .diretriz-card .dc-btn.toggle{ background:var(--blue); color:#fff; }
+  .diretriz-card .dc-btn.toggle:hover{ filter:brightness(1.15); }
+  .diretriz-card .dc-btn.toggle.off{ background:var(--mut2); color:var(--bg); }
+  .diretriz-card .dc-btn.delete{ background:transparent; color:var(--mut); border:1px solid var(--lineSoft); }
+  .diretriz-card .dc-btn.delete:hover{ color:#E23B2E; border-color:#E23B2E; }
+  .diretriz-list-foot{ margin-top:18px; display:flex; gap:10px; flex-wrap:wrap; }
+
+  .add-form{ margin-top:18px; background:var(--bg); border:1px solid var(--lineSoft); border-radius:14px;
+    padding:20px; display:none; animation:pop .28s ease both; }
+  .add-form.visible{ display:block; }
+  .add-form .row2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media (max-width:480px){ .add-form .row2{ grid-template-columns:1fr; } }
+  .add-form .afoot{ display:flex; gap:10px; margin-top:4px; }
+  .sugestao-section{ margin-top:22px; }
+  .sugestao-section .ptitle{ font-family:'Press Start 2P',monospace; font-size:12px; color:var(--teal); margin:0 0 20px; }
+  .perg-input{ display:flex; gap:10px; margin-bottom:14px; }
+  .perg-input .input{ flex:1; }
+  .perg-input button{ flex:none; cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700;
+    letter-spacing:.06em; color:var(--ink); background:var(--orange); border:none; border-radius:9px; padding:13px 18px;
+    transition:filter .13s, transform .12s; white-space:nowrap; }
+  .perg-input button:hover{ filter:brightness(1.08); transform:translateY(-1px); }
+  .perg-input button:disabled{ opacity:.5; cursor:wait; filter:none; transform:none; }
+  .sugestao-card{ background:var(--bg); border:1px solid var(--lineSoft); border-left:3px solid var(--teal);
+    border-radius:12px; padding:14px 16px; margin-bottom:12px; animation:pop .28s ease both; }
+  .sugestao-card .sc-field{ margin-bottom:10px; }
+  .sugestao-card .sc-field label{ font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.1em;
+    color:var(--mut2); display:block; margin-bottom:4px; }
+  .sugestao-card .sc-field select,
+  .sugestao-card .sc-field input,
+  .sugestao-card .sc-field textarea{ width:100%; background:var(--panel); color:var(--white);
+    border:1px solid var(--lineSoft); border-radius:8px; padding:10px 12px; font-size:13px;
+    font-family:'Red Hat Display',sans-serif; outline:none; transition:border-color .14s; }
+  .sugestao-card .sc-field select:focus,
+  .sugestao-card .sc-field input:focus,
+  .sugestao-card .sc-field textarea:focus{ border-color:var(--teal); }
+  .sugestao-card .sc-field textarea{ resize:vertical; min-height:50px; line-height:1.5; }
+  .sugestao-card .sc-actions{ display:flex; gap:10px; margin-top:6px; }
+  .sugestao-card .sc-btn{ cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;
+    letter-spacing:.06em; border:none; border-radius:8px; padding:9px 16px; transition:all .13s; }
+  .sugestao-card .sc-btn.add{ background:var(--green); color:var(--ink); }
+  .sugestao-card .sc-btn.add:hover{ filter:brightness(1.12); }
+  .sugestao-card .sc-btn.dismiss{ background:transparent; color:var(--mut); border:1px solid var(--lineSoft); }
+  .sugestao-card .sc-btn.dismiss:hover{ color:#E23B2E; border-color:#E23B2E; }
+  .sugestao-card .sc-num{ font-family:'Press Start 2P',monospace; font-size:9px; color:var(--teal);
+    margin-bottom:10px; }
+  .skl{ height:14px; border-radius:6px; background:linear-gradient(90deg,#221e1b 0%,#2c2723 50%,#221e1b 100%);
+    background-size:200% 100%; animation:shimmer 1.5s linear infinite; margin-bottom:10px; }
+  @keyframes shimmer{ to{ background-position:-200% 0; } }
+  .err{ background:rgba(226,59,46,.08); border:1px solid rgba(226,59,46,.4); border-left:3px solid #E23B2E;
+    border-radius:12px; padding:12px 15px; font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.6; color:#e7b4ad; }
+  .err b{ color:#fff; }
+  .sugestao-empty{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--mut); text-align:center;
+    padding:20px 0; line-height:1.6; }
+</style>
+</head>
+<body>
+  <div class="dots"></div>
+
+  <header class="nav">
+    <a class="brand" href="index.html">
+      <img src="assets/logo-white.png" alt="Gamer Hut"/>
+      <span class="tag">
+        <span class="pixel t1" style="display:block;">APRENDIZADO</span>
+        <span class="mono t2" style="display:block;">DIRETRIZES DA MARCA</span>
+      </span>
+    </a>
+    <nav class="links">
+      <a href="index.html">PORTAL</a>
+      <a href="criar.html">CRIAR</a>
+      <a href="review.html">REVIEW</a>
+      <a class="active" href="aprendizado.html">APRENDIZADO</a>
+      <a href="downloader.html">DOWNLOADER</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <div class="head">
+      <span class="eyebrow">Aprendizado contínuo · Gamer Hut</span>
+      <h1 class="display">Diretrizes</h1>
+      <p>Gerencie as diretrizes de marca que alimentam a voz da Gamer Hut nas gerações de conteúdo. As diretrizes ativas são aplicadas automaticamente em todas as criações.</p>
+    </div>
+
+    <section class="panel">
+      <h2 class="ptitle">DIRETRIZES</h2>
+
+      <div class="filter-group" id="filterGroup">
+        <span class="filter-btn on" data-filter="all">TODOS</span>
+        <span class="filter-btn" data-filter="brand">MARCA</span>
+        <span class="filter-btn" data-filter="generation">GERAÇÃO</span>
+        <span class="filter-btn" data-filter="tone">TOM</span>
+        <span class="filter-btn" data-filter="platform">PLATAFORMA</span>
+      </div>
+
+      <div class="diretriz-list" id="diretrizList">
+        <div class="empty" id="dirEmpty">
+          <span class="ic">📋</span>
+          <p>Nenhuma diretriz encontrada. Crie uma nova ou pergunte à IA sobre quais diretrizes criar.</p>
+        </div>
+      </div>
+
+      <div class="add-form" id="addForm">
+        <div class="row2">
+          <div class="field">
+            <label>Tipo</label>
+            <select id="addTipo" class="input" style="cursor:pointer;">
+              <option value="brand">Marca</option>
+              <option value="generation">Geração</option>
+              <option value="tone">Tom</option>
+              <option value="platform">Plataforma</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Chave <span class="hint">ex: gen-z, hype, instagram</span></label>
+            <input id="addKey" class="input" placeholder="gen-z, hype, instagram…"/>
+          </div>
+        </div>
+        <div class="field">
+          <label>Título</label>
+          <input id="addLabel" class="input" placeholder="Ex: Tom nostálgico com dados de mercado"/>
+        </div>
+        <div class="field">
+          <label>Conteúdo</label>
+          <textarea id="addConteudo" class="input" placeholder="Descrição completa da diretriz…"></textarea>
+        </div>
+        <div class="afoot">
+          <button class="btn btn-primary" id="addSaveBtn" style="flex:1;justify-content:center;">SALVAR DIRETRIZ</button>
+          <button class="btn btn-ghost" id="addCancelBtn" style="flex:1;justify-content:center;">CANCELAR</button>
+        </div>
+      </div>
+
+      <div class="diretriz-list-foot">
+        <button class="btn btn-ghost" id="showAddBtn" style="flex:1;justify-content:center;">+ NOVA DIRETRIZ</button>
+        <button class="btn btn-ghost" id="exportBtn" style="flex:1;justify-content:center;">EXPORTAR</button>
+      </div>
+    </section>
+
+    <section class="panel sugestao-section">
+      <h2 class="ptitle">PERGUNTE SOBRE DIRETRIZES</h2>
+      <p style="margin:0 0 16px;color:var(--mut);font-size:14px;line-height:1.6;max-width:64ch;">
+        Faça uma pergunta sobre que tipo de diretriz criar para melhorar a comunicação da marca. A IA sugere diretrizes com base no brand book, nos perfis geracionais e nas diretrizes ativas.
+      </p>
+      <div class="perg-input">
+        <input id="pergInput" class="input" placeholder="Ex: Que diretriz posso criar para melhorar o tom nostálgico no Instagram?"/>
+        <button id="pergBtn">PERGUNTAR</button>
+      </div>
+      <div id="sugestoesArea"></div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <img src="assets/logo-orange.png" alt="Gamer Hut"/>
+    <div class="fr">
+      <span class="a">MÍDIA FÍSICA NEVER DIES</span>
+      <span class="b">© 2025 GAMER HUT · PORTAL DE CRIAÇÃO</span>
+    </div>
+  </footer>
+
+  <script>
+  var REGRAS_OURO = [
+    'Marca é GAMER HUT por extenso. Nunca "Hut" sozinho. "GH" só em selo ou hashtag curta (#DicaDaGH).',
+    '"sua/seu" sempre. Nunca "tua/teu".',
+    'Não prometa data de entrega. Use "envio a partir do lançamento oficial".',
+    'WhatsApp é SAC, nunca canal de venda. Compras → site ou marketplaces oficiais.',
+    'NF é implícito. Não repita "com NF" em caption. Use "original e lacrado". NF aparece só em selo institucional.',
+    'Nunca "Bora" como CTA. Use: "Garanta o seu", "Pré-venda liberada", "Link na Bio".',
+    'Storytelling antes do CTA. Fala do jogo → posiciona → só então abre a venda.',
+    'Escassez só quando real. "Quando acabar, acabou" só em edição limitada de verdade.',
+    'Não cite console à venda, usado, pirata ou troca — nem pra negar. No feed, simplesmente não menciona.',
+    'Não critique marketplaces que vendem essas categorias. Posicionamento é positivo.',
+    'Toda peça transparece ≥2 pilares de tom. Drops big-name carregam os 3.'
+  ].join('\n');
+
+  var LEARNING_LOG_KEY = 'gh-learning-log';
+  var activeFilter = 'all';
+
+  function getLog(){ try{ return JSON.parse(localStorage.getItem(LEARNING_LOG_KEY))||[]; }catch(e){ return []; } }
+  function setLog(arr){ try{ localStorage.setItem(LEARNING_LOG_KEY, JSON.stringify(arr)); }catch(e){} }
+  function genId(){ return 'lg_'+Date.now()+'_'+Math.random().toString(36).slice(2,8); }
+  function esc(s){ return String(s||'').replace(/[&<>]/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[m]; }); }
+
+  var diretrizList = document.getElementById('diretrizList');
+  var dirEmpty = document.getElementById('dirEmpty');
+  var filterGroup = document.getElementById('filterGroup');
+  var addForm = document.getElementById('addForm');
+  var showAddBtn = document.getElementById('showAddBtn');
+  var addCancelBtn = document.getElementById('addCancelBtn');
+  var addSaveBtn = document.getElementById('addSaveBtn');
+  var addTipo = document.getElementById('addTipo');
+  var addKey = document.getElementById('addKey');
+  var addLabel = document.getElementById('addLabel');
+  var addConteudo = document.getElementById('addConteudo');
+  var exportBtn = document.getElementById('exportBtn');
+  var pergInput = document.getElementById('pergInput');
+  var pergBtn = document.getElementById('pergBtn');
+  var sugestoesArea = document.getElementById('sugestoesArea');
+
+  function renderDiretrizes(){
+    var log = getLog();
+    var filtered = activeFilter === 'all' ? log : log.filter(function(l){ return l.bloco_tipo === activeFilter; });
+    diretrizList.innerHTML = '';
+    if(!filtered.length){
+      diretrizList.appendChild(dirEmpty);
+      return;
+    }
+    filtered.forEach(function(l){
+      var card = document.createElement('div');
+      card.className = 'diretriz-card' + (l.is_current === 1 ? '' : ' archived');
+      card.innerHTML =
+        '<div class="dc-head">'+
+          '<span class="dc-pill">'+esc(l.bloco_tipo)+':'+esc(l.bloco_key||'')+'</span>'+
+          '<span style="font-family:\'JetBrains Mono\',monospace;font-size:9px;color:'+(l.is_current===1?'var(--green)':'var(--mut2)')+';">'+
+            (l.is_current===1 ? 'ATIVO' : 'ARQUIVADO')+
+          '</span>'+
+        '</div>'+
+        '<div class="dc-label">'+esc(l.label)+'</div>'+
+        '<div class="dc-body">'+esc(l.conteudo)+'</div>'+
+        '<div class="dc-actions">'+
+          '<button class="dc-btn toggle'+(l.is_current===1?'':' off')+'" data-id="'+esc(l.id)+'">'+
+            (l.is_current===1 ? 'ARQUIVAR' : 'ATIVAR')+
+          '</button>'+
+          '<button class="dc-btn delete" data-id="'+esc(l.id)+'">DELETAR</button>'+
+        '</div>';
+      card.querySelector('.dc-btn.toggle').onclick = function(){
+        var log2 = getLog();
+        var found = false;
+        log2.forEach(function(item){
+          if(item.id === l.id){ item.is_current = item.is_current === 1 ? 0 : 1; found = true; }
+        });
+        if(found) setLog(log2);
+        renderDiretrizes();
+      };
+      card.querySelector('.dc-btn.delete').onclick = function(){
+        if(!confirm('Deletar diretriz "'+(l.label||'')+'" permanentemente?')) return;
+        var log2 = getLog();
+        setLog(log2.filter(function(item){ return item.id !== l.id; }));
+        renderDiretrizes();
+      };
+      diretrizList.appendChild(card);
+    });
+  }
+
+  filterGroup.querySelectorAll('.filter-btn').forEach(function(el){
+    el.onclick = function(){
+      filterGroup.querySelectorAll('.filter-btn').forEach(function(c){ c.classList.remove('on'); });
+      el.classList.add('on');
+      activeFilter = el.dataset.filter;
+      renderDiretrizes();
+    };
+  });
+
+  showAddBtn.onclick = function(){
+    addForm.classList.add('visible');
+    showAddBtn.style.display = 'none';
+  };
+  addCancelBtn.onclick = function(){
+    addForm.classList.remove('visible');
+    showAddBtn.style.display = '';
+    addLabel.value = '';
+    addConteudo.value = '';
+    addKey.value = '';
+  };
+  addSaveBtn.onclick = function(){
+    var tipo = addTipo.value;
+    var key = addKey.value.trim();
+    var label = addLabel.value.trim();
+    var conteudo = addConteudo.value.trim();
+    if(!label || !conteudo){ alert('Preencha título e conteúdo da diretriz.'); return; }
+    if(tipo !== 'brand' && !key){ alert('Preencha a chave para este tipo de diretriz.'); return; }
+    var log = getLog();
+    log.push({
+      id: genId(),
+      bloco_tipo: tipo,
+      bloco_key: key,
+      label: label,
+      conteudo: conteudo,
+      is_current: 1,
+      data_criacao: new Date().toISOString()
+    });
+    setLog(log);
+    addLabel.value = '';
+    addConteudo.value = '';
+    addKey.value = '';
+    addForm.classList.remove('visible');
+    showAddBtn.style.display = '';
+    renderDiretrizes();
+  };
+
+  exportBtn.onclick = function(){
+    var log = getLog();
+    var blob = new Blob([JSON.stringify({ brand_versions: log }, null, 2)], { type:'application/json' });
+    var dataStr = new Date().toISOString().slice(0,10);
+    var a = document.createElement('a');
+    a.download = 'gamerhut-diretrizes-'+dataStr+'.json';
+    a.href = URL.createObjectURL(blob);
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 5000);
+  };
+
+  function extractJSON(text){
+    var src = String(text||'').replace(/```json|```/g,'');
+    try{ return JSON.parse(src); }catch(e){}
+    var m = src.match(/\{[\s\S]*\}/);
+    if(m){ try{ return JSON.parse(m[0]); }catch(e){} }
+    return null;
+  }
+
+  async function aiComplete(prompt){
+    if(typeof window.claude !== 'undefined' && window.claude.complete){
+      return await window.claude.complete(prompt);
+    }
+    var url = ((window.GH_CONFIG && window.GH_CONFIG.proxyUrl) || '').trim();
+    if(!url) throw new Error('Servidor de IA não configurado.');
+    var r = await fetch(url, {
+      method:'POST', headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({ prompt:prompt })
+    });
+    var data; try{ data = await r.json(); }catch(e){ throw new Error('Resposta inválida do servidor de IA.'); }
+    if(!r.ok || (data && data.error)){ throw new Error((data && data.error) || ('Erro '+r.status+' do servidor.')); }
+    return (data && data.text) || '';
+  }
+
+  var activeSugestoes = [];
+
+  function renderSugestoes(sugestoes){
+    sugestoesArea.innerHTML = '';
+    activeSugestoes = [];
+    if(!sugestoes || !sugestoes.length){
+      sugestoesArea.innerHTML = '<div class="sugestao-empty">Nenhuma sugestão retornada. Tente reformular sua pergunta.</div>';
+      return;
+    }
+    sugestoes.forEach(function(s, i){
+      var card = document.createElement('div');
+      card.className = 'sugestao-card';
+      card.innerHTML =
+        '<div class="sc-num">SUGESTÃO 0'+(i+1)+'</div>'+
+        '<div class="sc-field">'+
+          '<label>TIPO</label>'+
+          '<select class="sc-tipo">'+
+            '<option value="brand"'+(s.bloco_tipo==='brand'?' selected':'')+'>Marca</option>'+
+            '<option value="generation"'+(s.bloco_tipo==='generation'?' selected':'')+'>Geração</option>'+
+            '<option value="tone"'+(s.bloco_tipo==='tone'?' selected':'')+'>Tom</option>'+
+            '<option value="platform"'+(s.bloco_tipo==='platform'?' selected':'')+'>Plataforma</option>'+
+          '</select>'+
+        '</div>'+
+        '<div class="sc-field">'+
+          '<label>CHAVE</label>'+
+          '<input class="sc-key" value="'+esc(s.bloco_key||'')+'" placeholder="gen-z, hype, instagram…"/>'+
+        '</div>'+
+        '<div class="sc-field">'+
+          '<label>TÍTULO</label>'+
+          '<input class="sc-label" value="'+esc(s.label||'')+'"/>'+
+        '</div>'+
+        '<div class="sc-field">'+
+          '<label>CONTEÚDO</label>'+
+          '<textarea class="sc-conteudo" rows="3">'+esc(s.conteudo||'')+'</textarea>'+
+        '</div>'+
+        '<div class="sc-actions">'+
+          '<button class="sc-btn add" data-idx="'+i+'">ADICIONAR</button>'+
+          '<button class="sc-btn dismiss" data-idx="'+i+'">IGNORAR</button>'+
+        '</div>';
+      card.querySelector('.sc-btn.add').onclick = function(){
+        var log = getLog();
+        var tipo = card.querySelector('.sc-tipo').value;
+        var key = card.querySelector('.sc-key').value.trim();
+        var label = card.querySelector('.sc-label').value.trim();
+        var conteudo = card.querySelector('.sc-conteudo').value.trim();
+        if(!label || !conteudo){ alert('Preencha título e conteúdo.'); return; }
+        log.push({
+          id: genId(),
+          bloco_tipo: tipo,
+          bloco_key: key,
+          label: label,
+          conteudo: conteudo,
+          is_current: 1,
+          data_criacao: new Date().toISOString()
+        });
+        setLog(log);
+        card.remove();
+        if(!sugestoesArea.querySelector('.sugestao-card')){
+          sugestoesArea.innerHTML = '<div class="sugestao-empty" style="color:var(--green);">Sugestões adicionadas com sucesso!</div>';
+        }
+        renderDiretrizes();
+      };
+      card.querySelector('.sc-btn.dismiss').onclick = function(){
+        card.style.opacity = '0';
+        setTimeout(function(){ card.remove(); if(!sugestoesArea.querySelector('.sugestao-card')){ sugestoesArea.innerHTML = ''; } }, 280);
+      };
+      sugestoesArea.appendChild(card);
+    });
+  }
+
+  async function perguntar(){
+    var text = pergInput.value.trim();
+    if(!text) return;
+    pergBtn.disabled = true;
+    pergBtn.textContent = '⏳ PENSANDO…';
+    sugestoesArea.innerHTML =
+      '<div class="skl" style="width:70%"></div>'+
+      '<div class="skl" style="width:90%"></div>'+
+      '<div class="skl" style="width:50%"></div>';
+
+    var voice = (typeof window.getBrandVoice === 'function')
+      ? window.getBrandVoice() : (window.GH_BRAND || '');
+    var log = getLog();
+    var ativas = log.filter(function(l){ return l.is_current === 1; });
+
+    var genContexts = '';
+    if(window.GH_GENERATIONS){
+      Object.keys(window.GH_GENERATIONS).forEach(function(k){
+        var g = window.GH_GENERATIONS[k];
+        genContexts += '\n--- '+g.full+' ---\n' + g.context.trim() + '\n';
+      });
+    }
+
+    var prompt = [
+      REGRAS_OURO,
+      '',
+      voice,
+      '',
+      '--- PERFIS GERAÇÃO (generation-context.js) ---',
+      genContexts,
+      '',
+      '--- DIRETRIZES ATIVAS ATUAIS ---',
+      ativas.length ? ativas.map(function(l,i){ return (i+1)+'. ['+l.bloco_tipo+':'+l.bloco_key+'] '+l.label+' — '+l.conteudo; }).join('\n') : '(nenhuma)',
+      '',
+      '--- INSTRUÇÃO ---',
+      'Você é um assistente de estratégia de marca da Gamer Hut. Com base na pergunta do usuário, no brand book, nos perfis geracionais e nas diretrizes já ativas, sugira de 1 a 3 novas diretrizes de aprendizado que melhorem a comunicação da marca.',
+      '',
+      'Regras:',
+      '- Cada diretriz deve ter: bloco_tipo (brand/generation/tone/platform), bloco_key (ex: gen-z, hype, instagram ou vazio para brand), label (título curto), conteudo (texto completo em português)',
+      '- Não sugira diretrizes que violem as REGRAS INEGOCIÁVEIS',
+      '- Sugira diretrizes específicas e acionáveis, não genéricas',
+      '- Evite duplicar diretrizes já existentes',
+      '',
+      'Responda SOMENTE com JSON válido, sem texto fora dele, neste formato exato:',
+      '{"sugestoes":[{"bloco_tipo":"tone","bloco_key":"hype","label":"Título curto","conteudo":"Texto completo da diretriz em português"}]}',
+      '',
+      'PERGUNTA DO USUÁRIO: ' + text
+    ].join('\n');
+
+    try{
+      var aiText = await aiComplete(prompt);
+      var data = extractJSON(aiText);
+      var sugestoes = data && Array.isArray(data.sugestoes) ? data.sugestoes : [];
+      renderSugestoes(sugestoes);
+    }catch(e){
+      sugestoesArea.innerHTML = '<div class="err"><b>Não consegui processar sua pergunta agora.</b><br>' + esc(e&&e.message||'Erro de conexão com a IA.') + '</div>';
+    }
+    pergBtn.disabled = false;
+    pergBtn.textContent = 'PERGUNTAR';
+  }
+
+  pergBtn.onclick = perguntar;
+  pergInput.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ e.preventDefault(); perguntar(); }
+  });
+
+  renderDiretrizes();
+  </script>
+</body>
+</html>

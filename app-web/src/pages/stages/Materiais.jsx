@@ -302,7 +302,7 @@ export default function Materiais({ camp, produto, onUpdate }) {
       vsWord: campos.vsWord || 'OU',
     }
     localStorage.setItem('gh-studio', JSON.stringify(state))
-    window.open('/studio.html', '_blank')
+    window.open(import.meta.env.BASE_URL + 'studio.html', '_blank')
   }
 
   const handleMontarArte = () => {
