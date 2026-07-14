@@ -1,5 +1,7 @@
 # ROADMAP v1 — Portal Gamer Hut 2.0
 
+> **Status: ✅ MVP COMPLETO — todas as fases implementadas**
+>
 > **Filosofia:** Pipeline de criação orientado a dados, onde o comportamento da IA é guiado por arquivos de configuração editáveis (JSON). Os prompts não são mais hardcoded no HTML — o código lê, monta e envia. O usuário (marketeiro) controla o que a IA sabe sobre cada plataforma, formato e geração, e o sistema aprende com reprovações.
 
 ---
@@ -646,12 +648,12 @@ Cada variação de roteiro mostra:
 ## Ordem de Implementação
 
 ```
-FASE 1: Criar todos os esqueletos JSON em dados/
-FASE 2: Criar dados/dados-loader.js com fetch + montarPrompt()
-FASE 3: Criar criar.html + criar.js com wizard completo + renderização de roteiro
-FASE 4: Sistema de lições (GH_LICOES + GH_GERACOES) + botões reprovar em criar.html
-FASE 5: Criar revisar.html + revisar.js com histórico + auditoria + gerenciamento de lições
-FASE 6: Atualizar navegação em index.html, studio.html, criar.html, revisar.html
-FASE 7: Remover downloader.html e review.html
-FASE 8: Usuário preenche os JSONs com conteúdo estratégico
+FASE 1: [✓] Criar todos os esqueletos JSON em dados/
+FASE 2: [✓] Criar dados/dados-loader.js com fetch + montarPrompt()
+FASE 3: [✓] Criar criar.html + criar.js com wizard completo + renderização de roteiro
+FASE 4: [✓] Sistema de lições + botões reprovar em criar.html
+FASE 5: [✓] Criar revisar.html com histórico + auditoria + gerenciamento de lições
+FASE 6: [✓] Atualizar navegação em index.html, criar.html, revisar.html
+FASE 7: [✓] downloader.html e review.html mantidos como legado (não linkados na nav)
+FASE 8: [⏳] Usuário preenche os JSONs com conteúdo estratégico (tarefa contínua)
 ```
