@@ -3,8 +3,8 @@
   "nome": "Ranking",
   "plataforma": "instagram",
   "tipoSaida": "copy",
-  "version": 1,
-  "ultimaRevisao": "",
-  "instrucoes": "",
-  "exemplos": ""
+  "version": 2,
+  "ultimaRevisao": "2026-07-14",
+  "instrucoes": "LEMBRETE: fala com UMA geração só — confira o campo Geração antes de escrever.\n\nFORMATO: post ou carrossel de ranking (top 3, top 5, mais vendidos, mais aguardados) — extensão natural do pilar Resumo da Semana/Mês, com toque de curadoria (autoridade de quem entende o catálogo).\n\nESTRUTURA: título nomeando o corte do ranking ('#1 mais vendido', 'Top 3 reviews do mês', 'Mais aguardados da rotação') → cada posição com nome do jogo + 1 dado concreto que justifica a posição (esgotou em X horas, nota do squad, % de pré-venda) → fechamento com teaser do próximo período.\n\nREGRA: número tem que ser real ou plausivelmente real dentro do contexto da loja — nunca inventar dado de venda. Se não houver dado real disponível, usar critério qualitativo declarado (nota do squad, curadoria) em vez de forjar número.\nCTA: geralmente de recall/expectativa ('não vai dormir, vem coisa boa', 'ative o sino') mais do que venda direta — o ranking já vende pela prova social.",
+  "exemplos": "Título: 'Maio em números'\nLegenda: '#1 mais vendido: 007 First Light — standard esgotou em 6h. #2 mais aguardado: MGS Vol.2 Steelcase — pré-venda 50% em 2 dias. Mais de 3,4 mil novos seguidores esse mês. Obrigado, galera.'\nCTA: 'Junho vem com Tides + Kid Icarus 40. Ative o sino.'\nHashtags: #GamerHut #SemanaDaHut #DropsDaSemana #MidiaFisica\n\n---\n\nTítulo: 'Top 3 reviews do squad'\nLegenda: '9.4 · 9.1 · 8.7 — as notas dos 3 jogos que o squad mais recomendou esse mês. Qual você já jogou?'\nCTA: 'Comenta qual te deixou curioso.'"
 }

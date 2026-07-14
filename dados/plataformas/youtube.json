@@ -1,8 +1,8 @@
 {
   "id": "youtube",
   "nome": "YouTube",
-  "version": 1,
-  "ultimaRevisao": "",
-  "instrucoes": "",
-  "exemplos": ""
+  "version": 2,
+  "ultimaRevisao": "2026-07-14",
+  "instrucoes": "LEMBRETE: cada peça fala com UMA geração só (ver dados/geracoes). No YouTube o público já é naturalmente Millennial/Gen X — não force tom Gen Z aqui.\n\nDADOS REAIS DO CANAL (coletado 14/07/2026): 473 inscritos (+33 nos últimos 28 dias, crescendo) · público mensal de 7,1 mil. Distribuição de idade dos espectadores: 18-24 = 7,6% · 25-34 = 32,3% · 35-44 = 43,3% (maior fatia, de longe) · 45-54 = 16,8% · 55+ = ~0%. **92,4% do público tem 25 anos ou mais — este é o canal mais Millennial/Gen X-denso da marca entre os 3.** 60,6% são espectadores novos (não-inscritos) — ou seja, o canal ainda descobre público a cada vídeo, a base de inscritos fiel é pequena mas crescendo.\n\nLEITURA ESTRATÉGICA: o YouTube é um canal pequeno em volume (473 inscritos vs 22K TikTok e 107K Instagram) mas já entrega DIRETO o público que mais converte em seguidor/comprador nos outros canais (Millennial/Gen X). É investimento de baixo volume, alto valor por espectador — prioridade se a meta for esse público específico, não alcance de massa.\n\nDOIS TIPOS DE CONTEÚDO:\n1) Vídeo longo (>5min) com roteiro completo — review, gameplay, unboxing.\n2) Repost/reaproveitamento de conteúdo do Instagram/TikTok como Shorts (delay ~1 dia), pra capturar Gen Z de raspão — mas sem esperar que isso converta em inscrito (ver [[tiktok]], mesma lógica viewer×follower se aplica).\n\nROTEIRO DE VÍDEO LONGO: estrutura em cenas com duração aproximada, descrição visual e narração escrita pra locução. Abertura com contexto/gancho, corpo com argumento estruturado (prós/contras pra review, walkthrough pra gameplay, unbox passo a passo pra unboxing), fechamento com veredicto/CTA.\nTOM: mais estruturado e informativo que Reels/TikTok — pode e deve ter profundidade, comparação histórica, dado técnico. Nunca soar como script de TV corporativo.\nDESCRIÇÃO DO VÍDEO: contexto + link de compra + hashtags de nicho.\nTÍTULO: nome do jogo em destaque, claro, sem clickbait vazio.",
+  "exemplos": "TÍTULO-MODELO: '007 First Light · Vale a pena? Review completo (mídia física PS5)'\n\nABERTURA DE NARRAÇÃO: 'Treze anos depois do último 007 single-player, a IO Interactive lança First Light — e a Gamer Hut trouxe a edição física lacrada pra testar de verdade.'\n\nCTA DE FECHAMENTO: 'Se esse review te ajudou a decidir, o link da pré-venda tá na descrição. Original e lacrado, direto da Gamer Hut.'"
 }

@@ -3,8 +3,8 @@
   "nome": "Gameplay",
   "plataforma": "youtube",
   "tipoSaida": "roteiro",
-  "version": 1,
-  "ultimaRevisao": "",
-  "instrucoes": "",
-  "exemplos": ""
+  "version": 2,
+  "ultimaRevisao": "2026-07-14",
+  "instrucoes": "LEMBRETE: fala com UMA geração só — confira o campo Geração antes de escrever (ver [[youtube]]: canal naturalmente Millennial/Gen X, 92% do público tem 25+ anos).\n\nFORMATO: vídeo de gameplay comentado — não é review formal, é mostrar o jogo rodando com comentário ao vivo do squad. Foco em MOMENTO e REAÇÃO genuína, não em veredicto estruturado (isso é papel do formato Review).\n\nESTRUTURA: abertura contextual curta (o que é o jogo, edição física da Gamer Hut em mãos) → blocos de gameplay com comentário reagindo em tempo real (mecânica, surpresa, dificuldade, easter egg) → fechamento com impressão geral (não nota fechada) + CTA.\n\nTOM: mais solto e espontâneo que o Review — é a 'paixão' da marca em ação. Reações genuínas de quem realmente ama jogar, sem forçar hype. Pode ter humor leve.\n\nSempre reforçar visualmente que é a MÍDIA FÍSICA original rodando (case, disco ou steelbook visível em algum corte).",
+  "exemplos": "CENA ABERTURA: visual = case lacrado sendo aberto na mesa; narração = 'Peguei aqui o Mouse: P.I. for Hire lacrado, igualzinho chega pra vocês. Bora ver como é que joga.'\n\nCENA GAMEPLAY: visual = captura de tela com squad no canto reagindo; narração = 'Óh, não esperava esse tipo de combate num jogo noir, isso aqui é bem mais rápido do que parece no trailer.'\n\nCENA FECHAMENTO: narração = 'Muito bom pra quem gosta de arte diferente. Original e lacrado na Gamer Hut, link na descrição.'"
 }
