@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Revisar · Portal Gamer Hut</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,800;0,900;1,900&family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="portal.css"/>
+<script src="brand-voice.js"></script>
+<script src="config.js"></script>
+<script src="dados/dados-loader.js"></script>
+<style>
+  .head{ display:flex; flex-direction:column; gap:18px; margin-bottom:36px; }
+  .head h1{ font-size:clamp(40px,7vw,84px); line-height:.9; margin:0; text-wrap:balance; }
+  .head p{ margin:0; max-width:64ch; color:#cfc9c1; font-size:clamp(15px,2vw,19px); line-height:1.6; }
+
+  .panel{ background:var(--panel); border:1px solid var(--lineSoft); border-radius:18px; padding:26px 26px 28px; margin-bottom:22px; }
+  .panel .ptitle{ font-family:'Press Start 2P',monospace; font-size:12px; margin:0 0 20px; }
+  .panel .ptitle.orange{ color:var(--orange); }
+  .panel .ptitle.blue{ color:var(--blue); }
+  .panel .ptitle.teal{ color:var(--teal); }
+  .panel .ptitle.violet{ color:var(--violet); }
+
+  .filters{ display:flex; gap:12px; flex-wrap:wrap; margin-bottom:20px; }
+  .filters select{ flex:1; min-width:140px; }
+
+  #historyList{ display:flex; flex-direction:column; gap:8px; }
+  .hitem{ cursor:pointer; background:var(--bg); border:1px solid var(--lineSoft); border-radius:12px;
+    padding:14px 16px; transition:border-color .13s, background .13s; display:flex; align-items:center;
+    gap:12px; flex-wrap:wrap; }
+  .hitem:hover{ border-color:var(--mut); }
+  .hitem.open{ border-color:var(--orange); background:var(--panel2); }
+  .hitem .hid{ font-family:'Space Mono',monospace; font-size:10px; color:var(--mut2); }
+  .hitem .hdate{ font-family:'Space Mono',monospace; font-size:11px; color:var(--mut); white-space:nowrap; }
+  .hitem .hmeta{ display:flex; gap:8px; flex-wrap:wrap; flex:1; }
+  .hitem .hmeta span{ font-family:'Space Mono',monospace; font-size:10px; font-weight:700;
+    letter-spacing:.06em; color:var(--mut2); background:var(--panel); padding:4px 8px;
+    border-radius:6px; border:1px solid var(--lineSoft); }
+  .hitem .hstatus{ font-size:16px; margin-left:auto; }
+
+  .hdetail{ background:var(--panel2); border:1px solid var(--lineSoft); border-radius:0 0 12px 12px;
+    padding:18px 20px; margin-top:-8px; display:none; }
+  .hdetail.open{ display:block; }
+  .hdetail pre{ font-family:'Space Mono',monospace; font-size:12px; line-height:1.6;
+    color:#cfc9c1; white-space:pre-wrap; margin:0; max-height:320px; overflow-y:auto;
+    background:var(--bg); border-radius:8px; padding:14px; }
+
+  .audit-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; justify-content:flex-end; }
+  .audit-actions .btn-reprovar{ background:rgba(226,59,46,.12); color:#E23B2E;
+    border:1px solid rgba(226,59,46,.4); }
+  .audit-actions .btn-reprovar:hover{ background:rgba(226,59,46,.2); }
+  .audit-actions .btn-aprovar{ background:var(--green); color:var(--ink); border:1px solid var(--green); }
+
+  .report{ display:flex; flex-direction:column; gap:12px; margin-top:16px; padding:16px;
+    background:var(--bg); border-radius:12px; border:1px solid var(--lineSoft); }
+  .report .ritem{ display:flex; align-items:center; gap:12px; padding:8px 0;
+    border-top:1px solid var(--lineSoft); font-family:'Space Mono',monospace; font-size:11px; line-height:1.5; }
+  .report .ritem:first-child{ border-top:none; }
+  .report .rstatus{ font-size:18px; flex:none; }
+  .report .rlabel{ color:var(--white); font-weight:700; flex:none; min-width:100px; }
+  .report .rmsg{ color:#cfc9c1; flex:1; }
+
+  .licoes{ display:flex; flex-direction:column; gap:8px; }
+  .licao{ display:flex; align-items:center; gap:12px; background:var(--bg);
+    border:1px solid var(--lineSoft); border-radius:12px; padding:12px 14px; flex-wrap:wrap; }
+  .licao .lstatus{ font-size:14px; flex:none; }
+  .licao .ltext{ flex:1; font-size:13px; line-height:1.45; color:#cfc9c1;
+    font-family:'Space Grotesk',sans-serif; min-width:140px; }
+  .licao .lmeta{ font-family:'Space Mono',monospace; font-size:9px; color:var(--mut2);
+    display:flex; gap:10px; flex-wrap:wrap; }
+  .licao .lacts{ display:flex; gap:6px; flex-wrap:wrap; }
+  .licao .lacts button{ font-family:'Space Mono',monospace; font-size:9px; font-weight:700;
+    letter-spacing:.06em; cursor:pointer; background:transparent; border:1px solid var(--lineSoft);
+    border-radius:6px; padding:5px 9px; color:var(--mut); transition:all .13s; white-space:nowrap; }
+  .licao .lacts button:hover{ color:#fff; border-color:var(--mut); }
+  .licao .lacts button.prim{ color:var(--orange); border-color:rgba(232,100,60,.3); }
+  .licao .lacts button.prim:hover{ border-color:var(--orange); }
+  .licao .lacts button.danger{ color:#E23B2E; border-color:rgba(226,59,46,.3); }
+  .licao .lacts button.danger:hover{ border-color:#E23B2E; }
+  .licao .lacts button.done{ color:var(--mut2); border-color:var(--lineSoft); }
+
+  .stats{ display:flex; gap:18px; flex-wrap:wrap; margin-top:20px; padding-top:18px;
+    border-top:1px solid var(--lineSoft); }
+  .stats span{ font-family:'Space Mono',monospace; font-size:11px; color:var(--mut); }
+  .stats b{ color:var(--white); }
+
+  .empty-state{ display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:14px; text-align:center; color:var(--mut); padding:40px 20px; }
+  .empty-state .ic{ width:48px; height:48px; border-radius:12px; border:1px solid var(--lineSoft);
+    display:grid; place-items:center; font-size:20px; }
+  .empty-state p{ margin:0; font-family:'Space Mono',monospace; font-size:12px; line-height:1.6; max-width:36ch; }
+
+  .err{ background:rgba(226,59,46,.08); border:1px solid rgba(226,59,46,.4); border-left:3px solid #E23B2E;
+    border-radius:12px; padding:15px 17px; font-family:'Space Mono',monospace; font-size:12px; line-height:1.6; color:#e7b4ad; }
+  .err b{ color:#fff; }
+  @media (max-width:640px){ .filters{ flex-direction:column; } }
+</style>
+</head>
+<body>
+<div class="dots"></div>
+
+<header class="nav">
+  <a class="brand" href="index.html">
+    <img src="assets/logo-white.png" alt="Gamer Hut"/>
+    <span class="tag">
+      <span class="pixel t1" style="display:block;">REVISAR</span>
+      <span class="mono t2" style="display:block;">AUDITORIA</span>
+    </span>
+  </a>
+  <nav class="links">
+    <a href="index.html">PORTAL</a>
+    <a href="criar.html">CRIAR</a>
+    <a href="studio.html">STUDIO</a>
+    <a class="active" href="revisar.html">REVISAR</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <div class="head">
+    <span class="eyebrow">Revisão · Gamer Hut</span>
+    <h1 class="display">Revisar Conteúdo</h1>
+    <p>Audite materiais gerados, acompanhe o histórico de criações e gerencie as lições aprendidas para afinar cada vez mais o sistema.</p>
+  </div>
+
+  <!-- SEÇÃO 1 — Histórico de Gerações -->
+  <section class="panel">
+    <h2 class="ptitle blue">HISTÓRICO DE GERAÇÕES</h2>
+    <div class="filters">
+      <select id="filtroPlataforma" class="input"><option value="">Todas plataformas</option></select>
+      <select id="filtroFormato" class="input"><option value="">Todos formatos</option></select>
+      <select id="filtroGeracao" class="input"><option value="">Todas gerações</option></select>
+    </div>
+    <div id="historyList">
+      <div class="empty-state">
+        <span class="ic">📋</span>
+        <p>Nenhuma geração encontrada. As criações aparecerão aqui automaticamente.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEÇÃO 2 — Auditoria -->
+  <section id="auditoriaSection" class="panel">
+    <h2 class="ptitle orange">AUDITORIA</h2>
+    <div id="auditContent">
+      <div class="empty-state">
+        <span class="ic">🔍</span>
+        <p>Clique em um item do histórico para auditar o material gerado.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEÇÃO 3 — Gerenciamento de Lições -->
+  <section class="panel">
+    <h2 class="ptitle teal">LIÇÕES APRENDIDAS</h2>
+    <div id="licoesList">
+      <div class="empty-state">
+        <span class="ic">📘</span>
+        <p>Nenhuma lição registrada. Lições aparecem aqui após auditorias.</p>
+      </div>
+    </div>
+    <div id="licoesStats" class="stats"></div>
+  </section>
+</main>
+
+<footer class="foot">
+  <img src="assets/logo-orange.png" alt="Gamer Hut"/>
+  <div class="fr">
+    <span class="a">MÍDIA FÍSICA NEVER DIES</span>
+    <span class="b">© 2026 GAMER HUT · PORTAL DE CRIAÇÃO</span>
+  </div>
+</footer>
+
+<script>
+window.initRevisar = function() {
+  'use strict';
+
+  var D = window.DADOS;
+  var filtroPlat = document.getElementById('filtroPlataforma');
+  var filtroFmt  = document.getElementById('filtroFormato');
+  var filtroGer  = document.getElementById('filtroGeracao');
+  var historyEl  = document.getElementById('historyList');
+  var auditEl    = document.getElementById('auditContent');
+  var licoesEl   = document.getElementById('licoesList');
+  var statsEl    = document.getElementById('licoesStats');
+  var currentGeracao = null;
+
+  function esc(s) { return String(s || '').replace(/[&<>]/g, function(m) { return { '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]; }); }
+
+  function fmtDate(iso) {
+    if (!iso) return '—';
+    var d = new Date(iso);
+    return d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  }
+
+  function statusIcon(st, licaoId) {
+    if (st === 'aprovado' || st === 'aprovado-com-licao') return (licaoId || st === 'aprovado-com-licao') ? '✅✅' : '✅';
+    if (st === 'feedback') return '❌';
+    return '⏳';
+  }
+
+  async function aiComplete(prompt) {
+    if (typeof window.claude !== 'undefined' && window.claude.complete) {
+      return await window.claude.complete(prompt);
+    }
+    var url = ((window.GH_CONFIG && window.GH_CONFIG.proxyUrl) || '').trim();
+    if (!url) {
+      throw new Error('Servidor de IA não configurado. Abra config.js e cole a URL do seu servidor em proxyUrl.');
+    }
+    var r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: prompt })
+    });
+    var data;
+    try { data = await r.json(); } catch(e) { throw new Error('Resposta inválida do servidor de IA.'); }
+    if (!r.ok || (data && data.error)) throw new Error((data && data.error) || ('Erro ' + r.status + ' do servidor.'));
+    return (data && data.text) || '';
+  }
+
+  function carregarGeracoes() {
+    try { return JSON.parse(localStorage.getItem('gh-geracoes') || '[]'); }
+    catch(e) { return []; }
+  }
+
+  function carregarLicoes() {
+    try { return JSON.parse(localStorage.getItem('gh-licoes') || '[]'); }
+    catch(e) { return []; }
+  }
+
+  function licaoPorId(id) {
+    if (!id) return null;
+    return carregarLicoes().find(function(l) { return l.id === id; }) || null;
+  }
+
+  function popFilter(el, map, labelKey) {
+    var val = el.value;
+    el.innerHTML = '<option value="">' + el.getAttribute('data-all') + '</option>';
+    Object.keys(map).forEach(function(id) {
+      var opt = document.createElement('option');
+      opt.value = id;
+      opt.textContent = map[id][labelKey] || id;
+      el.appendChild(opt);
+    });
+    el.value = val || '';
+  }
+
+  function initFilters() {
+    filtroPlat.setAttribute('data-all', 'Todas plataformas');
+    filtroFmt.setAttribute('data-all', 'Todos formatos');
+    filtroGer.setAttribute('data-all', 'Todas gerações');
+
+    popFilter(filtroPlat, D.plataformas, 'nome');
+    popFilter(filtroFmt, D.formatos, 'nome');
+    popFilter(filtroGer, D.geracoes, 'nome');
+
+    filtroPlat.onchange = function() {
+      if (filtroPlat.value) {
+        var lista = D.formatosDaPlataforma(filtroPlat.value);
+        var map = {};
+        lista.forEach(function(f) { map[f.id] = f; });
+        popFilter(filtroFmt, map, 'nome');
+      } else {
+        popFilter(filtroFmt, D.formatos, 'nome');
+      }
+      renderHistory();
+    };
+    filtroFmt.onchange  = renderHistory;
+    filtroGer.onchange  = renderHistory;
+  }
+
+  function renderHistory() {
+    var geracoes = carregarGeracoes();
+    var pv = filtroPlat.value;
+    var fv = filtroFmt.value;
+    var gv = filtroGer.value;
+
+    if (pv && fv) {
+      var fmtObj = D.formatos[fv];
+      if (fmtObj && fmtObj.plataforma !== pv) {
+        filtroFmt.value = '';
+        fv = '';
+      }
+    }
+    if (pv) geracoes = geracoes.filter(function(g) { return g.plataformaId === pv; });
+    if (fv) geracoes = geracoes.filter(function(g) { return g.formatoId === fv; });
+    if (gv) geracoes = geracoes.filter(function(g) { return g.geracaoId === gv; });
+
+    if (!geracoes.length) {
+      historyEl.innerHTML = '<div class="empty-state"><span class="ic">📋</span><p>Nenhuma geração encontrada para os filtros selecionados.</p></div>';
+      return;
+    }
+
+    historyEl.innerHTML = '';
+    geracoes.forEach(function(g) {
+      var item = document.createElement('div');
+      item.className = 'hitem' + (currentGeracao && currentGeracao.id === g.id ? ' open' : '');
+      var plat = D.plataformas[g.plataformaId];
+      var fmt  = D.formatos[g.formatoId];
+      var ger  = D.geracoes[g.geracaoId];
+      item.innerHTML =
+        '<span class="hid">' + esc(g.id) + '</span>' +
+        '<span class="hdate">' + fmtDate(g.criadoEm) + '</span>' +
+        '<div class="hmeta">' +
+          '<span>' + esc(plat ? plat.nome : g.plataformaId) + '</span>' +
+          '<span>' + esc(fmt ? fmt.nome : g.formatoId) + '</span>' +
+          '<span>' + esc(ger ? ger.nome : g.geracaoId) + '</span>' +
+          (g.tom ? '<span>' + esc(g.tom) + '</span>' : '') +
+        '</div>' +
+        '<span class="hstatus">' + statusIcon(g.status, g.licaoId) + '</span>';
+      item.onclick = function() { selecionarGeracao(g); };
+      historyEl.appendChild(item);
+
+      if (currentGeracao && currentGeracao.id === g.id) {
+        var detail = document.createElement('div');
+        detail.className = 'hdetail open';
+        detail.innerHTML = '<pre>' + esc(JSON.stringify(g, null, 2)) + '</pre>';
+        historyEl.appendChild(detail);
+      }
+    });
+  }
+
+  function selecionarGeracao(g) {
+    currentGeracao = g;
+    renderHistory();
+    mostrarAuditoria(g);
+  }
+
+  function mostrarAuditoria(g) {
+    if (!g) {
+      auditEl.innerHTML = '<div class="empty-state"><span class="ic">🔍</span><p>Clique em um item do histórico para auditar o material gerado.</p></div>';
+      return;
+    }
+
+    var plat = D.plataformas[g.plataformaId];
+    var fmt  = D.formatos[g.formatoId];
+    var ger  = D.geracoes[g.geracaoId];
+
+    var html = '<div style="margin-bottom:16px;">';
+    html += '<div style="font-family:\'Space Mono\',monospace;font-size:11px;color:var(--mut2);margin-bottom:6px;">Material original</div>';
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">';
+    html += '<span style="font-family:\'Space Mono\',monospace;font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--mut2);background:var(--bg);padding:4px 8px;border-radius:6px;border:1px solid var(--lineSoft);">' + esc(plat ? plat.nome : g.plataformaId) + '</span>';
+    html += '<span style="font-family:\'Space Mono\',monospace;font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--mut2);background:var(--bg);padding:4px 8px;border-radius:6px;border:1px solid var(--lineSoft);">' + esc(fmt ? fmt.nome : g.formatoId) + '</span>';
+    html += '<span style="font-family:\'Space Mono\',monospace;font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--mut2);background:var(--bg);padding:4px 8px;border-radius:6px;border:1px solid var(--lineSoft);">' + esc(ger ? ger.nome : g.geracaoId) + '</span>';
+    if (g.tom) html += '<span style="font-family:\'Space Mono\',monospace;font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--mut2);background:var(--bg);padding:4px 8px;border-radius:6px;border:1px solid var(--lineSoft);">' + esc(g.tom) + '</span>';
+    html += '</div>';
+    html += '<pre style="font-family:\'Space Mono\',monospace;font-size:12px;line-height:1.6;color:#cfc9c1;white-space:pre-wrap;margin:0;background:var(--bg);border-radius:8px;padding:14px;max-height:300px;overflow-y:auto;">';
+    html += 'Briefing: ' + esc(g.brief || '—');
+    html += '\nCategoria: ' + esc(g.categoriaId || '—');
+    if (g.preco) html += '\nPreço: ' + esc(g.preco);
+    if (g.plataformaConsole) html += '\nConsole: ' + esc(g.plataformaConsole);
+    var resultado = g.resultado || g.variacoes;
+    html += '\n' + (typeof resultado === 'string' ? resultado : JSON.stringify(resultado, null, 2));
+    html += '</pre></div>';
+
+    if (g.relatorio) {
+      html += '<div class="report">';
+      g.relatorio.forEach(function(r) {
+        var ico = r.status === 'ok' ? '✅' : r.status === 'alerta' ? '⚠️' : '❌';
+        html += '<div class="ritem"><span class="rstatus">' + ico + '</span><span class="rlabel">' + esc(r.label || '') + '</span><span class="rmsg">' + esc(r.msg || '') + '</span></div>';
+      });
+      html += '</div>';
+      html += '<div class="audit-actions">';
+      html += '<button class="btn btn-reprovar" onclick="window.initRevisar.reprovar(\'' + g.id + '\')">REPROVAR</button>';
+      html += '<button class="btn btn-aprovar" onclick="window.initRevisar.aprovar(\'' + g.id + '\')">APROVAR E ARQUIVAR</button>';
+      html += '</div>';
+    } else {
+      html += '<button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:4px;" onclick="window.initRevisar.auditar(\'' + g.id + '\')">🔍 AUDITAR AGORA</button>';
+    }
+
+    if (g.feedback) {
+      html += '<div style="margin-top:14px;padding:12px;background:rgba(232,100,60,.08);border-radius:8px;font-family:\'Space Mono\',monospace;font-size:11px;line-height:1.5;color:#cfc9c1;"><b style="color:#fff;">Feedback original:</b> ' + esc(g.feedback) + '</div>';
+    }
+
+    var licaoAssoc = g.licaoId ? licaoPorId(g.licaoId) : null;
+    if (licaoAssoc) {
+      html += '<div style="margin-top:10px;padding:12px;background:rgba(46,157,91,.08);border-radius:8px;font-family:\'Space Mono\',monospace;font-size:11px;line-height:1.5;color:#cfc9c1;"><b style="color:#2E9D5B;">Lição gerada:</b> ' + esc(licaoAssoc.texto) + ' <span style="color:var(--mut2);">(força ' + (licaoAssoc.forca || 1).toFixed(1) + ')</span></div>';
+    }
+
+    auditEl.innerHTML = html;
+  }
+
+  async function auditar(id) {
+    var geracoes = carregarGeracoes();
+    var g = geracoes.find(function(x) { return x.id === id; });
+    if (!g) return;
+
+    var plat = D.plataformas[g.plataformaId];
+    var fmt = D.formatos[g.formatoId];
+    var ger = D.geracoes[g.geracaoId];
+
+    var ap = window.GH_BRAND || '';
+    if (plat && plat.instrucoes) {
+      ap += '\n\n---\n\nINSTRUÇÕES DE PLATAFORMA — ' + plat.nome + '\n' + plat.instrucoes;
+      if (plat.exemplos) ap += '\n\n' + plat.exemplos;
+    }
+    if (fmt && fmt.instrucoes) {
+      ap += '\n\n---\n\nINSTRUÇÕES DE FORMATO — ' + fmt.nome + '\n' + fmt.instrucoes;
+      if (fmt.exemplos) ap += '\n\n' + fmt.exemplos;
+    }
+    if (ger && ger.instrucoes) {
+      ap += '\n\n---\n\nINSTRUÇÕES DE GERAÇÃO — ' + ger.nome + '\n' + ger.instrucoes;
+      if (ger.exemplos) ap += '\n\n' + ger.exemplos;
+    }
+
+    ap += '\n\n---\n\n';
+    ap += 'Você é um revisor de conteúdo da Gamer Hut. Analise o material gerado abaixo e avalie cada aspecto como ok, alerta ou erro.\n\n';
+    ap += 'Contexto da geração:\n';
+    ap += '- Plataforma: ' + (plat ? plat.nome : g.plataformaId) + '\n';
+    ap += '- Formato: ' + (fmt ? fmt.nome : g.formatoId) + '\n';
+    ap += '- Geração: ' + (ger ? ger.nome : g.geracaoId) + '\n';
+    ap += '- Tom: ' + (g.tom || '—') + '\n';
+    ap += '- Categoria: ' + (g.categoriaId || '—') + '\n';
+    ap += '- Briefing: ' + (g.brief || '—') + '\n\n';
+    ap += 'Material gerado:\n' + JSON.stringify(g.resultado || g.variacoes, null, 2) + '\n\n';
+    ap += 'Responda SOMENTE com JSON válido, sem texto fora dele, neste formato exato:\n';
+    ap += '{"itens":[{"status":"ok","label":"Clareza","msg":"Descrição"},{"status":"alerta","label":"Tom","msg":"Descrição"},{"status":"erro","label":"Formato","msg":"Descrição"}]}';
+
+    try {
+      var text = await aiComplete(ap);
+      var cleaned = text.replace(/```(?:json)?\s*/gi, '').replace(/```/g, '').trim();
+      var parsed = JSON.parse(cleaned);
+      var relatorio = parsed.itens || [];
+
+      g.relatorio = relatorio;
+      g.status = 'pendente';
+      D.atualizarGeracao(id, { relatorio: relatorio, status: 'pendente' });
+      currentGeracao = g;
+      renderHistory();
+      mostrarAuditoria(g);
+    } catch(e) {
+      alert('Erro na auditoria: ' + e.message + '\n\nTente novamente.');
+    }
+  }
+
+  function reprovar(id) {
+    var geracoes = carregarGeracoes();
+    var g = geracoes.find(function(x) { return x.id === id; });
+    if (!g) return;
+
+    var feedback = prompt('Descreva o que está errado neste material:');
+    if (feedback === null) return;
+
+    var licao = prompt('Registrar lição aprendida com esta reprovação (ou deixe em branco):');
+    var licaoObj = null;
+    if (licao && licao.trim()) {
+      licaoObj = D.adicionarLicao(licao.trim(), g.plataformaId, g.formatoId, g.geracaoId);
+      renderLicoes();
+    }
+
+    g.status = 'feedback';
+    g.feedback = feedback;
+    g.licaoId = licaoObj ? licaoObj.id : null;
+    D.atualizarGeracao(id, { status: 'feedback', feedback: feedback, licaoId: g.licaoId });
+    currentGeracao = g;
+    renderHistory();
+    mostrarAuditoria(g);
+  }
+
+  function aprovar(id) {
+    var geracoes = carregarGeracoes();
+    var g = geracoes.find(function(x) { return x.id === id; });
+    if (!g) return;
+    g.status = 'aprovado';
+    D.atualizarGeracao(id, { status: 'aprovado' });
+    currentGeracao = g;
+    renderHistory();
+    mostrarAuditoria(g);
+  }
+
+  window.initRevisar.auditar   = auditar;
+  window.initRevisar.reprovar  = reprovar;
+  window.initRevisar.aprovar   = aprovar;
+
+  function renderLicoes() {
+    var licoes = carregarLicoes();
+    var ativas = licoes.filter(function(l) { return l.ativa; });
+
+    if (!licoes.length) {
+      licoesEl.innerHTML = '<div class="empty-state"><span class="ic">📘</span><p>Nenhuma lição registrada. Lições aparecem aqui após auditorias.</p></div>';
+      statsEl.innerHTML = '';
+      return;
+    }
+
+    licoesEl.innerHTML = '';
+    licoes.forEach(function(l) {
+      var diasRestantes = 0;
+      var statusClass = '';
+      if (l.expiraEm) {
+        var diff = new Date(l.expiraEm) - new Date();
+        diasRestantes = Math.ceil(diff / (1000 * 60 * 60 * 24));
+        if (diasRestantes > 15) statusClass = '🟢';
+        else if (diasRestantes > 0) statusClass = '🟡';
+        else statusClass = '🔴';
+      } else {
+        statusClass = l.ativa ? '🟢' : '🔴';
+      }
+
+      var item = document.createElement('div');
+      item.className = 'licao';
+      var plat = D.plataformas[l.plataforma];
+      var fmt  = D.formatos[l.formato];
+      var ger  = D.geracoes[l.geracao];
+
+      var acts = '<div class="lacts">';
+      if (l.ativa) {
+        acts += '<button class="prim" onclick="window.initRevisar.reforcar(\'' + l.id + '\')">Relevante</button>';
+        acts += '<button onclick="window.initRevisar.arquivar(\'' + l.id + '\')">Arquivar</button>';
+        acts += '<button class="danger" onclick="window.initRevisar.excluir(\'' + l.id + '\')">Excluir</button>';
+      } else {
+        acts += '<button class="prim" onclick="window.initRevisar.reativar(\'' + l.id + '\')">Reativar</button>';
+        acts += '<button class="danger" onclick="window.initRevisar.excluir(\'' + l.id + '\')">Excluir</button>';
+      }
+      acts += '</div>';
+
+      item.innerHTML =
+        '<span class="lstatus">' + statusClass + '</span>' +
+        '<span class="ltext">' + esc(l.texto) + '</span>' +
+        '<span class="lmeta">' +
+          'força ' + (l.forca || 1).toFixed(1) +
+          (plat ? ' · ' + esc(plat.nome) : '') +
+          (fmt ? ' · ' + esc(fmt.nome) : '') +
+          ' · ' + (diasRestantes > 0 ? diasRestantes + 'd' : 'expirada') +
+        '</span>' +
+        acts;
+      licoesEl.appendChild(item);
+    });
+
+    var expiradas = licoes.filter(function(l) {
+      return !l.ativa && l.expiraEm && new Date(l.expiraEm) < new Date();
+    });
+    var arquivadas = licoes.filter(function(l) {
+      return !l.ativa && (!l.expiraEm || new Date(l.expiraEm) >= new Date());
+    });
+    statsEl.innerHTML =
+      '<span><b>' + ativas.length + '</b> ativas</span>' +
+      '<span><b>' + expiradas.length + '</b> expiradas</span>' +
+      '<span><b>' + arquivadas.length + '</b> arquivadas</span>';
+  }
+
+  function reforcar(id) { D.reforcarLicao(id); renderLicoes(); }
+  function arquivar(id) { D.arquivarLicao(id); renderLicoes(); }
+  function reativar(id) { D.reativarLicao(id); renderLicoes(); }
+  function excluir(id) { if (confirm('Excluir esta lição permanentemente?')) { D.excluirLicao(id); renderLicoes(); } }
+
+  window.initRevisar.reforcar = reforcar;
+  window.initRevisar.arquivar = arquivar;
+  window.initRevisar.reativar = reativar;
+  window.initRevisar.excluir  = excluir;
+
+  initFilters();
+  renderHistory();
+  renderLicoes();
+};
+</script>
+<script>if (typeof DADOS !== 'undefined' && DADOS.iniciar) { DADOS.iniciar().then(initRevisar); } else { console.error('DADOS não carregado'); document.getElementById('historyList').innerHTML = '<div class="err"><b>Erro ao carregar dados.</b><br>Verifique se dados/dados-loader.js foi carregado.</div>'; }</script>
+</body>
+</html>

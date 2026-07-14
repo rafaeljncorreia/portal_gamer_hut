@@ -1,0 +1,10 @@
+{
+  "id": "youtube-repost",
+  "nome": "YouTube Repost",
+  "plataforma": "youtube",
+  "tipoSaida": "copy",
+  "version": 1,
+  "ultimaRevisao": "",
+  "instrucoes": "",
+  "exemplos": ""
+}

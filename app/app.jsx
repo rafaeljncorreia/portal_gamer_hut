@@ -429,6 +429,13 @@ function GridDots(){
 
 /* ---- top bar ---- */
 function TopBar({ s, dims, tag, busy, isVideoPage, onExport, onExportAll, onExportVideo }){
+  const [navHover, setNavHover] = useState(null);
+  const navLinks = [
+    { label:'PORTAL', href:'index.html', id:'portal' },
+    { label:'CRIAR', href:'criar.html', id:'criar' },
+    { label:'STUDIO', href:'studio.html', id:'studio', active:true },
+    { label:'REVISAR', href:'revisar.html', id:'revisar' },
+  ];
   return (
     <header style={{ height:64, flex:'none', display:'flex', alignItems:'center', justifyContent:'space-between',
       padding:'0 22px', background:GH.panel, borderBottom:`1px solid ${GH.lineSoft}` }}>
@@ -441,6 +448,27 @@ function TopBar({ s, dims, tag, busy, isVideoPage, onExport, onExportAll, onExpo
           <div className="gh-mono" style={{ color:GH.mut, fontSize:10, letterSpacing:'.18em', marginTop:3 }}>AUTOMAÇÃO DE CRIATIVOS</div>
         </div>
       </div>
+      <nav style={{ display:'flex', alignItems:'center', gap:8 }}>
+        {navLinks.map(n => {
+          const isActive = n.active;
+          const isHov = navHover === n.id;
+          return (
+            <a key={n.id} href={n.href}
+              className="gh-mono"
+              style={{
+                fontSize:11, letterSpacing:'.08em', padding:'8px 13px',
+                borderRadius:8, border:'1px solid transparent', whiteSpace:'nowrap',
+                color:isActive ? GH.ink : isHov ? GH.white : GH.mut,
+                background:isActive ? GH.orange : 'transparent',
+                borderColor:isActive ? GH.orange : isHov ? GH.lineSoft : 'transparent',
+                fontWeight:isActive ? 700 : 400,
+                transition:'all .14s', textDecoration:'none',
+              }}
+              onMouseEnter={() => setNavHover(n.id)}
+              onMouseLeave={() => setNavHover(null)}>{n.label}</a>
+          );
+        })}
+      </nav>
       <div style={{ display:'flex', alignItems:'center', gap:12 }}>
         <span className="gh-mono" style={{ color:GH.mut, fontSize:11, letterSpacing:'.08em' }}>
           {dims.w}×{dims.h} · {dims.ratio}</span>

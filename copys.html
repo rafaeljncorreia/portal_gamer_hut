@@ -23,25 +23,6 @@
   .layout{ display:grid; grid-template-columns:1.02fr .98fr; gap:22px; align-items:start; }
   @media (max-width:860px){ .layout{ grid-template-columns:1fr; } }
 
-  .panel{ background:var(--panel); border:1px solid var(--lineSoft); border-radius:18px; padding:26px 26px 28px; }
-  .panel .ptitle{ font-family:'Press Start 2P',monospace; font-size:12px; color:var(--blue); margin:0 0 20px; }
-  .field{ margin-bottom:18px; }
-  .field label{ display:flex; align-items:center; justify-content:space-between; gap:10px;
-    font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.14em;
-    text-transform:uppercase; color:var(--mut); margin-bottom:9px; }
-  .field label .hint{ letter-spacing:.04em; color:var(--mut2); text-transform:none; }
-  .input, textarea.input{ width:100%; background:var(--bg); color:var(--white); border:1px solid var(--lineSoft);
-    border-radius:10px; padding:13px 15px; font-size:15px; font-family:'Space Grotesk',sans-serif; outline:none;
-    transition:border-color .14s; }
-  .input:focus, textarea.input:focus{ border-color:var(--orange); }
-  textarea.input{ resize:vertical; min-height:104px; line-height:1.5; }
-  .chips{ display:flex; gap:8px; flex-wrap:wrap; }
-  .chip{ cursor:pointer; font-family:'Space Mono',monospace; font-size:12px; font-weight:700; letter-spacing:.04em;
-    padding:9px 14px; border-radius:8px; background:var(--bg); color:var(--white); border:1px solid var(--lineSoft);
-    transition:all .13s; user-select:none; }
-  .chip:hover{ border-color:var(--mut); }
-  .chip.on{ background:var(--blue); color:#fff; border-color:var(--blue); }
-  .chip.cat.on{ background:var(--ac,var(--orange)); color:var(-- acink,#0B0B0A); border-color:var(--ac,var(--orange)); }
   .stepper{ display:inline-flex; align-items:center; gap:0; border:1px solid var(--lineSoft); border-radius:10px;
     overflow:hidden; background:var(--bg); }
   .stbtn{ cursor:pointer; width:42px; height:42px; border:none; background:transparent; color:var(--orange);
@@ -53,8 +34,6 @@
   .stval b{ font-family:'Press Start 2P',monospace; font-size:13px; color:var(--orange); margin-right:6px; }
   .stephint{ margin:9px 0 0; font-family:'Space Mono',monospace; font-size:11px; color:var(--mut); line-height:1.5; }
   .stephint b{ color:var(--white); }
-  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-  @media (max-width:480px){ .row2{ grid-template-columns:1fr; } }
 
   #gen[disabled]{ opacity:.55; cursor:wait; }
 
@@ -106,6 +85,9 @@
   .err{ background:rgba(226,59,46,.08); border:1px solid rgba(226,59,46,.4); border-left:3px solid #E23B2E;
     border-radius:12px; padding:15px 17px; font-family:'Space Mono',monospace; font-size:12px; line-height:1.6; color:#e7b4ad; }
   .err b{ color:#fff; }
+  .legacy-banner{ background:rgba(226,59,46,.1); border-bottom:1px solid rgba(226,59,46,.3); text-align:center;
+    padding:10px clamp(20px,5vw,56px); font-family:'Space Mono',monospace; font-size:11px; color:#e7b4ad; }
+  .legacy-banner a{ color:#fff; text-decoration:underline; }
 </style>
 </head>
 <body>
@@ -126,6 +108,10 @@
       <a href="review.html">REVIEW</a>
     </nav>
   </header>
+
+  <div class="legacy-banner">
+    <span>📢 Esta página é legada. Use a nova <a href="criar.html"><b>Criação de Conteúdo</b></a> — com wizard de plataforma, formato, geração e suporte a roteiros.</span>
+  </div>
 
   <main class="wrap">
     <div class="head">
@@ -206,7 +192,7 @@
     <img src="assets/logo-orange.png" alt="Gamer Hut"/>
     <div class="fr">
       <span class="a">MÍDIA FÍSICA NEVER DIES</span>
-      <span class="b">© 2025 GAMER HUT · PORTAL DE CRIAÇÃO</span>
+      <span class="b">© 2026 GAMER HUT · PORTAL DE CRIAÇÃO</span>
     </div>
   </footer>
 

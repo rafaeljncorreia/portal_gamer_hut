@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Criar · Portal Gamer Hut</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,800;0,900;1,900&family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="portal.css"/>
+<script src="brand-voice.js"></script>
+<script src="config.js"></script>
+<script src="dados/dados-loader.js"></script>
+<style>
+  .head{ display:flex; flex-direction:column; gap:18px; margin-bottom:36px; }
+  .head h1{ font-size:clamp(40px,7vw,84px); line-height:.9; margin:0; text-wrap:balance; }
+  .head p{ margin:0; max-width:64ch; color:#cfc9c1; font-size:clamp(15px,2vw,19px); line-height:1.6; }
+
+  .layout{ display:grid; grid-template-columns:1.02fr .98fr; gap:22px; align-items:start; }
+  @media (max-width:860px){ .layout{ grid-template-columns:1fr; } }
+
+  /* prompt preview */
+  #promptPreview{ resize:vertical; min-height:120px; font-size:13px; line-height:1.55;
+    color:#cfc9c1; font-family:'Space Mono',monospace; white-space:pre-wrap; }
+
+  #gen{ width:100%; justify-content:center; margin-top:4px; }
+  #gen[disabled]{ opacity:.55; cursor:wait; }
+
+  /* output */
+  .out{ display:flex; flex-direction:column; gap:14px; min-height:240px; }
+  .empty{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+    text-align:center; color:var(--mut); padding:40px 20px; }
+  .empty .ic{ width:52px; height:52px; border-radius:14px; border:1px solid var(--lineSoft); display:grid;
+    place-items:center; color:var(--orange); font-size:22px; }
+  .empty p{ margin:0; font-family:'Space Mono',monospace; font-size:12px; line-height:1.6; max-width:34ch; }
+
+  .skl{ height:14px; border-radius:6px; background:linear-gradient(90deg,#221e1b 0%,#2c2723 50%,#221e1b 100%);
+    background-size:200% 100%; animation:shimmer 1.5s linear infinite; }
+  @keyframes shimmer{ to{ background-position:-200% 0; } }
+
+  .card{ background:var(--bg); border:1px solid var(--lineSoft); border-radius:14px; padding:18px 18px 16px;
+    border-left:3px solid var(--ac,var(--orange)); animation:pop .28s ease both; }
+  @keyframes pop{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:none; } }
+  .card .ch{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+  .card .vlabel{ font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.12em;
+    color:var(--ac,var(--orange)); }
+  .card .cbtn{ cursor:pointer; font-family:'Space Mono',monospace; font-size:10px; font-weight:700;
+    letter-spacing:.08em; color:var(--mut); background:transparent; border:1px solid var(--lineSoft);
+    border-radius:7px; padding:6px 10px; transition:all .13s; }
+  .card .cbtn:hover{ color:#fff; border-color:var(--orange); }
+  .card .cbtn.done{ color:#0B0B0A; background:var(--green); border-color:var(--green); }
+  .card .ttl{ font-family:'Archivo',sans-serif; font-weight:900; letter-spacing:-.01em; font-size:21px;
+    line-height:1.04; color:#fff; margin:0 0 9px; text-wrap:balance; }
+  .card .body{ font-size:14.5px; line-height:1.62; color:#d7d1c9; margin:0 0 12px; white-space:pre-wrap; }
+  .card .cta{ font-family:'Space Mono',monospace; font-size:13px; font-weight:700; color:#fff; margin:0 0 11px; }
+  .card .cta::before{ content:'▸ '; color:var(--ac,var(--orange)); }
+  .card .tags{ display:flex; flex-wrap:wrap; gap:6px; }
+  .card .tag2{ font-family:'Space Mono',monospace; font-size:11px; color:var(--ac,var(--orange));
+    background:rgba(232,100,60,.08); border-radius:6px; padding:3px 8px; }
+  .card .rlabel{ display:block; font-family:'Space Mono',monospace; font-size:10px; font-weight:700;
+    letter-spacing:.12em; color:var(--ac,var(--orange)); margin:12px 0 8px; }
+  .card .cena{ padding:8px 0; border-top:1px solid rgba(244,241,236,.06); font-size:13px; line-height:1.5; color:#cfc9c1; }
+  .card .cena:first-of-type{ border-top:none; }
+  .card .cena .dur{ font-family:'Press Start 2P',monospace; font-size:9px; color:var(--ac,var(--orange)); }
+  .card .cena .vis{ font-weight:600; color:#fff; margin:3px 0; }
+
+  .card-actions{ display:flex; gap:8px; margin-top:14px; }
+  .card-actions button{ flex:1; font-family:'Space Mono',monospace; font-size:10px; font-weight:700;
+    letter-spacing:.06em; cursor:pointer; border-radius:7px; padding:7px 10px;
+    transition:all .13s; text-align:center; border:1px solid transparent; }
+  .btn-aprovar{ background:rgba(46,157,91,.12); color:#2E9D5B; border-color:rgba(46,157,91,.3); }
+  .btn-aprovar:hover{ background:rgba(46,157,91,.2); }
+  .btn-aprovar.done{ background:#2E9D5B; color:#0B0B0A; border-color:#2E9D5B; cursor:default; }
+  .btn-reprovar{ background:rgba(226,59,46,.12); color:#E23B2E; border-color:rgba(226,59,46,.3); }
+  .btn-reprovar:hover{ background:rgba(226,59,46,.2); }
+  .feedback-box{ display:none; margin-top:10px; flex-direction:column; gap:8px; }
+  .feedback-box.open{ display:flex; }
+  .feedback-box textarea{ background:var(--bg); border:1px solid var(--lineSoft); border-radius:8px;
+    padding:10px 12px; font-family:'Space Mono',monospace; font-size:12px; color:#cfc9c1;
+    resize:vertical; min-height:60px; width:100%; box-sizing:border-box; }
+  .feedback-box .fb-btn{ font-family:'Space Mono',monospace; font-size:10px; font-weight:700;
+    letter-spacing:.06em; cursor:pointer; background:var(--orange); color:#0B0B0A;
+    border:none; border-radius:7px; padding:8px 12px; align-self:flex-end; transition:filter .13s; }
+  .feedback-box .fb-btn:hover{ filter:brightness(1.08); }
+  .feedback-box .fb-btn:disabled{ opacity:.5; cursor:not-allowed; }
+  .feedback-msg{ font-family:'Space Mono',monospace; font-size:11px; margin-top:8px; text-align:center; padding:6px; border-radius:6px; }
+  .feedback-msg.ok{ color:#2E9D5B; background:rgba(46,157,91,.08); }
+  .feedback-msg.err{ color:#E23B2E; background:rgba(226,59,46,.08); }
+
+  .err{ background:rgba(226,59,46,.08); border:1px solid rgba(226,59,46,.4); border-left:3px solid #E23B2E;
+    border-radius:12px; padding:15px 17px; font-family:'Space Mono',monospace; font-size:12px; line-height:1.6; color:#e7b4ad; }
+  .err b{ color:#fff; }
+
+  .regens{ display:flex; gap:10px; margin-top:6px; }
+  .regens button{ flex:1; }
+</style>
+</head>
+<body>
+<div class="dots"></div>
+
+<header class="nav">
+  <a class="brand" href="index.html">
+    <img src="assets/logo-white.png" alt="Gamer Hut"/>
+    <span class="tag">
+      <span class="pixel t1" style="display:block;">CRIAR</span>
+      <span class="mono t2" style="display:block;">WIZARD DE CONTEÚDO</span>
+    </span>
+  </a>
+  <nav class="links">
+    <a href="index.html">PORTAL</a>
+    <a class="active" href="criar.html">CRIAR</a>
+    <a href="studio.html">STUDIO</a>
+    <a href="revisar.html">REVISAR</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <div class="head">
+    <span class="eyebrow">Criação com IA · Gamer Hut</span>
+    <h1 class="display">Wizard de Conteúdo</h1>
+    <p>Preencha o briefing, escolha plataforma, formato e geração — o prompt é montado automaticamente com o guia de marca e as lições aprendidas.</p>
+  </div>
+
+  <div class="layout">
+    <!-- wizard -->
+    <section class="panel">
+      <h2 class="ptitle">BRIEFING</h2>
+
+      <div class="field">
+        <label>Briefing <span class="hint">jogo, plataforma, preço…</span></label>
+        <textarea id="brief" class="input" placeholder="Ex: Review do Metal Gear Solid Δ em mídia física, lacrado, dublado em PT-BR, PS5. R$ 349 com brinde de pôster."></textarea>
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label>Plataforma</label>
+          <select id="platSelect" class="input"></select>
+        </div>
+        <div class="field">
+          <label>Geração</label>
+          <select id="gerSelect" class="input"></select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Formato</label>
+        <select id="fmtSelect" class="input" disabled><option value="">Selecione uma plataforma primeiro</option></select>
+      </div>
+
+      <div class="field">
+        <label>Tom de voz</label>
+        <div class="chips" id="tones">
+          <span class="chip on" data-v="Hype, empolgado, gíria gamer">HYPE</span>
+          <span class="chip" data-v="Informativo e claro, direto ao ponto">INFORMATIVO</span>
+          <span class="chip" data-v="Nostálgico, saudosista, retrô">NOSTÁLGICO</span>
+          <span class="chip" data-v="Engraçado, debochado, meme">ZUEIRO</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Categoria</label>
+        <div class="chips" id="cats"></div>
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label>Preço <span class="hint">opcional</span></label>
+          <input id="preco" class="input" placeholder="Ex: R$ 349,90"/>
+        </div>
+        <div class="field">
+          <label>Plataforma Console <span class="hint">opcional</span></label>
+          <input id="platConsole" class="input" placeholder="Ex: PS5, Switch"/>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Prompt montado <span class="hint">pré-visualização</span></label>
+        <textarea id="promptPreview" class="input" readonly></textarea>
+      </div>
+
+      <button id="gen" class="btn btn-primary">⚡ GERAR CONTEÚDO</button>
+    </section>
+
+    <!-- output -->
+    <section class="panel">
+      <h2 class="ptitle" style="color:var(--orange);">RESULTADO</h2>
+      <div class="out" id="out">
+        <div class="empty">
+          <span class="ic">✍</span>
+          <p>Preencha o wizard e clique em <b style="color:#fff;">GERAR CONTEÚDO</b>. As variações aparecem aqui.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="foot">
+  <img src="assets/logo-orange.png" alt="Gamer Hut"/>
+  <div class="fr">
+    <span class="a">MÍDIA FÍSICA NEVER DIES</span>
+    <span class="b">© 2026 GAMER HUT · PORTAL DE CRIAÇÃO</span>
+  </div>
+</footer>
+
+<script src="criar.js"></script>
+<script>if (typeof DADOS !== 'undefined' && DADOS.iniciar) { DADOS.iniciar().then(initCriar); } else { console.error('DADOS não carregado'); document.getElementById('out').innerHTML = '<div class="err"><b>Erro ao carregar dados.</b><br>Verifique se dados/dados-loader.js foi carregado.</div>'; }</script>
+</body>
+</html>
