@@ -360,7 +360,6 @@ window.initCriar = function() {
       var c = document.createElement('div');
       c.className = 'card';
       c.style.setProperty('--ac', activeCat.color);
-      c.style.setProperty('--acInk', activeCat.ink);
       c.innerHTML = '<div class="skl" style="width:55%;height:18px;margin-bottom:12px"></div>' +
         '<div class="skl" style="width:96%;margin-bottom:9px"></div>' +
         '<div class="skl" style="width:88%;margin-bottom:9px"></div>' +

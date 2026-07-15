@@ -471,7 +471,7 @@ function QuizBody({ s, tag }){
       {hasImg
         ? <><div style={{ position:'absolute', inset:0 }}><ImageOrSlot src={s.image} blur={s.imageBlur} zoom={s.imageZoom} x={s.imageX} y={s.imageY}/></div><FullScrim/></>
         : <PatternLayer kind={s.pattern} accent={fill?readableOn(tag.color):tag.color} base={base} opacity={s.patternOpacity}/>}
-      <div style={{ position:'absolute', inset:0, padding:'72px 70px 148px', display:'flex', flexDirection:'column' }}>
+      <div style={{ position:'absolute', inset:0, padding: tag.id ? '72px 70px 148px' : '28px 70px 148px', display:'flex', flexDirection:'column' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
           <Seal tag={tag}/>
         </div>
@@ -568,7 +568,7 @@ function RankingBody({ s, tag }){
       {hasImg
         ? <><div style={{ position:'absolute', inset:0 }}><ImageOrSlot src={s.image} blur={s.imageBlur} zoom={s.imageZoom} x={s.imageX} y={s.imageY}/></div><FullScrim/></>
         : <PatternLayer kind={s.pattern} accent={fill?readableOn(tag.color):tag.color} base={base} opacity={s.patternOpacity}/>}
-      <div style={{ position:'absolute', inset:0, padding:'72px 70px 148px', display:'flex', flexDirection:'column' }}>
+      <div style={{ position:'absolute', inset:0, padding: tag.id ? '72px 70px 148px' : '28px 70px 148px', display:'flex', flexDirection:'column' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
           <Seal tag={tag}/>
         </div>
@@ -629,7 +629,7 @@ function ArrivalsBody({ s, tag }){
   return (
     <div style={{ position:'absolute', inset:0, background:base, overflow:'hidden' }}>
       <PatternLayer kind={s.pattern} accent={fill?readableOn(tag.color):tag.color} base={base} opacity={s.patternOpacity}/>
-      <div style={{ position:'absolute', inset:0, padding:'72px 70px 148px', display:'flex', flexDirection:'column' }}>
+      <div style={{ position:'absolute', inset:0, padding: tag.id ? '72px 70px 148px' : '28px 70px 148px', display:'flex', flexDirection:'column' }}>
         <div style={{ flex:'none', display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
           <Seal tag={tag}/>
         </div>
