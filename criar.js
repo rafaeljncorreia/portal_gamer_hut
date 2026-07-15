@@ -13,6 +13,28 @@ window.initCriar = function() {
     { id:'quiz',       label:'QUIZ',       color:'#E8643C', ink:'#0B0B0A' },
   ];
 
+  // ---- mapping format → studio template ----
+
+  var FORMAT_TO_TEMPLATE = {
+    'carrossel': 'carousel',
+    'post':      'image',
+    'quiz':      'quiz',
+    'ranking':   'ranking'
+  };
+
+  var STUDIO_FIELDS = {
+    carousel: ['tagId','eyebrow','title','subtitle','badge','cta','footer','image','titleSize','fill','pattern','pageCount','current','pages'],
+    image:    ['tagId','eyebrow','title','subtitle','priceLabel','image','ink'],
+    quiz:     ['tagId','eyebrow','question','quizOptions','answer','quizMode','hideOptions'],
+    ranking:  ['tagId','eyebrow','title','rankCount','rankItems']
+  };
+
+  function getStudioTemplate() {
+    var fmt = DADOS.formatos[fmtSelect.value];
+    if (!fmt) return null;
+    return FORMAT_TO_TEMPLATE[fmt.id] || null;
+  }
+
   var brief       = document.getElementById('brief');
   var platSelect  = document.getElementById('platSelect');
   var fmtSelect   = document.getElementById('fmtSelect');
