@@ -69,9 +69,9 @@ function TagPicker({ value, onChange }){
       <button onClick={()=>onChange(null)} className="gh-mono" style={{
         cursor:'pointer', padding:'10px 12px', borderRadius:8, fontSize:12, fontWeight:700,
         letterSpacing:'.02em', marginBottom:8, width:'100%', textAlign:'center',
-        background: value===null ? '#5C5854' : GH.bg,
-        color: value===null ? '#F4F1EC' : GH.mut,
-        border:`1px solid ${value===null ? '#5C5854' : GH.lineSoft}` }}>
+        background: value===null ? GH.mut2 : GH.bg,
+        color: value===null ? GH.white : GH.mut,
+        border:`1px solid ${value===null ? GH.mut2 : GH.lineSoft}` }}>
         — SEM TAG
       </button>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>

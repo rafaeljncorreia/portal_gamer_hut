@@ -746,7 +746,7 @@ function drawVideoComposite(ctx, W, H, o){
   ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
 
   // top row — seal + counter
-  drawPill(ctx, PAD, 66, tag.label, tag.color, tag.ink);
+  if(tag.id) drawPill(ctx, PAD, 66, tag.label, tag.color, tag.ink);
   const counter = String(pageIndex+1).padStart(2,'0')+'/'+String(s.pageCount).padStart(2,'0');
   ctx.font = '28px "Press Start 2P"';
   const cw = ctx.measureText(counter).width + 32, ch = 56;

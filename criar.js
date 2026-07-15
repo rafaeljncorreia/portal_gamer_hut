@@ -2,7 +2,7 @@ window.initCriar = function() {
   'use strict';
   if (typeof DADOS === 'undefined' || !DADOS.pronto) { console.warn('initCriar: DADOS não disponível'); return; }
 
-  var TAGS = [
+  var TAGS = (window.TAGS || [
     { id:'noticias',   label:'NOTÍCIAS',   color:'#E3B53E', ink:'#0B0B0A' },
     { id:'pre-venda',  label:'PRÉ-VENDA',  color:'#E23B2E', ink:'#F4F1EC' },
     { id:'restoque',   label:'RESTOQUE',   color:'#2E9D5B', ink:'#0B0B0A' },
@@ -11,7 +11,7 @@ window.initCriar = function() {
     { id:'trailer',    label:'TRAILER',    color:'#7B3FE4', ink:'#F4F1EC' },
     { id:'review',     label:'REVIEW',     color:'#2BB1C4', ink:'#0B0B0A' },
     { id:'quiz',       label:'QUIZ',       color:'#E8643C', ink:'#0B0B0A' },
-  ];
+  ]).map(function(t){ return { id:t.id, label:t.label, color:t.color, ink:t.ink }; });
 
   // ---- mapping format → studio template ----
 
@@ -287,7 +287,7 @@ window.initCriar = function() {
       el.className = 'chip cat' + (i === 1 ? ' on' : '');
       el.textContent = t.label;
       el.style.setProperty('--ac', t.color);
-      el.style.setProperty('--acink', t.ink);
+      el.style.setProperty('--acInk', t.ink);
       el.onclick = function() {
         activeCat = t;
         var all = catsEl.children;
@@ -359,8 +359,8 @@ window.initCriar = function() {
     for (var i = 0; i < n; i++) {
       var c = document.createElement('div');
       c.className = 'card';
-    c.style.setProperty('--ac', activeCat.color);
-    c.style.setProperty('--acInk', activeCat.ink);
+      c.style.setProperty('--ac', activeCat.color);
+      c.style.setProperty('--acInk', activeCat.ink);
       c.innerHTML = '<div class="skl" style="width:55%;height:18px;margin-bottom:12px"></div>' +
         '<div class="skl" style="width:96%;margin-bottom:9px"></div>' +
         '<div class="skl" style="width:88%;margin-bottom:9px"></div>' +
@@ -496,6 +496,7 @@ window.initCriar = function() {
     var c = document.createElement('div');
     c.className = 'card';
     c.style.setProperty('--ac', activeCat.color);
+    c.style.setProperty('--acInk', activeCat.ink);
     c.innerHTML =
       '<div class="ch"><span class="vlabel">VARIAÇÃO 0' + (i + 1) + '</span>' +
       '<button class="cbtn">COPIAR</button></div>' +
