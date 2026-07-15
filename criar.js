@@ -35,6 +35,63 @@ window.initCriar = function() {
     return FORMAT_TO_TEMPLATE[fmt.id] || null;
   }
 
+  function getSchemaForTemplate(template) {
+    var schemas = {
+      carousel: 'Escreva 2 variações de carrossel do Instagram (capa + 3 páginas internas).\n' +
+        'Responda SOMENTE com JSON válido, sem texto fora dele, neste formato exato:\n' +
+        '{"variacoes":[{\n' +
+        '  "titulo":"título da CAPA, curto e forte",\n' +
+        '  "sobre_titulo":"eyebrow label",\n' +
+        '  "legenda":"legenda do feed 2-4 frases",\n' +
+        '  "cta":"chamada para ação curta",\n' +
+        '  "badge":"texto do badge (opcional)",\n' +
+        '  "rodape":"rodapé (opcional)",\n' +
+        '  "hashtags":["5 a 7 hashtags sem #, sem espaços"],\n' +
+        '  "paginas":[\n' +
+        '    {"titulo":"título da página 2","texto":"texto da página 2"},\n' +
+        '    {"titulo":"título da página 3","texto":"texto da página 3"},\n' +
+        '    {"titulo":"título da página 4","texto":"texto da página 4"}\n' +
+        '  ]\n' +
+        '}]}\n' +
+        'IMPORTANTE: o array "paginas" deve ter EXATAMENTE 3 itens (as páginas internas).',
+      image: 'Escreva 3 variações de post com imagem do Instagram.\n' +
+        'Responda SOMENTE com JSON válido, sem texto fora dele, neste formato exato:\n' +
+        '{"variacoes":[{\n' +
+        '  "titulo":"título principal",\n' +
+        '  "sobre_titulo":"eyebrow label",\n' +
+        '  "legenda":"texto de apoio 2-4 frases",\n' +
+        '  "preco":"etiqueta de preço (opcional)",\n' +
+        '  "cta":"chamada para ação curta",\n' +
+        '  "hashtags":["5 a 7 hashtags sem #, sem espaços"]\n' +
+        '}]}',
+      quiz: 'Escreva 3 variações de quiz do Instagram.\n' +
+        'Responda SOMENTE com JSON válido, sem texto fora dele, neste formato exato:\n' +
+        '{"variacoes":[{\n' +
+        '  "titulo":"pergunta do quiz",\n' +
+        '  "sobre_titulo":"eyebrow label",\n' +
+        '  "opcoes":["Opção A","Opção B","Opção C","Opção D"],\n' +
+        '  "resposta":0,\n' +
+        '  "cta":"chamada para ação",\n' +
+        '  "hashtags":["5 a 7 hashtags sem #, sem espaços"]\n' +
+        '}]}\n' +
+        'IMPORTANTE: "opcoes" deve ter 4 itens. "resposta" é o índice (0-3) da opção correta.',
+      ranking: 'Escreva 3 variações de ranking do Instagram.\n' +
+        'Responda SOMENTE com JSON válido, sem texto fora dele, neste formato exato:\n' +
+        '{"variacoes":[{\n' +
+        '  "titulo":"título do ranking",\n' +
+        '  "sobre_titulo":"eyebrow label",\n' +
+        '  "itens":[\n' +
+        '    {"nome":"Nome do jogo","tag":"tag curta"},\n' +
+        '    {"nome":"Nome do jogo","tag":"tag curta"}\n' +
+        '  ],\n' +
+        '  "cta":"chamada para ação",\n' +
+        '  "hashtags":["5 a 7 hashtags sem #, sem espaços"]\n' +
+        '}]}\n' +
+        'IMPORTANTE: "itens" deve ter no mínimo 5 itens.'
+    };
+    return schemas[template] || '';
+  }
+
   var brief       = document.getElementById('brief');
   var platSelect  = document.getElementById('platSelect');
   var fmtSelect   = document.getElementById('fmtSelect');
@@ -162,9 +219,18 @@ window.initCriar = function() {
     var base = DADOS.montarPrompt(getOpts());
     var fmt = DADOS.formatos[fmtSelect.value];
     var tipoSaida = (fmt && fmt.tipoSaida) || 'copy';
+    var template = getStudioTemplate();
 
     if (tipoSaida === 'roteiro') {
       return base + '\n\n---\nREGRAS:\n- Título curto e forte (máx ~8 palavras).\n- Cada cena com visual descritivo e narração direta.\n- Vídeo entre 30 e 90 segundos.\n- Descrição com 2-3 frases + hashtags.\n- Variações com ângulos diferentes.\n- Português do Brasil.';
+    }
+
+    if (template) {
+      var idx = base.indexOf('Responda SOMENTE com JSON válido');
+      if (idx > -1) base = base.substring(0, idx);
+      base += getSchemaForTemplate(template);
+      base += '\n\n---\nREGRAS:\n- Título curto e forte (máx ~6 palavras).\n- Legenda de 2 a 4 frases, calorosa e específica ao briefing.\n- CTA final simples, de preferência perguntando algo ("Já garantiu?", "Vai jogar?").\n- Emojis com moderação (0 a 3).\n- Variações com ângulos diferentes (ex.: nostálgica, comercial, hype).\n- Português do Brasil.';
+      return base;
     }
 
     return base + '\n\n---\nREGRAS:\n- Título curto e forte (máx ~6 palavras).\n- Legenda de 2 a 4 frases, calorosa e específica ao briefing.\n- CTA final simples, de preferência perguntando algo ("Já garantiu?", "Vai jogar?").\n- Emojis com moderação (0 a 3).\n- Variações com ângulos diferentes (ex.: nostálgica, comercial, hype).\n- Português do Brasil.';
