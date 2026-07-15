@@ -175,11 +175,20 @@ window.initCriar = function() {
       patch.titleSize  = 96;
     }
 
+    // Remove stale fields belonging to other templates
+    var currentFields = STUDIO_FIELDS[template] || [];
+    var otherFields = {};
+    Object.keys(STUDIO_FIELDS).forEach(function(t) {
+      if (t !== template) STUDIO_FIELDS[t].forEach(function(f) { otherFields[f] = true; });
+    });
+
     // Merge with existing state and redirect
     var existing = {};
     try { existing = JSON.parse(localStorage.getItem('gh-studio')) || {}; } catch(e) {}
     var merged = {};
-    Object.keys(existing).forEach(function(k) { merged[k] = existing[k]; });
+    Object.keys(existing).forEach(function(k) {
+      if (currentFields.indexOf(k) > -1 || !otherFields[k]) merged[k] = existing[k];
+    });
     Object.keys(patch).forEach(function(k) { merged[k] = patch[k]; });
     localStorage.setItem('gh-studio', JSON.stringify(merged));
     window.location.href = 'studio.html';
@@ -319,9 +328,12 @@ window.initCriar = function() {
     }
 
     if (template) {
-      var idx = base.indexOf('Responda SOMENTE com JSON válido');
-      if (idx > -1) base = base.substring(0, idx);
-      base += getSchemaForTemplate(template);
+      var schema = getSchemaForTemplate(template);
+      if (schema) {
+        var idx = base.indexOf('Responda SOMENTE com JSON válido');
+        if (idx > -1) base = base.substring(0, idx);
+        base += schema;
+      }
       base += '\n\n---\nREGRAS:\n- Título curto e forte (máx ~6 palavras).\n- Legenda de 2 a 4 frases, calorosa e específica ao briefing.\n- CTA final simples, de preferência perguntando algo ("Já garantiu?", "Vai jogar?").\n- Emojis com moderação (0 a 3).\n- Variações com ângulos diferentes (ex.: nostálgica, comercial, hype).\n- Português do Brasil.';
       return base;
     }
@@ -461,6 +473,19 @@ window.initCriar = function() {
     });
     var fullText = [v.titulo, '', v.legenda, '', v.cta, '', tags.join(' ')].filter(function(x) { return x !== undefined; }).join('\n').trim();
 
+    var hasStudio = !!getStudioTemplate();
+    var hasPages = Array.isArray(v.paginas) && v.paginas.length;
+    var pagesHTML = '';
+    if (hasPages) {
+      pagesHTML = '<div class="pagesblock"><span class="pblabel">ESTRUTURA · ' + (v.paginas.length + 1) + ' PÁGINAS</span>' +
+        '<div class="pgrow"><span class="pgn">CAPA</span><span class="pgt">' + esc(v.titulo) + '</span></div>' +
+        v.paginas.map(function(p, pi) {
+          return '<div class="pgrow"><span class="pgn">P' + (pi + 2) + '</span><span class="pgt">' +
+            '<b>' + esc(p.titulo || '') + '</b>' + (p.texto ? ' — ' + esc(p.texto) : '') + '</span></div>';
+        }).join('') +
+        '</div>';
+    }
+
     var c = document.createElement('div');
     c.className = 'card';
     c.style.setProperty('--ac', activeCat.color);
@@ -468,9 +493,11 @@ window.initCriar = function() {
       '<div class="ch"><span class="vlabel">VARIAÇÃO 0' + (i + 1) + '</span>' +
       '<button class="cbtn">COPIAR</button></div>' +
       (v.titulo ? '<h3 class="ttl">' + esc(v.titulo) + '</h3>' : '') +
+      pagesHTML +
       (v.legenda ? '<p class="body">' + esc(v.legenda) + '</p>' : '') +
       (v.cta ? '<p class="cta">' + esc(v.cta) + '</p>' : '') +
       (tags.length ? '<div class="tags">' + tags.map(function(t) { return '<span class="tag2">' + esc(t) + '</span>'; }).join('') + '</div>' : '') +
+      (hasStudio ? '<button class="artbtn">CRIAR ARTE →</button>' : '') +
       '<div class="card-actions">' +
       '<button class="btn-aprovar">✅ APROVAR</button>' +
       '<button class="btn-reprovar">❌ REPROVAR</button>' +
@@ -492,6 +519,10 @@ window.initCriar = function() {
         setTimeout(function() { cb.textContent = 'COPIAR'; }, 1800);
       });
     };
+
+    if (hasStudio) {
+      c.querySelector('.artbtn').onclick = function() { sendToStudio(v); };
+    }
 
     // approve / reject
     var localId = genAtualId;
