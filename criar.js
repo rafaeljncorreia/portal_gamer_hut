@@ -23,10 +23,10 @@ window.initCriar = function() {
   };
 
   var STUDIO_FIELDS = {
-    carousel: ['tagId','eyebrow','title','subtitle','badge','cta','footer','image','titleSize','fill','pattern','pageCount','current','pages'],
-    image:    ['tagId','eyebrow','title','subtitle','priceLabel','image','ink'],
-    quiz:     ['tagId','eyebrow','question','quizOptions','answer','quizMode','hideOptions'],
-    ranking:  ['tagId','eyebrow','title','rankCount','rankItems']
+    carousel: ['template','tagId','title','eyebrow','subtitle','cta','badge','footer','fill','pattern','titleSize','image','pages','pageCount','current'],
+    image:    ['template','tagId','title','eyebrow','subtitle','priceLabel','fill','pattern','titleSize','image'],
+    quiz:     ['template','tagId','question','eyebrow','quizOptions','answer','fill','ink','pattern','titleSize','quizMode','hideOptions'],
+    ranking:  ['template','tagId','title','eyebrow','rankItems','rankCount','fill','ink','pattern','titleSize']
   };
 
   function getStudioTemplate() {
@@ -190,7 +190,12 @@ window.initCriar = function() {
       if (currentFields.indexOf(k) > -1 || !otherFields[k]) merged[k] = existing[k];
     });
     Object.keys(patch).forEach(function(k) { merged[k] = patch[k]; });
-    localStorage.setItem('gh-studio', JSON.stringify(merged));
+    try {
+      localStorage.setItem('gh-studio', JSON.stringify(merged));
+    } catch(e) {
+      alert('Erro ao salvar dados para o Studio. Verifique o espaço disponível.');
+      return;
+    }
     window.location.href = 'studio.html';
   }
 
@@ -521,7 +526,12 @@ window.initCriar = function() {
     };
 
     if (hasStudio) {
-      c.querySelector('.artbtn').onclick = function() { sendToStudio(v); };
+      c.querySelector('.artbtn').onclick = function() {
+        var btn = this;
+        btn.textContent = '→ REDIRECIONANDO…';
+        btn.disabled = true;
+        sendToStudio(v);
+      };
     }
 
     // approve / reject

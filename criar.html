@@ -87,10 +87,11 @@
   .feedback-msg.ok{ color:#2E9D5B; background:rgba(46,157,91,.08); }
   .feedback-msg.err{ color:#E23B2E; background:rgba(226,59,46,.08); }
 
-  .artbtn{ margin-top:15px; width:100%; cursor:pointer; font-family:'Space Mono',monospace;
+  .card .artbtn{ margin-top:15px; width:100%; cursor:pointer; font-family:'Space Mono',monospace;
     font-size:12px; font-weight:700; letter-spacing:.06em; color:#0B0B0A; background:var(--ac,var(--orange));
     border:none; border-radius:9px; padding:11px 14px; transition:filter .13s, transform .12s; }
-  .artbtn:hover{ filter:brightness(1.08); transform:translateY(-1px); }
+  .card .artbtn:hover{ filter:brightness(1.08); transform:translateY(-1px); }
+  .card .artbtn:disabled{ opacity:.5; cursor:default; transform:none; }
   .pagesblock{ margin:0 0 13px; border:1px solid var(--lineSoft); border-radius:11px; padding:13px 14px; background:var(--bg); }
   .pagesblock .pblabel{ display:block; font-family:'Space Mono',monospace; font-size:10px; font-weight:700;
     letter-spacing:.12em; color:var(--ac,var(--orange)); margin-bottom:10px; }
