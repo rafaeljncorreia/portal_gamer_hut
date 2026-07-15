@@ -65,21 +65,31 @@ function TemplatePicker({ value, onChange }){
 /* tag chooser — drives the whole identity */
 function TagPicker({ value, onChange }){
   return (
-    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
-      {TAGS.map(t=>{
-        const on = value===t.id;
-        return (
-          <button key={t.id} onClick={()=>onChange(t.id)} className="gh-mono" style={{
-            cursor:'pointer', padding:'10px 12px', borderRadius:8, fontSize:12, fontWeight:700,
-            letterSpacing:'.02em', display:'flex', alignItems:'center', gap:9, transition:'all .12s',
-            background: on?t.color:GH.bg, color: on?t.ink:GH.white,
-            border:`1px solid ${on?t.color:GH.lineSoft}` }}>
-            <span style={{ width:11, height:11, borderRadius:'50%', flex:'none',
-              background:on?t.ink:t.color }}/>
-            {t.label}
-          </button>
-        );
-      })}
+    <div>
+      <button onClick={()=>onChange(null)} className="gh-mono" style={{
+        cursor:'pointer', padding:'10px 12px', borderRadius:8, fontSize:12, fontWeight:700,
+        letterSpacing:'.02em', marginBottom:8, width:'100%', textAlign:'center',
+        background: value===null ? '#5C5854' : GH.bg,
+        color: value===null ? '#F4F1EC' : GH.mut,
+        border:`1px solid ${value===null ? '#5C5854' : GH.lineSoft}` }}>
+        — SEM TAG
+      </button>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
+        {TAGS.map(t=>{
+          const on = value===t.id;
+          return (
+            <button key={t.id} onClick={()=>onChange(t.id)} className="gh-mono" style={{
+              cursor:'pointer', padding:'10px 12px', borderRadius:8, fontSize:12, fontWeight:700,
+              letterSpacing:'.02em', display:'flex', alignItems:'center', gap:9, transition:'all .12s',
+              background: on?t.color:GH.bg, color: on?t.ink:GH.white,
+              border:`1px solid ${on?t.color:GH.lineSoft}` }}>
+              <span style={{ width:11, height:11, borderRadius:'50%', flex:'none',
+                background:on?t.ink:t.color }}/>
+              {t.label}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

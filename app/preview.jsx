@@ -18,6 +18,7 @@ function Lockup({ color='white', h=58, style={} }){
 }
 
 function Seal({ tag, big=false }){
+  if (!tag.id) return null;
   return (
     <span className="gh-pixel" style={{
       display:'inline-flex', alignItems:'center', gap:big?14:10,
@@ -662,7 +663,7 @@ function stageDims(s, pageIndex=0){
 
 /* ---------- master stage ---------- */
 function PostStage({ s, pageIndex=0, stageRef, exporting=false }){
-  const tag = TAGS.find(t=>t.id===s.tagId) || TAGS[0];
+  const tag = TAGS.find(t=>t.id===s.tagId) || FALLBACK_TAG;
   const dims = stageDims(s, pageIndex);
   let body;
   if(s.template==='block')    body = <BlockBody s={s} tag={tag}/>;

@@ -359,7 +359,8 @@ window.initCriar = function() {
     for (var i = 0; i < n; i++) {
       var c = document.createElement('div');
       c.className = 'card';
-      c.style.setProperty('--ac', activeCat.color);
+    c.style.setProperty('--ac', activeCat.color);
+    c.style.setProperty('--acInk', activeCat.ink);
       c.innerHTML = '<div class="skl" style="width:55%;height:18px;margin-bottom:12px"></div>' +
         '<div class="skl" style="width:96%;margin-bottom:9px"></div>' +
         '<div class="skl" style="width:88%;margin-bottom:9px"></div>' +
@@ -498,7 +499,7 @@ window.initCriar = function() {
     c.innerHTML =
       '<div class="ch"><span class="vlabel">VARIAÇÃO 0' + (i + 1) + '</span>' +
       '<button class="cbtn">COPIAR</button></div>' +
-      (v.titulo ? '<h3 class="ttl">' + esc(v.titulo) + '</h3>' : '') +
+      (!hasPages && v.titulo ? '<h3 class="ttl">' + esc(v.titulo) + '</h3>' : '') +
       pagesHTML +
       (v.legenda ? '<p class="body">' + esc(v.legenda) + '</p>' : '') +
       (v.cta ? '<p class="cta">' + esc(v.cta) + '</p>' : '') +

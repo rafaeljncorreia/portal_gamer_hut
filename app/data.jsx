@@ -30,6 +30,8 @@ const TAGS = [
   { id:'quiz',       label:'QUIZ',       seal:'QUIZ',   color:'#E8643C', ink:'#0B0B0A' },
 ];
 
+const FALLBACK_TAG = { id:null, label:'', seal:'', color:'#5C5854', ink:'#F4F1EC' };
+
 /* The generation templates */
 const TEMPLATES = [
   { id:'carousel', label:'CARROSSEL',      ratio:'4:5', w:1080, h:1350, note:'3–5 páginas sequenciais' },
@@ -162,4 +164,4 @@ function resolveInk(mode, autoTextHex){
   return { text:autoTextHex, logo: autoTextHex==='#0B0B0A' ? 'black' : 'white' };
 }
 
-Object.assign(window, { GH, TAGS, TEMPLATES, PATTERNS, PATTERN_LABELS, patternStyle, hexA, readableOn, resolveInk });
+Object.assign(window, { GH, TAGS, FALLBACK_TAG, TEMPLATES, PATTERNS, PATTERN_LABELS, patternStyle, hexA, readableOn, resolveInk });

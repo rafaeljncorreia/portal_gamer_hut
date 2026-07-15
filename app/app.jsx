@@ -90,7 +90,7 @@ function App(){
   }catch(e){} }, [s]);
 
   const tpl = TEMPLATES.find(t=>t.id===s.template);
-  const tag = TAGS.find(t=>t.id===s.tagId) || TAGS[0];
+  const tag = TAGS.find(t=>t.id===s.tagId) || FALLBACK_TAG;
   const isCarousel = s.template==='carousel';
   const onCover = !isCarousel || s.current===0;
   const pageIdx = isCarousel ? s.current : 0;
@@ -220,7 +220,7 @@ function App(){
     setBusy(true);
     try{
       const url = await captureToDataUrl(s, pageIdx);
-      const tagName = tag.label.toLowerCase().replace(/[^a-z]/g,'');
+      const tagName = tag.id ? tag.label.toLowerCase().replace(/[^a-z]/g,'') : 'sem-tag';
       const suffix = isCarousel ? `-p${s.current+1}` : '';
       triggerDownload(url, `gamerhut-${s.template}-${tagName}${suffix}.png`);
       flashToast('PNG exportado · '+dims.w+'×'+dims.h);
@@ -249,7 +249,7 @@ function App(){
     if(!pg.video){ flashToast('Envie o trailer no card primeiro'); return; }
     if(typeof MediaRecorder==='undefined'){ flashToast('Navegador não suporta gravar vídeo'); return; }
     const W=1080, H=1350;
-    const vtag = TAGS.find(t=>t.id===s.tagId) || TAGS[0];
+    const vtag = TAGS.find(t=>t.id===s.tagId) || FALLBACK_TAG;
     const canvas = document.createElement('canvas'); canvas.width=W; canvas.height=H;
     const ctx = canvas.getContext('2d');
     const bgImg  = pg.image ? Object.assign(new Image(), { src:pg.image }) : null;
@@ -472,9 +472,12 @@ function TopBar({ s, dims, tag, busy, isVideoPage, onExport, onExportAll, onExpo
       <div style={{ display:'flex', alignItems:'center', gap:12 }}>
         <span className="gh-mono" style={{ color:GH.mut, fontSize:11, letterSpacing:'.08em' }}>
           {dims.w}×{dims.h} · {dims.ratio}</span>
-        <span className="gh-mono" style={{ display:'inline-flex', alignItems:'center', gap:7, color:tag.color,
-          fontSize:11, fontWeight:700, border:`1px solid ${tag.color}`, padding:'6px 11px', borderRadius:7 }}>
-          <span style={{ width:9, height:9, borderRadius:'50%', background:tag.color }}/>{tag.label}</span>
+        {!s.tagId
+          ? <span className="gh-mono" style={{ color:GH.mut, fontSize:11, border:`1px solid ${GH.lineSoft}`,
+              padding:'6px 11px', borderRadius:7 }}>— SEM TAG</span>
+          : <span className="gh-mono" style={{ display:'inline-flex', alignItems:'center', gap:7, color:tag.color,
+              fontSize:11, fontWeight:700, border:`1px solid ${tag.color}`, padding:'6px 11px', borderRadius:7 }}>
+              <span style={{ width:9, height:9, borderRadius:'50%', background:tag.color }}/>{tag.label}</span>}
         {isVideoPage
           ? <>
               <button onClick={onExport} disabled={busy} className="gh-mono" style={{ cursor:'pointer',
