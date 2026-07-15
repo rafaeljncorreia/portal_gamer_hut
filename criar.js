@@ -97,107 +97,12 @@ window.initCriar = function() {
   function sendToStudio(v) {
     var template = getStudioTemplate();
     if (!template) return;
-
-    function up(s) { return String(s || '').toUpperCase(); }
-
-    var patch = {};
-
-    if (template === 'carousel') {
-      var pages;
-      if (v.paginas && v.paginas.length) {
-        pages = v.paginas.map(function(p) {
-          return { title: up(p.titulo), body: p.texto || '', image: null };
-        });
-      } else {
-        pages = [
-          { title: up(v.titulo), body: v.legenda || '', image: null },
-          { title: '',           body: v.cta || '',      image: null },
-          { title: '',           body: '',               image: null }
-        ];
-      }
-      patch.template  = 'carousel';
-      patch.tagId     = activeCat.id;
-      patch.title     = up(v.titulo);
-      patch.eyebrow   = up(v.sobre_titulo);
-      patch.subtitle  = v.legenda || '';
-      patch.cta       = v.cta || '';
-      patch.badge     = up(v.badge);
-      patch.footer    = up(v.rodape);
-      patch.fill      = true;
-      patch.pattern   = '8bit';
-      patch.titleSize = 104;
-      patch.image     = null;
-      patch.pages     = pages;
-      patch.pageCount = pages.length + 1;
-      patch.current   = 0;
-    }
-
-    else if (template === 'image') {
-      patch.template  = 'image';
-      patch.tagId     = activeCat.id;
-      patch.title     = up(v.titulo);
-      patch.eyebrow   = up(v.sobre_titulo);
-      patch.subtitle  = v.legenda || '';
-      patch.priceLabel = v.preco || preco.value.trim() || '';
-      patch.fill      = false;
-      patch.ink       = 'auto';
-      patch.pattern   = 'solid';
-      patch.titleSize = 80;
-      patch.image     = null;
-    }
-
-    else if (template === 'quiz') {
-      patch.template   = 'quiz';
-      patch.tagId      = activeCat.id;
-      patch.question   = v.titulo || '';
-      patch.eyebrow    = up(v.sobre_titulo);
-      patch.quizOptions = (v.opcoes || []).slice(0, 4);
-      patch.answer     = (typeof v.resposta === 'number') ? v.resposta : -1;
-      patch.fill       = false;
-      patch.ink        = 'auto';
-      patch.pattern    = '8bit';
-      patch.titleSize  = 80;
-      patch.quizMode   = 'pergunta';
-      patch.hideOptions = false;
-    }
-
-    else if (template === 'ranking') {
-      patch.template   = 'ranking';
-      patch.tagId      = activeCat.id;
-      patch.title      = up(v.titulo);
-      patch.eyebrow    = up(v.sobre_titulo);
-      patch.rankItems  = (v.itens || []).map(function(item) {
-        return { name: up(item.nome), note: up(item.tag) };
-      });
-      patch.rankCount  = (v.itens || []).length;
-      patch.fill       = false;
-      patch.ink        = 'auto';
-      patch.pattern    = 'grid';
-      patch.titleSize  = 96;
-    }
-
-    // Remove stale fields belonging to other templates
-    var currentFields = STUDIO_FIELDS[template] || [];
-    var otherFields = {};
-    Object.keys(STUDIO_FIELDS).forEach(function(t) {
-      if (t !== template) STUDIO_FIELDS[t].forEach(function(f) { otherFields[f] = true; });
+    var patch = buildStudioPatch(v, template, {
+      tagId: activeCat.id,
+      price: preco.value.trim(),
+      plat: platConsole.value.trim()
     });
-
-    // Merge with existing state and redirect
-    var existing = {};
-    try { existing = JSON.parse(localStorage.getItem('gh-studio')) || {}; } catch(e) {}
-    var merged = {};
-    Object.keys(existing).forEach(function(k) {
-      if (currentFields.indexOf(k) > -1 || !otherFields[k]) merged[k] = existing[k];
-    });
-    Object.keys(patch).forEach(function(k) { merged[k] = patch[k]; });
-    try {
-      localStorage.setItem('gh-studio', JSON.stringify(merged));
-    } catch(e) {
-      alert('Erro ao salvar dados para o Studio. Verifique o espaço disponível.');
-      return;
-    }
-    window.location.href = 'studio.html';
+    mergeStudioState(patch, template);
   }
 
   var brief       = document.getElementById('brief');
@@ -347,96 +252,57 @@ window.initCriar = function() {
     return base + '\n\n---\nREGRAS:\n- Título curto e forte (máx ~6 palavras).\n- Legenda de 2 a 4 frases, calorosa e específica ao briefing.\n- CTA final simples, de preferência perguntando algo ("Já garantiu?", "Vai jogar?").\n- Emojis com moderação (0 a 3).\n- Variações com ângulos diferentes (ex.: nostálgica, comercial, hype).\n- Português do Brasil.';
   }
 
-  // ---- utilities (copied from copys.html) ----
+  // ---- approve / reject / feedback (shared by renderCopy and renderRoteiro) ----
 
-  function esc(s) { return String(s || '').replace(/[&<>]/g, function(m) { return { '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]; }); }
+  function setupFeedbackHandlers(card, v, i, localId, localOpts) {
+    var pVer = (DADOS.plataformas[localOpts.plataformaId] || {}).version || 1;
+    var fVer = (DADOS.formatos[localOpts.formatoId] || {}).version || 1;
+    var aprBtn = card.querySelector('.btn-aprovar');
+    var rejBtn = card.querySelector('.btn-reprovar');
+    var fbBox = card.querySelector('.feedback-box');
+    var fbText = fbBox.querySelector('textarea');
+    var fbBtn = fbBox.querySelector('.fb-btn');
+    var fbMsg = card.querySelector('.feedback-msg');
 
-  function skeleton(count) {
-    out.innerHTML = '';
-    var fmt = DADOS.formatos[fmtSelect.value];
-    var tipoSaida = (fmt && fmt.tipoSaida) || 'copy';
-    var n = count || (tipoSaida === 'roteiro' ? 2 : 3);
-    for (var i = 0; i < n; i++) {
-      var c = document.createElement('div');
-      c.className = 'card';
-      c.style.setProperty('--ac', activeCat.color);
-      c.innerHTML = '<div class="skl" style="width:55%;height:18px;margin-bottom:12px"></div>' +
-        '<div class="skl" style="width:96%;margin-bottom:9px"></div>' +
-        '<div class="skl" style="width:88%;margin-bottom:9px"></div>' +
-        '<div class="skl" style="width:70%;margin-bottom:14px"></div>' +
-        '<div class="skl" style="width:40%"></div>';
-      out.appendChild(c);
-    }
-  }
-
-  function copyText(text) {
-    if (navigator.clipboard && window.isSecureContext) {
-      return navigator.clipboard.writeText(text)['catch'](function() { return legacyCopy(text); });
-    }
-    return legacyCopy(text);
-  }
-
-  function legacyCopy(text) {
-    return new Promise(function(res, rej) {
-      try {
-        var ta = document.createElement('textarea');
-        ta.value = text;
-        ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none';
-        document.body.appendChild(ta);
-        ta.focus();
-        ta.select();
-        var ok = document.execCommand('copy');
-        document.body.removeChild(ta);
-        ok ? res() : rej();
-      } catch(e) { rej(e); }
-    });
-  }
-
-  function extractJSON(text) {
-    var src = text.replace(/```json|```/g, '');
-    try { return JSON.parse(src); } catch(e) {}
-    var m = src.match(/\{[\s\S]*\}/);
-    if (m) { try { return JSON.parse(m[0]); } catch(e) {} }
-    var ai = src.indexOf('variacoes');
-    var arrStart = ai >= 0 ? src.indexOf('[', ai) : src.indexOf('[');
-    if (arrStart < 0) return null;
-    var objs = [];
-    var i = arrStart + 1;
-    while (i < src.length) {
-      while (i < src.length && src[i] !== '{' && src[i] !== ']') i++;
-      if (i >= src.length || src[i] === ']') break;
-      var depth = 0, inStr = false, esc2 = false, start = i;
-      for (; i < src.length; i++) {
-        var ch = src[i];
-        if (inStr) { if (esc2) esc2 = false; else if (ch === '\\') esc2 = true; else if (ch === '"') inStr = false; continue; }
-        if (ch === '"') { inStr = true; continue; }
-        if (ch === '{') depth++;
-        else if (ch === '}') { depth--; if (depth === 0) { i++; break; } }
+    aprBtn.onclick = function() {
+      if (!localId) return;
+      var licao = prompt('Registrar lição com esta aprovação? (opcional)\n\nDeixe em branco para aprovar sem lição.');
+      var ok;
+      if (licao && licao.trim()) {
+        ok = DADOS.adicionarLicao(licao.trim(), localOpts.plataformaId, localOpts.formatoId, localOpts.geracaoId, localId, pVer, fVer);
+        if (ok) ok = DADOS.atualizarGeracao(localId, { status: 'aprovado-com-licao', variacaoEscolhida: i });
+      } else {
+        ok = DADOS.atualizarGeracao(localId, { status: 'aprovado', variacaoEscolhida: i });
       }
-      if (depth !== 0) break;
-      var frag = src.slice(start, i);
-      try { var o = JSON.parse(frag); if (o && (o.titulo || o.legenda || o.cenas)) objs.push(o); } catch(e) {}
-    }
-    return objs.length ? { variacoes: objs } : null;
-  }
+      if (!ok) { fbMsg.textContent = 'Erro ao salvar. Verifique o armazenamento.'; fbMsg.className = 'feedback-msg err'; return; }
+      aprBtn.textContent = '✅ APROVADO';
+      aprBtn.disabled = true;
+      rejBtn.style.display = 'none';
+    };
 
-  async function aiComplete(prompt) {
-    if (typeof window.claude !== 'undefined' && window.claude.complete) {
-      return await window.claude.complete(prompt);
-    }
-    var url = ((window.GH_CONFIG && window.GH_CONFIG.proxyUrl) || '').trim();
-    if (!url) {
-      throw new Error('Servidor de IA não configurado. Abra config.js e cole a URL do seu servidor em proxyUrl.');
-    }
-    var r = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: prompt })
-    });
-    var data;
-    try { data = await r.json(); } catch(e) { throw new Error('Resposta inválida do servidor de IA.'); }
-    if (!r.ok || (data && data.error)) throw new Error((data && data.error) || ('Erro ' + r.status + ' do servidor.'));
-    return (data && data.text) || '';
+    rejBtn.onclick = function() {
+      if (!localId) return;
+      aprBtn.style.display = 'none';
+      rejBtn.style.display = 'none';
+      fbBox.classList.add('open');
+    };
+
+    fbText.oninput = function() {
+      fbBtn.disabled = !fbText.value.trim();
+    };
+
+    fbBtn.onclick = function() {
+      var txt = fbText.value.trim();
+      if (!txt) return;
+      fbBtn.disabled = true;
+      fbBtn.textContent = 'Enviando…';
+      var ok = DADOS.adicionarLicao(txt, localOpts.plataformaId, localOpts.formatoId, localOpts.geracaoId, localId, pVer, fVer);
+      if (ok) ok = DADOS.atualizarGeracao(localId, { status: 'feedback', feedback: txt });
+      if (!ok) { fbMsg.textContent = 'Erro ao salvar feedback. Tente novamente.'; fbMsg.className = 'feedback-msg err'; fbBtn.disabled = false; fbBtn.textContent = 'Enviar Feedback'; return; }
+      fbBox.classList.remove('open');
+      fbMsg.textContent = '❌ Feedback enviado';
+      fbMsg.className = 'feedback-msg err';
+    };
   }
 
   // ---- render output ----
@@ -653,57 +519,9 @@ window.initCriar = function() {
       });
     };
 
-    // approve / reject
     var localId = genAtualId;
     var localOpts = getOpts();
-    var pVer = (DADOS.plataformas[localOpts.plataformaId] || {}).version || 1;
-    var fVer = (DADOS.formatos[localOpts.formatoId] || {}).version || 1;
-    var aprBtn = c.querySelector('.btn-aprovar');
-    var rejBtn = c.querySelector('.btn-reprovar');
-    var fbBox = c.querySelector('.feedback-box');
-    var fbText = fbBox.querySelector('textarea');
-    var fbBtn = fbBox.querySelector('.fb-btn');
-    var fbMsg = c.querySelector('.feedback-msg');
-
-    aprBtn.onclick = function() {
-      if (!localId) return;
-      var licao = prompt('Registrar lição com esta aprovação? (opcional)\n\nDeixe em branco para aprovar sem lição.');
-      var ok;
-      if (licao && licao.trim()) {
-        ok = DADOS.adicionarLicao(licao.trim(), localOpts.plataformaId, localOpts.formatoId, localOpts.geracaoId, localId, pVer, fVer);
-        if (ok) ok = DADOS.atualizarGeracao(localId, { status: 'aprovado-com-licao', variacaoEscolhida: i });
-      } else {
-        ok = DADOS.atualizarGeracao(localId, { status: 'aprovado', variacaoEscolhida: i });
-      }
-      if (!ok) { fbMsg.textContent = 'Erro ao salvar. Verifique o armazenamento.'; fbMsg.className = 'feedback-msg err'; return; }
-      aprBtn.textContent = '✅ APROVADO';
-      aprBtn.disabled = true;
-      rejBtn.style.display = 'none';
-    };
-
-    rejBtn.onclick = function() {
-      if (!localId) return;
-      aprBtn.style.display = 'none';
-      rejBtn.style.display = 'none';
-      fbBox.classList.add('open');
-    };
-
-    fbText.oninput = function() {
-      fbBtn.disabled = !fbText.value.trim();
-    };
-
-    fbBtn.onclick = function() {
-      var txt = fbText.value.trim();
-      if (!txt) return;
-      fbBtn.disabled = true;
-      fbBtn.textContent = 'Enviando…';
-      var ok = DADOS.adicionarLicao(txt, localOpts.plataformaId, localOpts.formatoId, localOpts.geracaoId, localId, pVer, fVer);
-      if (ok) ok = DADOS.atualizarGeracao(localId, { status: 'feedback', feedback: txt });
-      if (!ok) { fbMsg.textContent = 'Erro ao salvar feedback. Tente novamente.'; fbMsg.className = 'feedback-msg err'; fbBtn.disabled = false; fbBtn.textContent = 'Enviar Feedback'; return; }
-      fbBox.classList.remove('open');
-      fbMsg.textContent = '❌ Feedback enviado';
-      fbMsg.className = 'feedback-msg err';
-    };
+    setupFeedbackHandlers(c, v, i, localId, localOpts);
 
     out.appendChild(c);
   }
@@ -723,7 +541,9 @@ window.initCriar = function() {
 
     genBtn.disabled = true;
     genBtn.textContent = '⏳ GERANDO…';
-    skeleton();
+    var fmt2 = DADOS.formatos[fmtSelect.value];
+    var tipoSaida = (fmt2 && fmt2.tipoSaida) || 'copy';
+    skeleton(tipoSaida === 'roteiro' ? 2 : 3, activeCat.color);
 
     try {
       var text = await aiComplete(prompt);

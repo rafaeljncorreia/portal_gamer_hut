@@ -8,8 +8,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,800;0,900;1,900&family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="portal.css"/>
+<script src="lib/utils.js"></script>
 <script src="brand-voice.js"></script>
 <script src="config.js"></script>
+<script src="lib/utils.js"></script>
 <style>
   .head{ display:flex; flex-direction:column; gap:18px; margin-bottom:36px; }
   .head h1{ font-size:clamp(40px,7vw,84px); line-height:.9; margin:0; text-wrap:balance; }
@@ -255,84 +257,31 @@
 
   // ---- send a copy variation into the Creative Studio (preserves current work) ----
   function sendToStudio(v){
-    const titulo  = (v.titulo||'').trim().toUpperCase();
-    const legenda = (v.legenda||'').trim();
-    const cta     = (v.cta||'').trim();
-    const price   = document.getElementById('price').value.trim();
-    const plat    = document.getElementById('plat').value.trim();
-    let patch = { tagId: activeCat.id };
+    const cta = (v.cta||'').trim();
+    let eyebrow;
     if(activeModel==='block'){
-      patch = { ...patch, template:'block', fill:true, pattern:'solid', image:null,
-        eyebrow: (cta||activeCat.label).toUpperCase(), title: titulo, subtitle: legenda, titleSize:108 };
-    } else if(activeModel==='reels'){
-      patch = { ...patch, template:'reels', fill:true, pattern:'8bit', format:'stories', image:null,
-        eyebrow: activeCat.label, title: titulo, subtitle: cta||'assiste já', titleSize:110 };
-    } else if(activeModel==='carousel'){
-      const inner = Array.isArray(v.paginas) && v.paginas.length
-        ? v.paginas.map(p=>({ title:(p.titulo||'').toUpperCase(), body:(p.texto||''), image:null }))
-        : [ { title: titulo, body: legenda, image:null }, { title:'', body: cta||'', image:null } ];
-      patch = { ...patch, template:'carousel', fill:true, pattern:'8bit', current:0, image:null,
-        eyebrow: activeCat.label, title: titulo, subtitle: 'arrasta pro lado', cta:'ARRASTA PRO LADO',
-        titleSize:104, pageCount: inner.length + 1, pages: inner };
+      eyebrow = (cta||activeCat.label).toUpperCase();
     } else if(activeModel==='quiz'){
-      patch = { ...patch, template:'quiz', fill:false, ink:'auto', pattern:'8bit', quizMode:'pergunta',
-        image:null, eyebrow: 'RESPONDE AÍ', question: titulo, answer:-1, hideOptions:false, titleSize:80 };
-    } else if(activeModel==='ranking'){
-      patch = { ...patch, template:'ranking', fill:false, ink:'auto', pattern:'grid', image:null,
-        eyebrow: activeCat.label, title: titulo, titleSize:96 };
-    } else if(activeModel==='arrivals'){
-      patch = { ...patch, template:'arrivals', fill:false, ink:'auto', pattern:'8bit', image:null,
-        eyebrow: activeCat.label, title: titulo || 'NOVIDADES DA SEMANA', titleSize:84 };
-    } else if(activeModel==='thumb'){
-      patch = { ...patch, template:'thumb', fill:false, ink:'auto', pattern:'8bit', image:null,
-        eyebrow: activeCat.label, title: titulo, accentWord:'', subtitle:'',
-        badge:'EXCLUSIVO GAMER HUT', priceLabel:'', titleSize:140 };
-    } else { // image
-      patch = { ...patch, template:'image', fill:false, pattern:'solid', image:null,
-        eyebrow: activeCat.label, title: titulo, subtitle: legenda, priceLabel: price||plat||'', titleSize:80 };
+      eyebrow = 'RESPONDE AÍ';
+    } else {
+      eyebrow = activeCat.label;
     }
-    let cur={};
-    try{ cur = JSON.parse(localStorage.getItem('gh-studio')||'{}'); }catch(e){}
-    localStorage.setItem('gh-studio', JSON.stringify({ ...cur, ...patch }));
-    window.location.href = 'studio.html';
+    const patch = buildStudioPatch(v, activeModel, {
+      tagId: activeCat.id,
+      price: document.getElementById('price').value.trim(),
+      plat: document.getElementById('plat').value.trim(),
+      eyebrow: eyebrow
+    });
+    mergeStudioState(patch, activeModel);
   }
 
-  // clipboard with execCommand fallback (navigator.clipboard is blocked in some iframes)
-  function copyText(text){
-    if(navigator.clipboard && window.isSecureContext){
-      return navigator.clipboard.writeText(text).catch(()=>legacyCopy(text));
-    }
-    return legacyCopy(text);
-  }
-  function legacyCopy(text){
-    return new Promise((res,rej)=>{
-      try{
-        const ta=document.createElement('textarea'); ta.value=text;
-        ta.style.cssText='position:fixed;top:0;left:0;opacity:0;pointer-events:none';
-        document.body.appendChild(ta); ta.focus(); ta.select();
-        const ok=document.execCommand('copy'); document.body.removeChild(ta);
-        ok?res():rej();
-      }catch(e){ rej(e); }
-    });
-  }
 
   const out = document.getElementById('out');
   const btn = document.getElementById('gen');
 
-  function esc(s){ return String(s||'').replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
 
-  function skeleton(){
-    out.innerHTML='';
-    for(let i=0;i<3;i++){
-      const c=document.createElement('div'); c.className='copy'; c.style.setProperty('--ac',activeCat.color);
-      c.innerHTML='<div class="skl" style="width:55%;height:18px;margin-bottom:12px"></div>'+
-        '<div class="skl" style="width:96%;margin-bottom:9px"></div>'+
-        '<div class="skl" style="width:88%;margin-bottom:9px"></div>'+
-        '<div class="skl" style="width:70%;margin-bottom:14px"></div>'+
-        '<div class="skl" style="width:40%"></div>';
-      out.appendChild(c);
-    }
-  }
+
+
 
   function render(variacoes){
     out.innerHTML='';
@@ -371,59 +320,16 @@
     out.innerHTML='<div class="err"><b>Não consegui gerar agora.</b><br>'+esc(msg)+'</div>';
   }
 
-  function extractJSON(text){
-    const src = text.replace(/```json|```/g,'');
-    try{ return JSON.parse(src); }catch(e){}
-    let m = src.match(/\{[\s\S]*\}/);
-    if(m){ try{ return JSON.parse(m[0]); }catch(e){} }
-    // salvage a truncated response: walk the "variacoes" array and parse each complete {...}
-    const ai = src.indexOf('variacoes');
-    const arrStart = ai>=0 ? src.indexOf('[', ai) : src.indexOf('[');
-    if(arrStart<0) return null;
-    const objs=[]; let i=arrStart+1;
-    while(i < src.length){
-      // find next object opener
-      while(i<src.length && src[i]!=='{' && src[i]!==']') i++;
-      if(i>=src.length || src[i]===']') break;
-      // scan to matching close, string-aware
-      let depth=0, inStr=false, esc=false, start=i;
-      for(; i<src.length; i++){ const ch=src[i];
-        if(inStr){ if(esc)esc=false; else if(ch==='\\')esc=true; else if(ch==='"')inStr=false; continue; }
-        if(ch==='"'){ inStr=true; continue; }
-        if(ch==='{') depth++;
-        else if(ch==='}'){ depth--; if(depth===0){ i++; break; } }
-      }
-      if(depth!==0) break; // truncated mid-object → stop
-      const frag = src.slice(start, i);
-      try{ const o=JSON.parse(frag); if(o && (o.titulo||o.legenda)) objs.push(o); }catch(e){}
-    }
-    return objs.length ? { variacoes: objs } : null;
-  }
 
-  // AI completion: native connector inside the Portal, or the proxy server when published.
-  async function aiComplete(prompt){
-    if(typeof window.claude !== 'undefined' && window.claude.complete){
-      return await window.claude.complete(prompt);
-    }
-    const url = ((window.GH_CONFIG && window.GH_CONFIG.proxyUrl) || '').trim();
-    if(!url){
-      throw new Error('Servidor de IA não configurado. Abra config.js e cole a URL do seu servidor em proxyUrl (instruções em server/DEPLOY.md).');
-    }
-    const r = await fetch(url, {
-      method:'POST', headers:{ 'Content-Type':'application/json' },
-      body: JSON.stringify({ prompt })
-    });
-    let data; try{ data = await r.json(); }catch(e){ throw new Error('Resposta inválida do servidor de IA.'); }
-    if(!r.ok || (data && data.error)){ throw new Error((data && data.error) || ('Erro '+r.status+' do servidor.')); }
-    return (data && data.text) || '';
-  }
+
+
 
   async function generate(){
     const brief = document.getElementById('brief').value.trim();
     if(!brief){ document.getElementById('brief').focus(); return; }
     const plat = document.getElementById('plat').value.trim();
     const price = document.getElementById('price').value.trim();
-    btn.disabled=true; btn.textContent='⏳ GERANDO…'; skeleton();
+    btn.disabled=true; btn.textContent='⏳ GERANDO…'; skeleton(3, activeCat.color);
 
     const prompt =
 `${window.GH_BRAND || 'Você é o redator social da GAMER HUT, loja de jogos em mídia física.'}

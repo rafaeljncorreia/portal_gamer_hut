@@ -434,7 +434,7 @@ function LogoFooter({ dark=false, onImage=false, colorOverride=null }){
   const col = colorOverride || (onImage ? 'white' : (dark ? 'black' : 'white'));
   return (
     <div style={{ position:'absolute', left:0, right:0, bottom:54, display:'flex', justifyContent:'center' }}>
-      <Lockup color={col} h={46} style={{ opacity:onImage?.96:.92 }}/>
+      <Lockup color={col} h={46} style={{ opacity: onImage ? 0.96 : 0.92 }}/>
     </div>
   );
 }
