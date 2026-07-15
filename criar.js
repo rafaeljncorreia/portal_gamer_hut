@@ -24,7 +24,7 @@ window.initCriar = function() {
 
   var STUDIO_FIELDS = {
     carousel: ['template','tagId','title','eyebrow','subtitle','cta','badge','footer','fill','pattern','titleSize','image','pages','pageCount','current'],
-    image:    ['template','tagId','title','eyebrow','subtitle','priceLabel','fill','pattern','titleSize','image'],
+    image:    ['template','tagId','title','eyebrow','subtitle','priceLabel','fill','ink','pattern','titleSize','image'],
     quiz:     ['template','tagId','question','eyebrow','quizOptions','answer','fill','ink','pattern','titleSize','quizMode','hideOptions'],
     ranking:  ['template','tagId','title','eyebrow','rankItems','rankCount','fill','ink','pattern','titleSize']
   };
@@ -140,6 +140,7 @@ window.initCriar = function() {
       patch.subtitle  = v.legenda || '';
       patch.priceLabel = v.preco || preco.value.trim() || '';
       patch.fill      = false;
+      patch.ink       = 'auto';
       patch.pattern   = 'solid';
       patch.titleSize = 80;
       patch.image     = null;
