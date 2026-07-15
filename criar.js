@@ -92,6 +92,99 @@ window.initCriar = function() {
     return schemas[template] || '';
   }
 
+  // ---- send to Creative Studio ----
+
+  function sendToStudio(v) {
+    var template = getStudioTemplate();
+    if (!template) return;
+
+    function up(s) { return String(s || '').toUpperCase(); }
+
+    var patch = {};
+
+    if (template === 'carousel') {
+      var pages;
+      if (v.paginas && v.paginas.length) {
+        pages = v.paginas.map(function(p) {
+          return { title: up(p.titulo), body: p.texto || '', image: null };
+        });
+      } else {
+        pages = [
+          { title: up(v.titulo), body: v.legenda || '', image: null },
+          { title: '',           body: v.cta || '',      image: null },
+          { title: '',           body: '',               image: null }
+        ];
+      }
+      patch.template  = 'carousel';
+      patch.tagId     = activeCat.id;
+      patch.title     = up(v.titulo);
+      patch.eyebrow   = up(v.sobre_titulo);
+      patch.subtitle  = v.legenda || '';
+      patch.cta       = v.cta || '';
+      patch.badge     = up(v.badge);
+      patch.footer    = up(v.rodape);
+      patch.fill      = true;
+      patch.pattern   = '8bit';
+      patch.titleSize = 104;
+      patch.image     = null;
+      patch.pages     = pages;
+      patch.pageCount = pages.length + 1;
+      patch.current   = 0;
+    }
+
+    else if (template === 'image') {
+      patch.template  = 'image';
+      patch.tagId     = activeCat.id;
+      patch.title     = up(v.titulo);
+      patch.eyebrow   = up(v.sobre_titulo);
+      patch.subtitle  = v.legenda || '';
+      patch.priceLabel = v.preco || preco.value.trim() || '';
+      patch.fill      = false;
+      patch.pattern   = 'solid';
+      patch.titleSize = 80;
+      patch.image     = null;
+    }
+
+    else if (template === 'quiz') {
+      patch.template   = 'quiz';
+      patch.tagId      = activeCat.id;
+      patch.question   = v.titulo || '';
+      patch.eyebrow    = up(v.sobre_titulo);
+      patch.quizOptions = (v.opcoes || []).slice(0, 4);
+      patch.answer     = (typeof v.resposta === 'number') ? v.resposta : -1;
+      patch.fill       = false;
+      patch.ink        = 'auto';
+      patch.pattern    = '8bit';
+      patch.titleSize  = 80;
+      patch.quizMode   = 'pergunta';
+      patch.hideOptions = false;
+    }
+
+    else if (template === 'ranking') {
+      patch.template   = 'ranking';
+      patch.tagId      = activeCat.id;
+      patch.title      = up(v.titulo);
+      patch.eyebrow    = up(v.sobre_titulo);
+      patch.rankItems  = (v.itens || []).map(function(item) {
+        return { name: up(item.nome), note: up(item.tag) };
+      });
+      patch.rankCount  = (v.itens || []).length;
+      patch.fill       = false;
+      patch.ink        = 'auto';
+      patch.pattern    = 'grid';
+      patch.titleSize  = 96;
+    }
+
+    // Merge with existing state and redirect
+    var existing = {};
+    try { existing = JSON.parse(localStorage.getItem('gh-studio')) || {}; } catch(e) {}
+    var merged = {};
+    Object.keys(existing).forEach(function(k) { merged[k] = existing[k]; });
+    Object.keys(patch).forEach(function(k) { merged[k] = patch[k]; });
+    localStorage.setItem('gh-studio', JSON.stringify(merged));
+    window.location.href = 'studio.html';
+  }
+
   var brief       = document.getElementById('brief');
   var platSelect  = document.getElementById('platSelect');
   var fmtSelect   = document.getElementById('fmtSelect');
