@@ -110,6 +110,18 @@
 
   .regens{ display:flex; gap:10px; margin-top:6px; }
   .regens button{ flex:1; }
+
+  .stepper-wrap{ display:flex; align-items:center; gap:0; }
+  .stepper-wrap .step-btn{ width:40px; height:40px; border:1px solid var(--lineSoft); background:var(--bg);
+    color:#cfc9c1; font-size:20px; font-weight:700; cursor:pointer; transition:all .13s;
+    display:grid; place-items:center; user-select:none; }
+  .stepper-wrap .step-btn:first-child{ border-radius:9px 0 0 9px; }
+  .stepper-wrap .step-btn:last-child{ border-radius:0 9px 9px 0; }
+  .stepper-wrap .step-btn:hover{ background:var(--lineSoft); color:#fff; }
+  .stepper-wrap .step-btn:active{ background:var(--orange); color:#0B0B0A; }
+  .stepper-wrap #pagesDisplay{ width:48px; height:40px; display:grid; place-items:center;
+    font-family:'Space Mono',monospace; font-size:16px; font-weight:700; color:#fff;
+    border-top:1px solid var(--lineSoft); border-bottom:1px solid var(--lineSoft); background:var(--bg); }
 </style>
 </head>
 <body>
@@ -162,6 +174,15 @@
       <div class="field">
         <label>Formato</label>
         <select id="fmtSelect" class="input" disabled><option value="">Selecione uma plataforma primeiro</option></select>
+      </div>
+
+      <div class="field" id="pagesField" style="display:none">
+        <label>Páginas do carrossel</label>
+        <div class="stepper-wrap">
+          <button type="button" class="step-btn" onclick="stepPages(-1)">−</button>
+          <span id="pagesDisplay">4</span>
+          <button type="button" class="step-btn" onclick="stepPages(1)">+</button>
+        </div>
       </div>
 
       <div class="field">
@@ -221,6 +242,15 @@
 
 <script src="criar.js"></script>
 <script src="app/data.jsx"></script>
+<script>
+function stepPages(delta) {
+  var el = document.getElementById('pagesDisplay');
+  var val = parseInt(el.textContent, 10) + delta;
+  if (val < 3) val = 3;
+  if (val > 8) val = 8;
+  el.textContent = val;
+}
+</script>
 <script>if (typeof DADOS !== 'undefined' && DADOS.iniciar) { DADOS.iniciar().then(initCriar); } else { console.error('DADOS não carregado'); document.getElementById('out').innerHTML = '<div class="err"><b>Erro ao carregar dados.</b><br>Verifique se dados/dados-loader.js foi carregado.</div>'; }</script>
 </body>
 </html>

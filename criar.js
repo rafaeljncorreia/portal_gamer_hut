@@ -35,25 +35,30 @@ window.initCriar = function() {
     return FORMAT_TO_TEMPLATE[fmt.id] || null;
   }
 
-  function getSchemaForTemplate(template) {
+  function getSchemaForTemplate(template, pageCount) {
     var schemas = {
-      carousel: 'Escreva 2 variações de carrossel do Instagram (capa + 3 páginas internas).\n' +
-        'Responda SOMENTE com JSON válido, sem texto fora dele, neste formato exato:\n' +
-        '{"variacoes":[{\n' +
-        '  "titulo":"título da CAPA, curto e forte",\n' +
-        '  "sobre_titulo":"eyebrow label",\n' +
-        '  "legenda":"legenda do feed 2-4 frases",\n' +
-        '  "cta":"chamada para ação curta",\n' +
-        '  "badge":"texto do badge (opcional)",\n' +
-        '  "rodape":"rodapé (opcional)",\n' +
-        '  "hashtags":["5 a 7 hashtags sem #, sem espaços"],\n' +
-        '  "paginas":[\n' +
-        '    {"titulo":"título da página 2","texto":"texto da página 2"},\n' +
-        '    {"titulo":"título da página 3","texto":"texto da página 3"},\n' +
-        '    {"titulo":"título da página 4","texto":"texto da página 4"}\n' +
-        '  ]\n' +
-        '}]}\n' +
-        'IMPORTANTE: o array "paginas" deve ter EXATAMENTE 3 itens (as páginas internas).',
+      carousel: function() {
+        var inner = pageCount || 4;
+        var pages = [];
+        for (var i = 2; i <= inner; i++) {
+          pages.push('    {"titulo":"título da página ' + i + '","texto":"texto da página ' + i + '"}');
+        }
+        return 'Escreva 2 variações de carrossel do Instagram (capa + ' + (inner - 1) + ' páginas internas).\n' +
+          'Responda SOMENTE com JSON válido, sem texto fora dele, neste formato exato:\n' +
+          '{"variacoes":[{\n' +
+          '  "titulo":"título da CAPA, curto e forte",\n' +
+          '  "sobre_titulo":"eyebrow label",\n' +
+          '  "legenda":"legenda do feed 2-4 frases",\n' +
+          '  "cta":"chamada para ação curta",\n' +
+          '  "badge":"texto do badge (opcional)",\n' +
+          '  "rodape":"rodapé (opcional)",\n' +
+          '  "hashtags":["5 a 7 hashtags sem #, sem espaços"],\n' +
+          '  "paginas":[\n' +
+          pages.join(',\n') + '\n' +
+          '  ]\n' +
+          '}]}\n' +
+          'IMPORTANTE: o array "paginas" deve ter EXATAMENTE ' + (inner - 1) + ' itens (as páginas internas).';
+      },
       image: 'Escreva 3 variações de post com imagem do Instagram.\n' +
         'Responda SOMENTE com JSON válido, sem texto fora dele, neste formato exato:\n' +
         '{"variacoes":[{\n' +
@@ -89,7 +94,8 @@ window.initCriar = function() {
         '}]}\n' +
         'IMPORTANTE: "itens" deve ter no mínimo 5 itens.'
     };
-    return schemas[template] || '';
+    var s = schemas[template];
+    return typeof s === 'function' ? s() : (s || '');
   }
 
   // ---- send to Creative Studio ----
@@ -215,7 +221,8 @@ window.initCriar = function() {
       categoriaId: activeCat ? activeCat.id : '',
       brief: brief.value.trim(),
       preco: preco.value.trim(),
-      plataformaConsole: platConsole.value.trim()
+      plataformaConsole: platConsole.value.trim(),
+      pages: parseInt(document.getElementById('pagesDisplay').textContent, 10) || 4
     };
   }
 
@@ -239,7 +246,7 @@ window.initCriar = function() {
     }
 
     if (template) {
-      var schema = getSchemaForTemplate(template);
+      var schema = getSchemaForTemplate(template, opts.pages);
       if (schema) {
         var idx = base.indexOf('Responda SOMENTE com JSON válido');
         if (idx > -1) base = base.substring(0, idx);
@@ -590,7 +597,12 @@ window.initCriar = function() {
     if (platSelect.value) populateFormats(platSelect.value);
     updatePreview();
   };
-  fmtSelect.onchange = updatePreview;
+  fmtSelect.onchange = function() {
+    var fmt = DADOS.formatos[fmtSelect.value];
+    var isCarousel = fmt && fmt.id === 'carrossel';
+    document.getElementById('pagesField').style.display = isCarousel ? '' : 'none';
+    updatePreview();
+  };
   gerSelect.onchange = updatePreview;
   preco.oninput = updatePreview;
   platConsole.oninput = updatePreview;
