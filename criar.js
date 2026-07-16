@@ -48,68 +48,149 @@ window.initCriar = function() {
         var inner = pageCount || 4;
         var pages = [];
         for (var i = 2; i <= inner; i++) {
-          pages.push('    {"titulo":"título da página ' + i + '","texto":"texto da página ' + i + '"}');
+          pages.push('      {"title":"TÍTULO PÁG ' + i + ' (CAIXA ALTA)","body":"texto da página ' + i + '"}');
         }
         return 'Escreva 2 variações de carrossel do Instagram (capa + ' + (inner - 1) + ' páginas internas).\n' +
-          'Responda SOMENTE com JSON válido, sem texto fora dele, neste formato exato:\n' +
+          'PENSE NO DESIGN — escolha pattern, titleSize, fill, cores com intenção visual.\n' +
+          'Responda SOMENTE com JSON válido, neste formato exato:\n' +
           '{"variacoes":[{\n' +
-          '  "titulo":"título da CAPA, curto e forte",\n' +
-          '  "sobre_titulo":"eyebrow label",\n' +
-          '  "legenda":"legenda do feed 2-4 frases",\n' +
-          '  "cta":"chamada para ação curta",\n' +
-          '  "badge":"texto do badge (opcional)",\n' +
-          '  "rodape":"rodapé (opcional)",\n' +
-          '  "hashtags":["5 a 7 hashtags sem #, sem espaços"],\n' +
-          '  "paginas":[\n' +
+          '  "studio":{\n' +
+          '    "title":"TÍTULO DA CAPA (CAIXA ALTA, curto e forte)",\n' +
+          '    "eyebrow":"EYEBROW LABEL (CAIXA ALTA)",\n' +
+          '    "subtitle":"legenda do feed 2-4 frases",\n' +
+          '    "cta":"CHAMADA PARA AÇÃO (CAIXA ALTA)",\n' +
+          '    "badge":"BADGE OPCIONAL (CAIXA ALTA, máx 3 palavras)",\n' +
+          '    "footer":"RODAPÉ OPCIONAL (CAIXA ALTA)",\n' +
+          '    "fill":true,\n' +
+          '    "pattern":"8bit",\n' +
+          '    "titleSize":104,\n' +
+          '    "pages":[\n' +
           pages.join(',\n') + '\n' +
-          '  ]\n' +
+          '    ]\n' +
+          '  },\n' +
+          '  "descricao":{\n' +
+          '    "titulo":"título da capa (normal, sem caixa alta)",\n' +
+          '    "legenda":"legenda do feed — 2 a 4 frases, calorosa e específica",\n' +
+          '    "cta":"chamada final pro engajamento",\n' +
+          '    "hashtags":["5 a 7 hashtags sem #, sem espaços"]\n' +
+          '  }\n' +
           '}]}\n' +
-          'IMPORTANTE: o array "paginas" deve ter EXATAMENTE ' + (inner - 1) + ' itens (as páginas internas).';
+          'IMPORTANTE: studio.pages deve ter EXATAMENTE ' + (inner - 1) + ' itens.';
       },
       image: 'Escreva 3 variações de post com imagem do Instagram.\n' +
-        'Responda SOMENTE com JSON válido, sem texto fora dele, neste formato exato:\n' +
+        'PENSE NO DESIGN — escolha pattern (solid/8bit/grid), titleSize, fill, ink com intenção visual.\n' +
+        'Responda SOMENTE com JSON válido, neste formato exato:\n' +
         '{"variacoes":[{\n' +
-        '  "titulo":"título principal",\n' +
-        '  "sobre_titulo":"eyebrow label",\n' +
-        '  "legenda":"texto de apoio 2-4 frases",\n' +
-        '  "preco":"etiqueta de preço (opcional)",\n' +
-        '  "cta":"chamada para ação curta",\n' +
-        '  "hashtags":["5 a 7 hashtags sem #, sem espaços"]\n' +
+        '  "studio":{\n' +
+        '    "title":"TÍTULO PRINCIPAL (CAIXA ALTA)",\n' +
+        '    "eyebrow":"EYEBROW LABEL (CAIXA ALTA)",\n' +
+        '    "subtitle":"texto de apoio 2-4 frases",\n' +
+        '    "priceLabel":"ETIQUETA DE PREÇO OPCIONAL",\n' +
+        '    "cta":"CALLL TO ACTION (CAIXA ALTA)",\n' +
+        '    "fill":false,\n' +
+        '    "pattern":"solid",\n' +
+        '    "titleSize":80,\n' +
+        '    "ink":"auto"\n' +
+        '  },\n' +
+        '  "descricao":{\n' +
+        '    "titulo":"título principal (normal, sem caixa alta)",\n' +
+        '    "legenda":"texto de apoio 2-4 frases",\n' +
+        '    "cta":"chamada final",\n' +
+        '    "hashtags":["5 a 7 hashtags sem #, sem espaços"]\n' +
+        '  }\n' +
         '}]}',
       quiz: 'Escreva 3 variações de quiz do Instagram.\n' +
-        'Responda SOMENTE com JSON válido, sem texto fora dele, neste formato exato:\n' +
+        'PENSE NO DESIGN — escolha pattern, titleSize, fill com intenção visual.\n' +
+        'Responda SOMENTE com JSON válido, neste formato exato:\n' +
         '{"variacoes":[{\n' +
-        '  "titulo":"pergunta do quiz",\n' +
-        '  "sobre_titulo":"eyebrow label",\n' +
-        '  "opcoes":["Opção A","Opção B","Opção C","Opção D"],\n' +
-        '  "resposta":0,\n' +
-        '  "cta":"chamada para ação",\n' +
-        '  "hashtags":["5 a 7 hashtags sem #, sem espaços"]\n' +
+        '  "studio":{\n' +
+        '    "question":"PERGUNTA DO QUIZ (CAIXA ALTA)",\n' +
+        '    "eyebrow":"EYEBROW LABEL (CAIXA ALTA)",\n' +
+        '    "quizOptions":["OPÇÃO A","OPÇÃO B","OPÇÃO C","OPÇÃO D"],\n' +
+        '    "answer":0,\n' +
+        '    "fill":false,\n' +
+        '    "pattern":"8bit",\n' +
+        '    "titleSize":80,\n' +
+        '    "ink":"auto",\n' +
+        '    "quizMode":"pergunta",\n' +
+        '    "hideOptions":false\n' +
+        '  },\n' +
+        '  "descricao":{\n' +
+        '    "titulo":"pergunta do quiz (normal)",\n' +
+        '    "legenda":"contexto da pergunta",\n' +
+        '    "cta":"PARTICIPE!",\n' +
+        '    "hashtags":["5 a 7 hashtags sem #, sem espaços"]\n' +
+        '  }\n' +
         '}]}\n' +
-        'IMPORTANTE: "opcoes" deve ter 4 itens. "resposta" é o índice (0-3) da opção correta.',
+        'IMPORTANTE: quizOptions deve ter 4 itens. answer é o índice (0-3) da opção correta.',
       thumb: 'Escreva 3 variações de REPOST para YouTube Shorts / Comunidade.\n' +
         'O conteúdo é um repost de um vídeo já existente, NÃO conteúdo original.\n' +
-        'Responda SOMENTE com JSON válido, sem texto fora dele, neste formato exato:\n' +
+        'PENSE NO DESIGN — thumb 16:9, titleSize grande (140), pattern 8bit, destaque visual forte.\n' +
+        'Responda SOMENTE com JSON válido, neste formato exato:\n' +
         '{"variacoes":[{\n' +
-        '  "titulo":"título chamativo para a thumb (máx 6 palavras)",\n' +
-        '  "sobre_titulo":"eyebrow tipo REVIEW / GAMEPLAY / UNBOXING",\n' +
-        '  "legenda":"resumo do vídeo em 1-2 frases",\n' +
-        '  "cta":"chamada para assistir o vídeo original",\n' +
-        '  "hashtags":["5 a 7 hashtags sem #, sem espaços"]\n' +
+        '  "studio":{\n' +
+        '    "title":"TÍTULO DA THUMB (CAIXA ALTA, máx 6 palavras)",\n' +
+        '    "eyebrow":"EYEBROW — REVIEW / GAMEPLAY (CAIXA ALTA)",\n' +
+        '    "subtitle":"texto secundário de apoio",\n' +
+        '    "accentWord":"PALAVRA DESTAQUE OPCIONAL (CAIXA ALTA)",\n' +
+        '    "badge":"BADGE OPCIONAL (CAIXA ALTA)",\n' +
+        '    "priceLabel":"PLATAFORMA / CONSOLE OPCIONAL",\n' +
+        '    "fill":false,\n' +
+        '    "pattern":"8bit",\n' +
+        '    "titleSize":140,\n' +
+        '    "ink":"auto"\n' +
+        '  },\n' +
+        '  "descricao":{\n' +
+        '    "titulo":"título para descrição do post (normal)",\n' +
+        '    "legenda":"descrição do vídeo — 1 a 3 frases",\n' +
+        '    "cta":"ASSISTA AO VÍDEO COMPLETO",\n' +
+        '    "hashtags":["5 a 7 hashtags sem #, sem espaços"]\n' +
+        '  }\n' +
         '}]}',
       ranking: 'Escreva 3 variações de ranking do Instagram.\n' +
-        'Responda SOMENTE com JSON válido, sem texto fora dele, neste formato exato:\n' +
+        'PENSE NO DESIGN — pattern grid, titleSize 96, fill com intenção.\n' +
+        'Responda SOMENTE com JSON válido, neste formato exato:\n' +
         '{"variacoes":[{\n' +
-        '  "titulo":"título do ranking",\n' +
-        '  "sobre_titulo":"eyebrow label",\n' +
-        '  "itens":[\n' +
-        '    {"nome":"Nome do jogo","tag":"tag curta"},\n' +
-        '    {"nome":"Nome do jogo","tag":"tag curta"}\n' +
-        '  ],\n' +
-        '  "cta":"chamada para ação",\n' +
-        '  "hashtags":["5 a 7 hashtags sem #, sem espaços"]\n' +
+        '  "studio":{\n' +
+        '    "title":"TÍTULO DO RANKING (CAIXA ALTA)",\n' +
+        '    "eyebrow":"EYEBROW LABEL (CAIXA ALTA)",\n' +
+        '    "rankItems":[\n' +
+        '      {"name":"NOME DO JOGO","note":"TAG CURTA"},\n' +
+        '      {"name":"NOME DO JOGO","note":"TAG CURTA"}\n' +
+        '    ],\n' +
+        '    "rankCount":5,\n' +
+        '    "fill":false,\n' +
+        '    "pattern":"grid",\n' +
+        '    "titleSize":96,\n' +
+        '    "ink":"auto"\n' +
+        '  },\n' +
+        '  "descricao":{\n' +
+        '    "titulo":"título do ranking (normal)",\n' +
+        '    "legenda":"descrição do ranking",\n' +
+        '    "cta":"chamada para ação",\n' +
+        '    "hashtags":["5 a 7 hashtags sem #, sem espaços"]\n' +
+        '  }\n' +
         '}]}\n' +
-        'IMPORTANTE: "itens" deve ter no mínimo 5 itens.'
+        'IMPORTANTE: rankItems deve ter no mínimo 5 itens.',
+      reels: 'Escreva 3 variações de capa de Reels / TikTok.\n' +
+        'PENSE NO DESIGN — formato 9:16, pattern 8bit, fill=true, destaque visual.\n' +
+        'Responda SOMENTE com JSON válido, neste formato exato:\n' +
+        '{"variacoes":[{\n' +
+        '  "studio":{\n' +
+        '    "title":"TÍTULO DA CAPA (CAIXA ALTA)",\n' +
+        '    "eyebrow":"EYEBROW LABEL (CAIXA ALTA)",\n' +
+        '    "subtitle":"CTA / texto secundário",\n' +
+        '    "fill":true,\n' +
+        '    "pattern":"8bit",\n' +
+        '    "format":"stories",\n' +
+        '    "titleSize":110\n' +
+        '  },\n' +
+        '  "descricao":{\n' +
+        '    "titulo":"título para descrição (normal)",\n' +
+        '    "legenda":"descrição do vídeo curto",\n' +
+        '    "hashtags":["5 a 7 hashtags sem #, sem espaços"]\n' +
+        '  }\n' +
+        '}]}'
     };
     var s = schemas[template];
     return typeof s === 'function' ? s() : (s || '');
@@ -252,13 +333,78 @@ window.initCriar = function() {
 
   // ---- build full prompt with quality rules ----
 
+  function getRoteiroStudioSchema(tpl) {
+    var schemas = {
+      thumb: 'Cada variação deve incluir UM OBJETO "studio" com os campos visuais para thumb, UM OBJETO "descricao" com o texto do post e UM OBJETO "roteiro" com as cenas.\n' +
+        'PENSE NO DESIGN — thumb 16:9, titleSize grande (140), pattern 8bit, destaque visual forte.\n' +
+        'Formato JSON exato:\n' +
+        '{"variacoes":[{\n' +
+        '  "studio":{\n' +
+        '    "title":"TÍTULO DA THUMB (CAIXA ALTA, máx 6 palavras)",\n' +
+        '    "eyebrow":"EYEBROW — REVIEW / GAMEPLAY (CAIXA ALTA)",\n' +
+        '    "subtitle":"texto secundário de apoio",\n' +
+        '    "accentWord":"PALAVRA DESTAQUE OPCIONAL (CAIXA ALTA)",\n' +
+        '    "badge":"BADGE OPCIONAL (CAIXA ALTA)",\n' +
+        '    "priceLabel":"PLATAFORMA / CONSOLE OPCIONAL",\n' +
+        '    "fill":false,\n' +
+        '    "pattern":"8bit",\n' +
+        '    "titleSize":140,\n' +
+        '    "ink":"auto"\n' +
+        '  },\n' +
+        '  "descricao":{\n' +
+        '    "titulo":"título do post (normal)",\n' +
+        '    "legenda":"descrição do vídeo — 1 a 3 frases",\n' +
+        '    "hashtags":["5 a 7 hashtags sem #, sem espaços"]\n' +
+        '  },\n' +
+        '  "roteiro":{\n' +
+        '    "cenas":[\n' +
+        '      {"duracao":"0:00-0:05","visual":"descrição visual","narracao":"texto falado"}\n' +
+        '    ]\n' +
+        '  }\n' +
+        '}]}\n' +
+        'IMPORTANTE: o array cenas dentro de roteiro deve conter todas as cenas do roteiro (mínimo 3, máximo 8).',
+      reels: 'Cada variação deve incluir UM OBJETO "studio" com os campos visuais para capa de Reels, UM OBJETO "descricao" com o texto do post e UM OBJETO "roteiro" com as cenas.\n' +
+        'PENSE NO DESIGN — formato 9:16, pattern 8bit, fill=true, destaque visual.\n' +
+        'Formato JSON exato:\n' +
+        '{"variacoes":[{\n' +
+        '  "studio":{\n' +
+        '    "title":"TÍTULO DA CAPA (CAIXA ALTA)",\n' +
+        '    "eyebrow":"EYEBROW (CAIXA ALTA)",\n' +
+        '    "subtitle":"CTA / texto secundário",\n' +
+        '    "fill":true,\n' +
+        '    "pattern":"8bit",\n' +
+        '    "format":"stories",\n' +
+        '    "titleSize":110\n' +
+        '  },\n' +
+        '  "descricao":{\n' +
+        '    "titulo":"título do post (normal)",\n' +
+        '    "legenda":"descrição do vídeo curto — 1 a 2 frases",\n' +
+        '    "hashtags":["5 a 7 hashtags sem #, sem espaços"]\n' +
+        '  },\n' +
+        '  "roteiro":{\n' +
+        '    "cenas":[\n' +
+        '      {"duracao":"0:00-0:05","visual":"descrição visual","narracao":"texto falado"}\n' +
+        '    ]\n' +
+        '  }\n' +
+        '}]}\n' +
+        'IMPORTANTE: o array cenas deve ter mínimo 2, máximo 5 cenas (vídeo curto).'
+    };
+    return schemas[tpl] || '';
+  }
+
   function buildFullPrompt() {
-    var base = DADOS.montarPrompt(getOpts());
+    var opts = getOpts();
+    var base = DADOS.montarPrompt(opts);
     var fmt = DADOS.formatos[fmtSelect.value];
     var tipoSaida = (fmt && fmt.tipoSaida) || 'copy';
     var template = getStudioTemplate();
 
     if (tipoSaida === 'roteiro') {
+      if (template) {
+        var idx2 = base.indexOf('Responda SOMENTE com JSON válido');
+        if (idx2 > -1) base = base.substring(0, idx2);
+        base += getRoteiroStudioSchema(template);
+      }
       return base + '\n\n---\nREGRAS:\n- Título curto e forte (máx ~8 palavras).\n- Cada cena com visual descritivo e narração direta.\n- Vídeo entre 30 e 90 segundos.\n- Descrição com 2-3 frases + hashtags.\n- Variações com ângulos diferentes.\n- Português do Brasil.';
     }
 
@@ -368,18 +514,23 @@ window.initCriar = function() {
   }
 
   function renderCopy(v, i) {
-    var tags = (v.hashtags || []).map(function(h) {
+    var d = v.descricao || v;
+    var tags = (d.hashtags || []).map(function(h) {
       return '#' + String(h).replace(/^#/, '').replace(/\s+/g, '');
     });
-    var descFull = [v.titulo, v.legenda, v.cta, tags.join(' ')].filter(function(x) { return x; }).join('\n\n').trim();
+    var titulo = d.titulo || v.titulo || '';
+    var legenda = d.legenda || v.legenda || '';
+    var cta = d.cta || v.cta || '';
+    var paginas = d.paginas || (v.studio && v.studio.pages) || v.paginas || null;
+    var descFull = [titulo, legenda, cta, tags.join(' ')].filter(function(x) { return x; }).join('\n\n').trim();
 
     var hasStudio = !!getStudioTemplate();
-    var hasPages = Array.isArray(v.paginas) && v.paginas.length;
+    var hasPages = Array.isArray(paginas) && paginas.length;
     var pagesHTML = '';
     if (hasPages) {
-      pagesHTML = '<div class="pagesblock"><span class="pblabel">ESTRUTURA · ' + (v.paginas.length + 1) + ' PÁGINAS</span>' +
-        '<div class="pgrow"><span class="pgn">CAPA</span><span class="pgt">' + esc(v.titulo) + '</span></div>' +
-        v.paginas.map(function(p, pi) {
+      pagesHTML = '<div class="pagesblock"><span class="pblabel">ESTRUTURA · ' + (paginas.length + 1) + ' PÁGINAS</span>' +
+        '<div class="pgrow"><span class="pgn">CAPA</span><span class="pgt">' + esc(titulo) + '</span></div>' +
+        paginas.map(function(p, pi) {
           return '<div class="pgrow"><span class="pgn">P' + (pi + 2) + '</span><span class="pgt">' +
             '<b>' + esc(p.titulo || '') + '</b>' + (p.texto ? ' — ' + esc(p.texto) : '') + '</span></div>';
         }).join('') +
@@ -393,10 +544,10 @@ window.initCriar = function() {
     c.innerHTML =
       '<div class="ch"><span class="vlabel">VARIAÇÃO 0' + (i + 1) + '</span></div>' +
       '<span class="rlabel">── DESCRIÇÃO ──</span>' +
-      (!hasPages && v.titulo ? '<h3 class="ttl">' + esc(v.titulo) + '</h3>' : '') +
+      (!hasPages && titulo ? '<h3 class="ttl">' + esc(titulo) + '</h3>' : '') +
       pagesHTML +
-      (v.legenda ? '<p class="body">' + esc(v.legenda) + '</p>' : '') +
-      (v.cta ? '<p class="cta">' + esc(v.cta) + '</p>' : '') +
+      (legenda ? '<p class="body">' + esc(legenda) + '</p>' : '') +
+      (cta ? '<p class="cta">' + esc(cta) + '</p>' : '') +
       (tags.length ? '<div class="tags">' + tags.map(function(t) { return '<span class="tag2">' + esc(t) + '</span>'; }).join('') + '</div>' : '') +
       '<button class="cbtn" style="margin-top:10px">📋 COPIAR DESCRIÇÃO</button>' +
       (hasStudio ? '<span class="rlabel">── ARTE ──</span><button class="artbtn">MONTAR ARTE →</button>' : '') +
@@ -487,11 +638,16 @@ window.initCriar = function() {
   }
 
   function renderRoteiro(v, i) {
-    var tags = (v.hashtags || []).map(function(h) {
+    var d = v.descricao || v;
+    var r = v.roteiro || v;
+    var tags = (d.hashtags || []).map(function(h) {
       return '#' + String(h).replace(/^#/, '').replace(/\s+/g, '');
     });
-    var descText = [v.titulo, v.descricao, tags.join(' ')].filter(function(x) { return x; }).join('\n\n').trim();
-    var cenasText = (v.cenas || []).map(function(cena, ci) {
+    var titulo = d.titulo || v.titulo || '';
+    var legenda = d.legenda || v.descricao || '';
+    var cenas = (r.cenas || v.cenas || []);
+    var descText = [titulo, legenda, tags.join(' ')].filter(function(x) { return x; }).join('\n\n').trim();
+    var cenasText = cenas.map(function(cena, ci) {
       return 'Cena ' + (ci + 1) + ' (' + cena.duracao + '):\nVisual: ' + cena.visual + '\nNarração: ' + cena.narracao;
     }).join('\n\n');
 
@@ -504,15 +660,15 @@ window.initCriar = function() {
     var html =
       '<div class="ch"><span class="vlabel">ROTEIRO 0' + (i + 1) + '</span></div>' +
       '<span class="rlabel">── DESCRIÇÃO ──</span>' +
-      (v.titulo ? '<h3 class="ttl">' + esc(v.titulo) + '</h3>' : '') +
-      (v.descricao ? '<p class="body">' + esc(v.descricao) + '</p>' : '') +
+      (titulo ? '<h3 class="ttl">' + esc(titulo) + '</h3>' : '') +
+      (legenda ? '<p class="body">' + esc(legenda) + '</p>' : '') +
       (tags.length ? '<div class="tags">' + tags.map(function(t) { return '<span class="tag2">' + esc(t) + '</span>'; }).join('') + '</div>' : '') +
       '<button class="cbtn desc-btn" style="margin-top:10px">📋 COPIAR DESCRIÇÃO</button>' +
       (hasStudio ? '<span class="rlabel">── ARTE ──</span><button class="artbtn">MONTAR CAPA →</button>' : '');
 
-    if (Array.isArray(v.cenas) && v.cenas.length) {
+    if (cenas.length) {
       html += '<span class="rlabel">── ROTEIRO ──</span>';
-      v.cenas.forEach(function(cena) {
+      cenas.forEach(function(cena) {
         html += '<div class="cena">' +
           '<div class="dur">' + esc(cena.duracao) + '</div>' +
           '<div class="vis">' + esc(cena.visual) + '</div>' +
