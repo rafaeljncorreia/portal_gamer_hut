@@ -66,14 +66,6 @@ function TemplatePicker({ value, onChange }){
 function TagPicker({ value, onChange }){
   return (
     <div>
-      <button onClick={()=>onChange(null)} className="gh-mono" style={{
-        cursor:'pointer', padding:'10px 12px', borderRadius:8, fontSize:12, fontWeight:700,
-        letterSpacing:'.02em', marginBottom:8, width:'100%', textAlign:'center',
-        background: value===null ? GH.mut2 : GH.bg,
-        color: value===null ? GH.white : GH.mut,
-        border:`1px solid ${value===null ? GH.mut2 : GH.lineSoft}` }}>
-        — SEM TAG
-      </button>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
         {TAGS.map(t=>{
           const on = value===t.id;

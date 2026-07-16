@@ -473,12 +473,9 @@ function TopBar({ s, dims, tag, busy, isVideoPage, onExport, onExportAll, onExpo
       <div style={{ display:'flex', alignItems:'center', gap:12 }}>
         <span className="gh-mono" style={{ color:GH.mut, fontSize:11, letterSpacing:'.08em' }}>
           {dims.w}×{dims.h} · {dims.ratio}</span>
-        {!tag.id
-          ? <span className="gh-mono" style={{ color:GH.mut, fontSize:11, fontWeight:700, border:`1px solid ${GH.lineSoft}`,
-              padding:'6px 11px', borderRadius:7 }}>— SEM TAG</span>
-          : <span className="gh-mono" style={{ display:'inline-flex', alignItems:'center', gap:7, color:tag.color,
-              fontSize:11, fontWeight:700, border:`1px solid ${tag.color}`, padding:'6px 11px', borderRadius:7 }}>
-              <span style={{ width:9, height:9, borderRadius:'50%', background:tag.color }}/>{tag.label}</span>}
+        <span className="gh-mono" style={{ display:'inline-flex', alignItems:'center', gap:7, color:tag.color,
+            fontSize:11, fontWeight:700, border:`1px solid ${tag.color}`, padding:'6px 11px', borderRadius:7 }}>
+            <span style={{ width:9, height:9, borderRadius:'50%', background:tag.color }}/>{tag.label}</span>
         {isVideoPage
           ? <>
               <button onClick={onExport} disabled={busy} className="gh-mono" style={{ cursor:'pointer',
