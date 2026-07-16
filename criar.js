@@ -371,7 +371,7 @@ window.initCriar = function() {
     var tags = (v.hashtags || []).map(function(h) {
       return '#' + String(h).replace(/^#/, '').replace(/\s+/g, '');
     });
-    var fullText = [v.titulo, '', v.legenda, '', v.cta, '', tags.join(' ')].filter(function(x) { return x !== undefined; }).join('\n').trim();
+    var descFull = [v.titulo, v.legenda, v.cta, tags.join(' ')].filter(function(x) { return x; }).join('\n\n').trim();
 
     var hasStudio = !!getStudioTemplate();
     var hasPages = Array.isArray(v.paginas) && v.paginas.length;
@@ -391,14 +391,15 @@ window.initCriar = function() {
     c.style.setProperty('--ac', activeCat.color);
     c.style.setProperty('--acInk', activeCat.ink);
     c.innerHTML =
-      '<div class="ch"><span class="vlabel">VARIAÇÃO 0' + (i + 1) + '</span>' +
-      '<button class="cbtn">COPIAR</button></div>' +
+      '<div class="ch"><span class="vlabel">VARIAÇÃO 0' + (i + 1) + '</span></div>' +
+      '<span class="rlabel">── DESCRIÇÃO ──</span>' +
       (!hasPages && v.titulo ? '<h3 class="ttl">' + esc(v.titulo) + '</h3>' : '') +
       pagesHTML +
       (v.legenda ? '<p class="body">' + esc(v.legenda) + '</p>' : '') +
       (v.cta ? '<p class="cta">' + esc(v.cta) + '</p>' : '') +
       (tags.length ? '<div class="tags">' + tags.map(function(t) { return '<span class="tag2">' + esc(t) + '</span>'; }).join('') + '</div>' : '') +
-      (hasStudio ? '<button class="artbtn">CRIAR ARTE →</button>' : '') +
+      '<button class="cbtn" style="margin-top:10px">📋 COPIAR DESCRIÇÃO</button>' +
+      (hasStudio ? '<span class="rlabel">── ARTE ──</span><button class="artbtn">MONTAR ARTE →</button>' : '') +
       '<div class="card-actions">' +
       '<button class="btn-aprovar">✅ APROVAR</button>' +
       '<button class="btn-reprovar">❌ REPROVAR</button>' +
@@ -411,13 +412,13 @@ window.initCriar = function() {
 
     var cb = c.querySelector('.cbtn');
     cb.onclick = function() {
-      copyText(fullText).then(function() {
-        cb.textContent = 'COPIADO ✓';
+      copyText(descFull).then(function() {
+        cb.textContent = '📋 COPIADO ✓';
         cb.classList.add('done');
-        setTimeout(function() { cb.textContent = 'COPIAR'; cb.classList.remove('done'); }, 1600);
+        setTimeout(function() { cb.textContent = '📋 COPIAR DESCRIÇÃO'; cb.classList.remove('done'); }, 1600);
       })['catch'](function() {
-        cb.textContent = 'SELECIONE E COPIE';
-        setTimeout(function() { cb.textContent = 'COPIAR'; }, 1800);
+        cb.textContent = '📋 SELECIONE E COPIE';
+        setTimeout(function() { cb.textContent = '📋 COPIAR DESCRIÇÃO'; }, 1800);
       });
     };
 
@@ -489,17 +490,10 @@ window.initCriar = function() {
     var tags = (v.hashtags || []).map(function(h) {
       return '#' + String(h).replace(/^#/, '').replace(/\s+/g, '');
     });
+    var descText = [v.titulo, v.descricao, tags.join(' ')].filter(function(x) { return x; }).join('\n\n').trim();
     var cenasText = (v.cenas || []).map(function(cena, ci) {
       return 'Cena ' + (ci + 1) + ' (' + cena.duracao + '):\nVisual: ' + cena.visual + '\nNarração: ' + cena.narracao;
     }).join('\n\n');
-    var fullText = [
-      'Título: ' + (v.titulo || ''),
-      v.descricao ? 'Descrição: ' + v.descricao : '',
-      '',
-      cenasText,
-      '',
-      tags.length ? 'Hashtags: ' + tags.join(' ') : ''
-    ].filter(function(x) { return x; }).join('\n').trim();
 
     var hasStudio = !!getStudioTemplate();
 
@@ -508,14 +502,16 @@ window.initCriar = function() {
     c.style.setProperty('--ac', activeCat.color);
     c.style.setProperty('--acInk', activeCat.ink);
     var html =
-      '<div class="ch"><span class="vlabel">ROTEIRO 0' + (i + 1) + '</span>' +
-      '<button class="cbtn">COPIAR</button></div>' +
+      '<div class="ch"><span class="vlabel">ROTEIRO 0' + (i + 1) + '</span></div>' +
+      '<span class="rlabel">── DESCRIÇÃO ──</span>' +
       (v.titulo ? '<h3 class="ttl">' + esc(v.titulo) + '</h3>' : '') +
       (v.descricao ? '<p class="body">' + esc(v.descricao) + '</p>' : '') +
-      (tags.length ? '<div class="tags">' + tags.map(function(t) { return '<span class="tag2">' + esc(t) + '</span>'; }).join('') + '</div>' : '');
+      (tags.length ? '<div class="tags">' + tags.map(function(t) { return '<span class="tag2">' + esc(t) + '</span>'; }).join('') + '</div>' : '') +
+      '<button class="cbtn desc-btn" style="margin-top:10px">📋 COPIAR DESCRIÇÃO</button>' +
+      (hasStudio ? '<span class="rlabel">── ARTE ──</span><button class="artbtn">MONTAR CAPA →</button>' : '');
 
     if (Array.isArray(v.cenas) && v.cenas.length) {
-      html += '<span class="rlabel">CENAS</span>';
+      html += '<span class="rlabel">── ROTEIRO ──</span>';
       v.cenas.forEach(function(cena) {
         html += '<div class="cena">' +
           '<div class="dur">' + esc(cena.duracao) + '</div>' +
@@ -523,10 +519,10 @@ window.initCriar = function() {
           (cena.narracao ? '<div>' + esc(cena.narracao) + '</div>' : '') +
           '</div>';
       });
+      html += '<button class="cbtn roteiro-btn" style="margin-top:10px">📋 COPIAR ROTEIRO</button>';
     }
 
     html +=
-      (hasStudio ? '<button class="artbtn">CRIAR CAPA →</button>' : '') +
       '<div class="card-actions">' +
       '<button class="btn-aprovar">✅ APROVAR</button>' +
       '<button class="btn-reprovar">❌ REPROVAR</button>' +
@@ -539,17 +535,31 @@ window.initCriar = function() {
 
     c.innerHTML = html;
 
-    var cb = c.querySelector('.cbtn');
-    cb.onclick = function() {
-      copyText(fullText).then(function() {
-        cb.textContent = 'COPIADO ✓';
-        cb.classList.add('done');
-        setTimeout(function() { cb.textContent = 'COPIAR'; cb.classList.remove('done'); }, 1600);
+    var descBtn = c.querySelector('.desc-btn');
+    descBtn.onclick = function() {
+      copyText(descText).then(function() {
+        descBtn.textContent = '📋 COPIADO ✓';
+        descBtn.classList.add('done');
+        setTimeout(function() { descBtn.textContent = '📋 COPIAR DESCRIÇÃO'; descBtn.classList.remove('done'); }, 1600);
       })['catch'](function() {
-        cb.textContent = 'SELECIONE E COPIE';
-        setTimeout(function() { cb.textContent = 'COPIAR'; }, 1800);
+        descBtn.textContent = '📋 SELECIONE E COPIE';
+        setTimeout(function() { descBtn.textContent = '📋 COPIAR DESCRIÇÃO'; }, 1800);
       });
     };
+
+    var roteiroBtn = c.querySelector('.roteiro-btn');
+    if (roteiroBtn) {
+      roteiroBtn.onclick = function() {
+        copyText(cenasText).then(function() {
+          roteiroBtn.textContent = '📋 COPIADO ✓';
+          roteiroBtn.classList.add('done');
+          setTimeout(function() { roteiroBtn.textContent = '📋 COPIAR ROTEIRO'; roteiroBtn.classList.remove('done'); }, 1600);
+        })['catch'](function() {
+          roteiroBtn.textContent = '📋 SELECIONE E COPIE';
+          setTimeout(function() { roteiroBtn.textContent = '📋 COPIAR ROTEIRO'; }, 1800);
+        });
+      };
+    }
 
     if (hasStudio) {
       c.querySelector('.artbtn').onclick = function() {
