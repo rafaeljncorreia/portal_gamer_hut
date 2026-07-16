@@ -16,17 +16,24 @@ window.initCriar = function() {
   // ---- mapping format → studio template ----
 
   var FORMAT_TO_TEMPLATE = {
-    'carrossel': 'carousel',
-    'post':      'image',
-    'quiz':      'quiz',
-    'ranking':   'ranking'
+    'carrossel':      'carousel',
+    'post':           'image',
+    'quiz':           'quiz',
+    'ranking':        'ranking',
+    'youtube-repost': 'thumb',
+    'review':         'thumb',
+    'gameplay':       'thumb',
+    'unboxing':       'thumb',
+    'video-curto':    'reels'
   };
 
   var STUDIO_FIELDS = {
     carousel: ['template','tagId','title','eyebrow','subtitle','cta','badge','footer','fill','pattern','titleSize','image','pages','pageCount','current'],
     image:    ['template','tagId','title','eyebrow','subtitle','priceLabel','fill','ink','pattern','titleSize','image'],
     quiz:     ['template','tagId','question','eyebrow','quizOptions','answer','fill','ink','pattern','titleSize','quizMode','hideOptions'],
-    ranking:  ['template','tagId','title','eyebrow','rankItems','rankCount','fill','ink','pattern','titleSize']
+    ranking:  ['template','tagId','title','eyebrow','rankItems','rankCount','fill','ink','pattern','titleSize'],
+    thumb:    ['template','tagId','title','eyebrow','subtitle','accentWord','badge','priceLabel','fill','ink','pattern','titleSize','image'],
+    reels:    ['template','tagId','title','eyebrow','subtitle','fill','pattern','format','titleSize','image']
   };
 
   function getStudioTemplate() {
@@ -80,6 +87,16 @@ window.initCriar = function() {
         '  "hashtags":["5 a 7 hashtags sem #, sem espaços"]\n' +
         '}]}\n' +
         'IMPORTANTE: "opcoes" deve ter 4 itens. "resposta" é o índice (0-3) da opção correta.',
+      thumb: 'Escreva 3 variações de REPOST para YouTube Shorts / Comunidade.\n' +
+        'O conteúdo é um repost de um vídeo já existente, NÃO conteúdo original.\n' +
+        'Responda SOMENTE com JSON válido, sem texto fora dele, neste formato exato:\n' +
+        '{"variacoes":[{\n' +
+        '  "titulo":"título chamativo para a thumb (máx 6 palavras)",\n' +
+        '  "sobre_titulo":"eyebrow tipo REVIEW / GAMEPLAY / UNBOXING",\n' +
+        '  "legenda":"resumo do vídeo em 1-2 frases",\n' +
+        '  "cta":"chamada para assistir o vídeo original",\n' +
+        '  "hashtags":["5 a 7 hashtags sem #, sem espaços"]\n' +
+        '}]}',
       ranking: 'Escreva 3 variações de ranking do Instagram.\n' +
         'Responda SOMENTE com JSON válido, sem texto fora dele, neste formato exato:\n' +
         '{"variacoes":[{\n' +
@@ -252,7 +269,11 @@ window.initCriar = function() {
         if (idx > -1) base = base.substring(0, idx);
         base += schema;
       }
-      base += '\n\n---\nREGRAS:\n- Título curto e forte (máx ~6 palavras).\n- Legenda de 2 a 4 frases, calorosa e específica ao briefing.\n- CTA final simples, de preferência perguntando algo ("Já garantiu?", "Vai jogar?").\n- Emojis com moderação (0 a 3).\n- Variações com ângulos diferentes (ex.: nostálgica, comercial, hype).\n- Português do Brasil.';
+      if (fmtSelect.value === 'youtube-repost') {
+        base += '\n\n---\nREGRAS DE REPOST:\n- Trate como REPOST de conteúdo já publicado, NÃO conteúdo original.\n- Legenda deve resumir/contextualizar o vídeo, não apresentar o produto.\n- CTA direciona para o vídeo original ("Assista ao vídeo completo", "Confira o review").\n- Tom de compartilhamento ("Nesse vídeo a gente mostra", "A gente foi conferir").\n- Título curto e forte (máx ~6 palavras).\n- Emojis com moderação (0 a 3).\n- Variações com ângulos diferentes.\n- Português do Brasil.';
+      } else {
+        base += '\n\n---\nREGRAS:\n- Título curto e forte (máx ~6 palavras).\n- Legenda de 2 a 4 frases, calorosa e específica ao briefing.\n- CTA final simples, de preferência perguntando algo ("Já garantiu?", "Vai jogar?").\n- Emojis com moderação (0 a 3).\n- Variações com ângulos diferentes (ex.: nostálgica, comercial, hype).\n- Português do Brasil.';
+      }
       return base;
     }
 
@@ -480,9 +501,12 @@ window.initCriar = function() {
       tags.length ? 'Hashtags: ' + tags.join(' ') : ''
     ].filter(function(x) { return x; }).join('\n').trim();
 
+    var hasStudio = !!getStudioTemplate();
+
     var c = document.createElement('div');
     c.className = 'card';
     c.style.setProperty('--ac', activeCat.color);
+    c.style.setProperty('--acInk', activeCat.ink);
     var html =
       '<div class="ch"><span class="vlabel">ROTEIRO 0' + (i + 1) + '</span>' +
       '<button class="cbtn">COPIAR</button></div>' +
@@ -502,6 +526,7 @@ window.initCriar = function() {
     }
 
     html +=
+      (hasStudio ? '<button class="artbtn">CRIAR CAPA →</button>' : '') +
       '<div class="card-actions">' +
       '<button class="btn-aprovar">✅ APROVAR</button>' +
       '<button class="btn-reprovar">❌ REPROVAR</button>' +
@@ -525,6 +550,15 @@ window.initCriar = function() {
         setTimeout(function() { cb.textContent = 'COPIAR'; }, 1800);
       });
     };
+
+    if (hasStudio) {
+      c.querySelector('.artbtn').onclick = function() {
+        var btn = this;
+        btn.textContent = '→ REDIRECIONANDO…';
+        btn.disabled = true;
+        sendToStudio(v);
+      };
+    }
 
     var localId = genAtualId;
     var localOpts = getOpts();
