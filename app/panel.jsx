@@ -35,7 +35,13 @@ function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS }){
 
       <CtrlSection title="TAG DE CATEGORIA"
         right={<span className="gh-mono" style={{ color:GH.mut, fontSize:9, letterSpacing:'.1em' }}>DEFINE A COR</span>}>
-        <TagPicker value={s.tagId} onChange={id=>set({ tagId:id })}/>
+        <TagPicker value={s.tagId} onChange={id=>set({ tagId:id, sealLabel:null })}/>
+        <div style={{ marginTop:14 }}>
+          <Field label="Texto do selo (opcional)">
+            <TextInput value={s.sealLabel??''} placeholder={tag.label||'SEM TAG'}
+              onChange={e=>set({ sealLabel:e.target.value||'' })}/>
+          </Field>
+        </div>
       </CtrlSection>
 
       {/* CAROUSEL page manager */}

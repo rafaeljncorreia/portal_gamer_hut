@@ -17,8 +17,9 @@ function Lockup({ color='white', h=58, style={} }){
     style={{ height:h, width:'auto', display:'block', ...style }} />;
 }
 
-function Seal({ tag, big=false }){
-  if (!tag.id) return null;
+function Seal({ tag, sealLabel, big=false }){
+  const txt = sealLabel === '' ? null : (sealLabel || (tag.id ? tag.label : null));
+  if (!txt) return null;
   return (
     <span className="gh-pixel" style={{
       display:'inline-flex', alignItems:'center', gap:big?14:10,
@@ -28,7 +29,7 @@ function Seal({ tag, big=false }){
       borderRadius:4, boxShadow:`0 0 0 4px rgba(0,0,0,.18)`,
     }}>
       <span style={{ width:big?14:10, height:big?14:10, background:tag.ink, borderRadius:'50%' }}/>
-      {tag.label}
+      {txt}
     </span>
   );
 }
@@ -126,7 +127,7 @@ function BlockBody({ s, tag }){
       <div style={{ position:'absolute', inset:0, padding:'76px 76px 150px',
         display:'flex', flexDirection:'column' }}>
         <div style={{ flex:'none', display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
-          <Seal tag={tag}/>
+          <Seal tag={tag} sealLabel={s.sealLabel}/>
           <Mark color={logoCol} h={56}/>
         </div>
         <div style={{ flex:1, minHeight:0, display:'flex', flexDirection:'column',
@@ -154,7 +155,7 @@ function ImageBody({ s, tag }){
       <Scrim from="rgba(0,0,0,.94)" h="66%"/>
       <div style={{ position:'absolute', top:0, left:0, right:0, padding:'64px 64px 0',
         display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
-        <Seal tag={tag}/>
+        <Seal tag={tag} sealLabel={s.sealLabel}/>
         {s.priceLabel && <span className="gh-pixel" style={{ background:'rgba(11,11,10,.82)',
           color:GH.white, padding:'14px 18px', fontSize:22, borderRadius:4,
           boxShadow:`inset 0 0 0 2px ${tag.color}` }}>{s.priceLabel}</span>}
@@ -251,7 +252,7 @@ function VideoBody({ s, tag, pg, pageIndex, exporting }){
       <div style={{ position:'absolute', inset:0, padding:'66px 70px 58px', display:'flex', flexDirection:'column' }}>
         {/* top row */}
         <div style={{ flexShrink:0, display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
-          <Seal tag={tag}/>
+          <Seal tag={tag} sealLabel={s.sealLabel}/>
           <span className="gh-pixel" style={{ color:tag.color, fontSize:28,
             background:'rgba(11,11,10,.6)', padding:'12px 16px', borderRadius:4 }}>
             {String(pageIndex+1).padStart(2,'0')}/{String(s.pageCount).padStart(2,'0')}</span>
@@ -294,7 +295,7 @@ function CarouselBody({ s, tag, pageIndex, exporting }){
       <Scrim from="rgba(0,0,0,.95)" h="70%"/>
       <div style={{ position:'absolute', top:0, left:0, right:0, padding:'60px 64px 0',
         display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
-        <Seal tag={tag}/>
+        <Seal tag={tag} sealLabel={s.sealLabel}/>
         <span className="gh-pixel" style={{ color:tag.color, fontSize:28,
           background:'rgba(11,11,10,.6)', padding:'12px 16px', borderRadius:4 }}>
           {String(pageIndex+1).padStart(2,'0')}/{String(s.pageCount).padStart(2,'0')}</span>
@@ -399,7 +400,7 @@ function ThumbBody({ s, tag, exporting }){
         justifyContent:'space-between' }}>
         {/* top row — seal + badge */}
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
-          <Seal tag={tag} big/>
+          <Seal tag={tag} big sealLabel={s.sealLabel}/>
           {s.badge && <span className="gh-pixel" style={{ background:GH.ink, color:tag.color,
             padding:'15px 22px', fontSize:24, borderRadius:5, display:'inline-flex', gap:11, alignItems:'center',
             boxShadow:'0 0 0 4px rgba(0,0,0,.18)' }}>
@@ -466,14 +467,15 @@ function QuizBody({ s, tag }){
   const accent = hasImg ? tag.color : (fill ? (txt==='#0B0B0A'?'#0B0B0A':readableOn(tag.color)) : tag.color);
   const logoCol = (s.ink&&s.ink!=='auto') ? ink.logo : (hasImg ? 'white' : solidLogoCol(s, tag, fill, ink));
   const esseou = s.quizMode==='esseou';
+  const showSeal = tag.id && s.sealLabel !== '';
   return (
     <div style={{ position:'absolute', inset:0, background:base, overflow:'hidden' }}>
       {hasImg
         ? <><div style={{ position:'absolute', inset:0 }}><ImageOrSlot src={s.image} blur={s.imageBlur} zoom={s.imageZoom} x={s.imageX} y={s.imageY}/></div><FullScrim/></>
         : <PatternLayer kind={s.pattern} accent={fill?readableOn(tag.color):tag.color} base={base} opacity={s.patternOpacity}/>}
-      <div style={{ position:'absolute', inset:0, padding: tag.id ? '72px 70px 148px' : '28px 70px 148px', display:'flex', flexDirection:'column' }}>
+      <div style={{ position:'absolute', inset:0, padding: showSeal ? '72px 70px 148px' : '28px 70px 148px', display:'flex', flexDirection:'column' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
-          <Seal tag={tag}/>
+          <Seal tag={tag} sealLabel={s.sealLabel}/>
         </div>
         {esseou
           ? <EsseOuAquele s={s} txt={txt} accent={accent}/>
@@ -563,14 +565,15 @@ function RankingBody({ s, tag }){
   const logoCol = (s.ink&&s.ink!=='auto') ? ink.logo : (hasImg ? 'white' : solidLogoCol(s, tag, fill, ink));
   const stories = s.format==='stories';
   const items = (s.rankItems||[]).slice(0, s.rankCount||5).filter(it=>it && (it.name||'').trim()!=='');
+  const showSeal = tag.id && s.sealLabel !== '';
   return (
     <div style={{ position:'absolute', inset:0, background:base, overflow:'hidden' }}>
       {hasImg
         ? <><div style={{ position:'absolute', inset:0 }}><ImageOrSlot src={s.image} blur={s.imageBlur} zoom={s.imageZoom} x={s.imageX} y={s.imageY}/></div><FullScrim/></>
         : <PatternLayer kind={s.pattern} accent={fill?readableOn(tag.color):tag.color} base={base} opacity={s.patternOpacity}/>}
-      <div style={{ position:'absolute', inset:0, padding: tag.id ? '72px 70px 148px' : '28px 70px 148px', display:'flex', flexDirection:'column' }}>
+      <div style={{ position:'absolute', inset:0, padding: showSeal ? '72px 70px 148px' : '28px 70px 148px', display:'flex', flexDirection:'column' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
-          <Seal tag={tag}/>
+          <Seal tag={tag} sealLabel={s.sealLabel}/>
         </div>
         <div style={{ marginTop:30, flex:1, display:'flex', flexDirection:'column',
           justifyContent: stories?'center':'space-between', gap: stories?54:0 }}>
@@ -626,12 +629,13 @@ function ArrivalsBody({ s, tag }){
   const accent = fill ? (txt==='#0B0B0A'?'#0B0B0A':readableOn(tag.color)) : tag.color;
   const items = (s.arrivals||[]).slice(0, s.arrivalCount||4).filter(it=>it && ((it.name||'').trim()!=='' || it.image));
   const odd = items.length % 2 === 1;
+  const showSeal = tag.id && s.sealLabel !== '';
   return (
     <div style={{ position:'absolute', inset:0, background:base, overflow:'hidden' }}>
       <PatternLayer kind={s.pattern} accent={fill?readableOn(tag.color):tag.color} base={base} opacity={s.patternOpacity}/>
-      <div style={{ position:'absolute', inset:0, padding: tag.id ? '72px 70px 148px' : '28px 70px 148px', display:'flex', flexDirection:'column' }}>
+      <div style={{ position:'absolute', inset:0, padding: showSeal ? '72px 70px 148px' : '28px 70px 148px', display:'flex', flexDirection:'column' }}>
         <div style={{ flex:'none', display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
-          <Seal tag={tag}/>
+          <Seal tag={tag} sealLabel={s.sealLabel}/>
         </div>
         <div style={{ flex:'none', marginTop:28, display:'flex', flexDirection:'column', gap:14 }}>
           <Eyebrow text={s.eyebrow} color={accent}/>
@@ -746,7 +750,8 @@ function drawVideoComposite(ctx, W, H, o){
   ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
 
   // top row — seal + counter
-  if(tag.id) drawPill(ctx, PAD, 66, tag.label, tag.color, tag.ink);
+  const sealTxt = s.sealLabel === '' ? null : (s.sealLabel || (tag.id ? tag.label : null));
+  if(sealTxt) drawPill(ctx, PAD, 66, sealTxt, tag.color, tag.ink);
   const counter = String(pageIndex+1).padStart(2,'0')+'/'+String(s.pageCount).padStart(2,'0');
   ctx.font = '28px "Press Start 2P"';
   const cw = ctx.measureText(counter).width + 32, ch = 56;

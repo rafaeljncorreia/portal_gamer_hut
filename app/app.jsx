@@ -9,6 +9,7 @@ const DEFAULT_STATE = {
   title:'A PRIMEIRA EXCLUSIVIDADE DA GAMER HUT',
   subtitle:'neste post', badge:'STATE OF PLAY', cta:'ARRASTA PRO LADO',
   accentWord:'',
+  sealLabel:null,
   footer:'MÍDIA FÍSICA\nNEVER DIES', priceLabel:'R$ 349 · LACRADO',
   titleSize:108, image:null, pageCount:4, current:0, patternOpacity:100, videoAudio:true,
   pages:[
