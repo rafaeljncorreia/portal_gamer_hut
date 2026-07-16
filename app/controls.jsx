@@ -166,7 +166,7 @@ function ImageDrop({ value, onChange, label='Imagem do jogo', blur, onBlur, zoom
                 <button onClick={()=>onZoom&&onZoom(100)} className="gh-mono" style={{ cursor:'pointer',
                   padding:'3px 8px', borderRadius:5, fontSize:9, background:'transparent',
                   color:GH.mut, border:`1px solid ${GH.lineSoft}`, letterSpacing:'.06em' }}>RESET</button>
-                <span className="gh-pixel" style={{ color:GH.orange, fontSize:11, minWidth:38, textAlign:'right' }}>{Math.round(zoom||100)}%</span>
+                <span className="gh-pixel" style={{ color:GH.orange, fontSize:11, minWidth:38, textAlign:'right' }}>{Math.round(zoom??100)}%</span>
               </div>
             </div>
             <input type="range" min={100} max={300} step={1} value={zoom||100}
@@ -181,10 +181,10 @@ function ImageDrop({ value, onChange, label='Imagem do jogo', blur, onBlur, zoom
                 <button onClick={()=>onImgX&&onImgX(50)} className="gh-mono" style={{ cursor:'pointer',
                   padding:'3px 8px', borderRadius:5, fontSize:9, background:'transparent',
                   color:GH.mut, border:`1px solid ${GH.lineSoft}`, letterSpacing:'.06em' }}>CENTRO</button>
-                <span className="gh-pixel" style={{ color:GH.orange, fontSize:11, minWidth:38, textAlign:'right' }}>{Math.round(imgX||50)}%</span>
+                <span className="gh-pixel" style={{ color:GH.orange, fontSize:11, minWidth:38, textAlign:'right' }}>{Math.round(imgX??50)}%</span>
               </div>
             </div>
-            <input type="range" min={0} max={100} step={1} value={imgX||50}
+            <input type="range" min={0} max={100} step={1} value={imgX??50}
               onChange={e=>onImgX&&onImgX(+e.target.value)} style={{ width:'100%', accentColor:GH.orange }}/>
           </div>
 
@@ -196,10 +196,10 @@ function ImageDrop({ value, onChange, label='Imagem do jogo', blur, onBlur, zoom
                 <button onClick={()=>onImgY&&onImgY(50)} className="gh-mono" style={{ cursor:'pointer',
                   padding:'3px 8px', borderRadius:5, fontSize:9, background:'transparent',
                   color:GH.mut, border:`1px solid ${GH.lineSoft}`, letterSpacing:'.06em' }}>CENTRO</button>
-                <span className="gh-pixel" style={{ color:GH.orange, fontSize:11, minWidth:38, textAlign:'right' }}>{Math.round(imgY||50)}%</span>
+                <span className="gh-pixel" style={{ color:GH.orange, fontSize:11, minWidth:38, textAlign:'right' }}>{Math.round(imgY??50)}%</span>
               </div>
             </div>
-            <input type="range" min={0} max={100} step={1} value={imgY||50}
+            <input type="range" min={0} max={100} step={1} value={imgY??50}
               onChange={e=>onImgY&&onImgY(+e.target.value)} style={{ width:'100%', accentColor:GH.orange }}/>
           </div>
 

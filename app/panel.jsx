@@ -38,7 +38,7 @@ function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS }){
         <TagPicker value={s.tagId} onChange={id=>set({ tagId:id, sealLabel:null })}/>
         <div style={{ marginTop:14 }}>
           <Field label="Texto do selo (opcional)">
-            <TextInput value={s.sealLabel??''} placeholder={tag.label||'SEM TAG'}
+            <TextInput value={s.sealLabel!=null?s.sealLabel:''} placeholder={tag.label||'SEM TAG'}
               onChange={e=>set({ sealLabel:e.target.value||'' })}/>
           </Field>
         </div>
