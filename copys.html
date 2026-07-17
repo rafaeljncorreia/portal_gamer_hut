@@ -156,6 +156,7 @@
           <label>Modelo da arte <span class="hint">ao clicar em “Criar arte”</span></label>
           <div class="chips" id="models">
             <span class="chip on" data-m="image">POST C/ IMAGEM</span>
+            <span class="chip" data-m="meme">MEME</span>
             <span class="chip" data-m="block">POST BLOCADO</span>
             <span class="chip" data-m="carousel">CARROSSEL</span>
             <span class="chip" data-m="quiz">QUIZ</span>
@@ -199,6 +200,10 @@
   </footer>
 
   <script>
+  // IIFE: isola as declarações (var TAGS, const…) do escopo global — senão o
+  // `var TAGS` colide com o `const TAGS` de app/data.jsx e um SyntaxError de
+  // redeclaração impede TODO este script de rodar. (criar.js usa o mesmo padrão.)
+  (function(){
   var TAGS = (window.TAGS || []).map(function(t){ return { id:t.id, label:t.label, color:t.color, ink:t.ink }; });
 
   // ---- build category chips ----
@@ -375,6 +380,7 @@ IMPORTANTE: o array "paginas" deve ter EXATAMENTE ${pageCount-1} itens (as pági
   (function(){ const bt=document.getElementById('brandtag');
     if(!window.GH_BRAND){ bt.classList.add('off'); bt.textContent='● Guia de marca não carregado'; } })();
   document.getElementById('brief').addEventListener('keydown',e=>{ if((e.metaKey||e.ctrlKey)&&e.key==='Enter') generate(); });
+  })();
   </script>
 </body>
 </html>

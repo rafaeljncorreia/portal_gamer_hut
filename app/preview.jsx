@@ -175,6 +175,74 @@ function ImageBody({ s, tag }){
   );
 }
 
+/* ---------- B2 · MEME (4:5) ----------
+   Meme autoral da GH em dois modos:
+   · caption — barra de texto sólida (cima ou baixo) + imagem preenchendo o resto
+   · impact  — texto no topo e/ou base SOBRE a imagem (meme clássico), com contorno
+   Branding leve: marca GH pequena + @handle num canto. Sem selo, sem logo central. */
+function memeOutline(px){
+  const o = [];
+  for(let dx=-1; dx<=1; dx++) for(let dy=-1; dy<=1; dy++){ if(dx||dy) o.push(`${dx*px}px ${dy*px}px 0 #000`); }
+  o.push(`0 0 ${px*3}px rgba(0,0,0,.55)`);
+  return o.join(',');
+}
+function MemeCredit({ text }){
+  if(!text) return null;
+  return (
+    <div style={{ position:'absolute', right:22, bottom:22, display:'inline-flex', alignItems:'center', gap:10,
+      background:'rgba(11,11,10,.62)', padding:'8px 13px 8px 10px', borderRadius:8,
+      boxShadow:'0 2px 10px rgba(0,0,0,.35)' }}>
+      <Mark color="white" h={26}/>
+      <span className="gh-mono" style={{ color:GH.white, fontSize:22, fontWeight:700, letterSpacing:'.02em' }}>{text}</span>
+    </div>
+  );
+}
+function MemeBody({ s, tag }){
+  const impact = s.memeLayout==='impact';
+  const credit = s.memeCredit || '';
+  if(impact){
+    const px = Math.max(3, Math.round((s.titleSize||64)/20));
+    const outline = memeOutline(px);
+    const textStyle = {
+      margin:0, color:'#FFFFFF', textAlign:'center', width:'100%',
+      fontSize:s.titleSize||64, lineHeight:1.0, letterSpacing:'-.01em', textTransform:'uppercase',
+      textWrap:'balance', overflowWrap:'anywhere', textShadow:outline,
+    };
+    return (
+      <div style={{ position:'absolute', inset:0, background:GH.bg, overflow:'hidden' }}>
+        <div style={{ position:'absolute', inset:0 }}>
+          <ImageOrSlot src={s.image} blur={s.imageBlur} zoom={s.imageZoom} x={s.imageX} y={s.imageY} label="ARRASTE A IMAGEM DO MEME"/></div>
+        <div style={{ position:'absolute', inset:0, padding:'56px 54px 64px', display:'flex', flexDirection:'column',
+          justifyContent:'space-between', pointerEvents:'none' }}>
+          <h1 className="gh-display" style={textStyle}>{s.memeTop}</h1>
+          <h1 className="gh-display" style={textStyle}>{s.memeBottom}</h1>
+        </div>
+        <MemeCredit text={credit}/>
+      </div>
+    );
+  }
+  // caption mode
+  const barColor = s.memeBarColor || '#F4F1EC';
+  const barInk = readableOn(barColor);
+  const barTop = (s.memeBarPos||'top')==='top';
+  const Bar = (
+    <div style={{ flex:'none', background:barColor, padding:'52px 60px', display:'flex' }}>
+      <p className="gh-display" style={{ margin:0, color:barInk, fontSize:s.titleSize||64, lineHeight:1.06,
+        letterSpacing:'-.01em', textWrap:'balance', overflowWrap:'anywhere' }}>{s.memeCaption}</p>
+    </div>
+  );
+  return (
+    <div style={{ position:'absolute', inset:0, background:GH.bg, overflow:'hidden', display:'flex', flexDirection:'column' }}>
+      {barTop && Bar}
+      <div style={{ flex:1, minHeight:0, position:'relative' }}>
+        <ImageOrSlot src={s.image} blur={s.imageBlur} zoom={s.imageZoom} x={s.imageX} y={s.imageY} label="ARRASTE A IMAGEM DO MEME"/>
+        <MemeCredit text={credit}/>
+      </div>
+      {!barTop && Bar}
+    </div>
+  );
+}
+
 /* ---------- C2 · VIDEO TRAILER SLIDE (carousel page type) ----------
    Full-bleed game art + centered title + a floating card that PLAYS the
    uploaded trailer in the live preview. On export (PNG) the card renders a
@@ -672,6 +740,7 @@ function PostStage({ s, pageIndex=0, stageRef, exporting=false }){
   let body;
   if(s.template==='block')    body = <BlockBody s={s} tag={tag}/>;
   else if(s.template==='image') body = <ImageBody s={s} tag={tag}/>;
+  else if(s.template==='meme') body = <MemeBody s={s} tag={tag}/>;
   else if(s.template==='carousel') body = <CarouselBody s={s} tag={tag} pageIndex={pageIndex} exporting={exporting}/>;
   else if(s.template==='quiz') body = <QuizBody s={s} tag={tag}/>;
   else if(s.template==='ranking') body = <RankingBody s={s} tag={tag}/>;

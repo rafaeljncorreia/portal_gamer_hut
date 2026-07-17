@@ -18,7 +18,8 @@
       BASE + '/formatos/carrossel.json',
       BASE + '/formatos/post.json',
       BASE + '/formatos/quiz.json',
-      BASE + '/formatos/ranking.json'
+      BASE + '/formatos/ranking.json',
+      BASE + '/formatos/meme.json'
     ],
     geracoes: [
       BASE + '/geracoes/gen-z.json',

@@ -11,6 +11,7 @@ function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS }){
   const isRanking  = s.template==='ranking';
   const isThumb    = s.template==='thumb';
   const isArrivals = s.template==='arrivals';
+  const isMeme     = s.template==='meme';
   const accent = s.fill ? readableOn(tag.color) : tag.color;
 
   const setPage = (patch)=> setS(p=>{
@@ -33,16 +34,17 @@ function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS }){
             options={[ {id:'feed', label:'FEED 4:5'}, {id:'stories', label:'STORIES 9:16'} ]}/>
         </CtrlSection>}
 
-      <CtrlSection title="TAG DE CATEGORIA"
-        right={<span className="gh-mono" style={{ color:GH.mut, fontSize:9, letterSpacing:'.1em' }}>DEFINE A COR</span>}>
-        <TagPicker value={s.tagId} onChange={id=>set({ tagId:id, sealLabel:null })}/>
-        <div style={{ marginTop:14 }}>
-          <Field label="Texto do selo (opcional)">
-            <TextInput value={s.sealLabel!=null?s.sealLabel:''} placeholder={tag.label||'SEM TAG'}
-              onChange={e=>set({ sealLabel:e.target.value||'' })}/>
-          </Field>
-        </div>
-      </CtrlSection>
+      {!isMeme &&
+        <CtrlSection title="TAG DE CATEGORIA"
+          right={<span className="gh-mono" style={{ color:GH.mut, fontSize:9, letterSpacing:'.1em' }}>DEFINE A COR</span>}>
+          <TagPicker value={s.tagId} onChange={id=>set({ tagId:id, sealLabel:null })}/>
+          <div style={{ marginTop:14 }}>
+            <Field label="Texto do selo (opcional)">
+              <TextInput value={s.sealLabel!=null?s.sealLabel:''} placeholder={tag.label||'SEM TAG'}
+                onChange={e=>set({ sealLabel:e.target.value||'' })}/>
+            </Field>
+          </div>
+        </CtrlSection>}
 
       {/* CAROUSEL page manager */}
       {isCarousel &&
@@ -145,6 +147,7 @@ function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS }){
           : isRanking ? <RankingFields s={s} set={set} setS={setS}/>
           : isThumb ? <ThumbFields s={s} set={set}/>
           : isArrivals ? <ArrivalsFields s={s} set={set} setS={setS}/>
+          : isMeme ? <MemeFields s={s} set={set}/>
           : <>
           {!isImage && <Field label={isReels||isCarousel?'Badge (canto superior)':'Selo'}>
             <TextInput value={s.badge||''} placeholder="ex: STATE OF PLAY" onChange={e=>set({badge:e.target.value})}/>
@@ -194,7 +197,7 @@ function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS }){
       </CtrlSection>
 
       {/* STYLE */}
-      {onCover && !isImage &&
+      {onCover && !isImage && !isMeme &&
         <CtrlSection title="ESTILO DE FUNDO" right={
           <span className="gh-mono" style={{ color:GH.mut, fontSize:9, letterSpacing:'.1em' }}>{PATTERNS.length} PADRÕES</span>}>
           {(isReels||isCarousel||isQuiz||isRanking||isThumb) && s.image
@@ -236,7 +239,7 @@ function Controls({ s, set, tag, onCover, pageIdx, pickTemplate, setS }){
         </CtrlSection>}
 
       {/* INK — text + logo color */}
-      {((onCover && !isBlock) || isImage) &&
+      {((onCover && !isBlock && !isMeme) || isImage) &&
         <CtrlSection title="COR DO TEXTO / LOGO">
           <Segmented value={s.ink||'auto'} onChange={v=>set({ink:v})} options={[
             {id:'auto', label:'AUTO'}, {id:'white', label:'BRANCO'}, {id:'black', label:'PRETO'} ]}/>
@@ -516,6 +519,56 @@ function ArrivalsFields({ s, set, setS }){
             </div>
           );
         })}
+      </div>
+    </>
+  );
+}
+
+/* ---- MEME fields ---- */
+function MemeFields({ s, set }){
+  const impact = s.memeLayout==='impact';
+  return (
+    <>
+      <div style={{ marginBottom:18 }}>
+        <Segmented value={s.memeLayout||'caption'} onChange={v=>set({ memeLayout:v })}
+          options={[ {id:'caption', label:'LEGENDA + IMAGEM'}, {id:'impact', label:'TEXTO NA IMAGEM'} ]}/>
+      </div>
+      <Field label="Imagem do meme">
+        <ImageDrop value={s.image} onChange={v=>set({ image:v })} label="Imagem do meme"
+          blur={s.imageBlur} onBlur={v=>set({ imageBlur:v })}
+          zoom={s.imageZoom} onZoom={v=>set({ imageZoom:v })}
+          imgX={s.imageX} onImgX={v=>set({ imageX:v })}
+          imgY={s.imageY} onImgY={v=>set({ imageY:v })}/>
+      </Field>
+      {impact ? <>
+        <Field label="Texto de cima">
+          <TextArea value={s.memeTop||''} placeholder="EU FINGINDO" onChange={e=>set({ memeTop:e.target.value })} style={{ minHeight:56 }}/>
+        </Field>
+        <Field label="Texto de baixo">
+          <TextArea value={s.memeBottom||''} placeholder="QUE ZEREI ONTEM" onChange={e=>set({ memeBottom:e.target.value })} style={{ minHeight:56 }}/>
+        </Field>
+      </> : <>
+        <Field label="Legenda do meme (setup / punchline)">
+          <TextArea value={s.memeCaption||''} onChange={e=>set({ memeCaption:e.target.value })} style={{ minHeight:72 }}/>
+        </Field>
+        <Field label="Posição da barra">
+          <Segmented value={s.memeBarPos||'top'} onChange={v=>set({ memeBarPos:v })}
+            options={[ {id:'top', label:'EM CIMA'}, {id:'bottom', label:'EMBAIXO'} ]}/>
+        </Field>
+        <Field label="Cor da barra">
+          <ColorField value={s.memeBarColor||null} onChange={v=>set({ memeBarColor:v })} fallbackLabel="BRANCO"/>
+        </Field>
+      </>}
+      <Field label="Assinatura (canto)">
+        <TextInput value={s.memeCredit!=null?s.memeCredit:''} placeholder="@gamerhut"
+          onChange={e=>set({ memeCredit:e.target.value })}/>
+      </Field>
+      <div style={{ display:'flex', gap:10, alignItems:'flex-start', background:GH.bg,
+        border:`1px solid ${GH.lineSoft}`, borderRadius:9, padding:'12px 13px' }}>
+        <span style={{ color:GH.orange, fontSize:13, lineHeight:1.3 }}>●</span>
+        <p className="gh-mono" style={{ margin:0, color:GH.mut, fontSize:10, lineHeight:1.6, letterSpacing:'.03em' }}>
+          Meme autoral <span style={{ color:GH.white }}>4:5 · 1080×1350</span>. Ajuste o tamanho do texto em
+          <span style={{ color:GH.white }}> TIPOGRAFIA</span>. Arraste a imagem no preview pra reposicionar (zoom &gt; 100%).</p>
       </div>
     </>
   );

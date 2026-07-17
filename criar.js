@@ -24,17 +24,13 @@ window.initCriar = function() {
     'review':         'thumb',
     'gameplay':       'thumb',
     'unboxing':       'thumb',
-    'video-curto':    'reels'
+    'video-curto':    'reels',
+    'meme':           'meme'
   };
 
-  var STUDIO_FIELDS = {
-    carousel: ['template','tagId','title','eyebrow','subtitle','cta','badge','footer','fill','pattern','titleSize','image','pages','pageCount','current'],
-    image:    ['template','tagId','title','eyebrow','subtitle','priceLabel','fill','ink','pattern','titleSize','image'],
-    quiz:     ['template','tagId','question','eyebrow','quizOptions','answer','fill','ink','pattern','titleSize','quizMode','hideOptions'],
-    ranking:  ['template','tagId','title','eyebrow','rankItems','rankCount','fill','ink','pattern','titleSize'],
-    thumb:    ['template','tagId','title','eyebrow','subtitle','accentWord','badge','priceLabel','fill','ink','pattern','titleSize','image'],
-    reels:    ['template','tagId','title','eyebrow','subtitle','fill','pattern','format','titleSize','image']
-  };
+  // O mapa de campos por template (STUDIO_FIELDS) vive só em lib/utils.js
+  // (window.STUDIO_FIELDS). buildStudioPatch()/mergeStudioState() de lá são a
+  // fonte única — não duplicar aqui pra não divergir.
 
   function getStudioTemplate() {
     var fmt = DADOS.formatos[fmtSelect.value];
@@ -190,7 +186,27 @@ window.initCriar = function() {
         '    "legenda":"descrição do vídeo curto",\n' +
         '    "hashtags":["5 a 7 hashtags sem #, sem espaços"]\n' +
         '  }\n' +
-        '}]}'
+        '}]}',
+      meme: 'Escreva 3 variações de MEME autoral da Gamer Hut.\n' +
+        'A imagem é escolhida pelo usuário depois — aqui você só escreve o TEXTO do meme.\n' +
+        'Gere OS DOIS formatos (legenda de barra E texto de topo/base) pra pessoa poder alternar no editor.\n' +
+        'Responda SOMENTE com JSON válido, neste formato exato:\n' +
+        '{"variacoes":[{\n' +
+        '  "studio":{\n' +
+        '    "memeLayout":"caption",\n' +
+        '    "memeCaption":"setup/punchline do meme — frase relacionável (minúsculas ok)",\n' +
+        '    "memeTop":"TEXTO DE CIMA (CAIXA ALTA, curto)",\n' +
+        '    "memeBottom":"TEXTO DE BAIXO (CAIXA ALTA, curto)",\n' +
+        '    "titleSize":64\n' +
+        '  },\n' +
+        '  "descricao":{\n' +
+        '    "titulo":"título curto pro post (normal)",\n' +
+        '    "legenda":"legenda do feed — 1 a 3 frases no clima do meme",\n' +
+        '    "cta":"CTA de engajamento (ex.: marca aquele amigo que é assim)",\n' +
+        '    "hashtags":["5 a 7 hashtags sem #, sem espaços"]\n' +
+        '  }\n' +
+        '}]}\n' +
+        'IMPORTANTE: memeLayout deve ser "caption" ou "impact". Humor no clima gamer, relacionável, sem ofender ninguém.'
     };
     var s = schemas[template];
     return typeof s === 'function' ? s() : (s || '');

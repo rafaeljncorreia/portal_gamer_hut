@@ -37,6 +37,7 @@ const TEMPLATES = [
   { id:'carousel', label:'CARROSSEL',      ratio:'4:5', w:1080, h:1350, note:'3–5 páginas sequenciais' },
   { id:'block',    label:'POST BLOCADO',   ratio:'4:5', w:1080, h:1350, note:'Tipografia forte, cor sólida' },
   { id:'image',    label:'POST C/ IMAGEM', ratio:'4:5', w:1080, h:1350, note:'Texto + imagem em destaque' },
+  { id:'meme',     label:'MEME',           ratio:'4:5', w:1080, h:1350, note:'Meme autoral · legenda ou texto na imagem' },
   { id:'quiz',     label:'QUIZ',           ratio:'4:5', w:1080, h:1350, note:'Pergunta ou “esse ou aquele”' },
   { id:'ranking',  label:'TOP / RANKING',  ratio:'4:5', w:1080, h:1350, note:'Lista numerada · top da semana' },
   { id:'arrivals', label:'NOVIDADES',      ratio:'4:5', w:1080, h:1350, note:'Grade de novidades da semana' },

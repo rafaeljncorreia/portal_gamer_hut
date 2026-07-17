@@ -1,7 +1,7 @@
 # Integração CRIAR → Creative Studio
 
 > Mapeamento entre o wizard de conteúdo (criar.html) e o editor de arte (studio.html)
-> Versão: 1.0 — 2026-07-15
+> Versão: 1.1 — 2026-07-17 (adicionado template/formato MEME)
 
 ---
 
@@ -90,9 +90,14 @@ var FORMAT_TO_TEMPLATE = {
   'carrossel': 'carousel',
   'post':      'image',
   'quiz':      'quiz',
-  'ranking':   'ranking'
+  'ranking':   'ranking',
+  'meme':      'meme'
 };
 ```
+
+> **STUDIO_FIELDS (fonte única):** o mapa de campos por template vive **só** em `lib/utils.js`
+> (`window.STUDIO_FIELDS`), usado por `buildStudioPatch()`/`mergeStudioState()`. A cópia que existia
+> em `criar.js` era código morto e foi removida — não reintroduzir para evitar divergência.
 
 ### Formatos que NÃO têm template no Studio
 
@@ -192,6 +197,23 @@ Pages também pode ter type:'video' com `eyebrow`, `accent`, `footer`, `video`.
 | `rankItems[].name` | string | Nome do jogo | Sim |
 | `rankItems[].note` | string | Tag curta | Não |
 
+### 3.6 MEME (meme)
+
+| Campo Studio | Tipo | Painel | Obrigatório |
+|---|---|---|---|
+| `memeLayout` | string | Seletor `caption` / `impact` | Default `'caption'` |
+| `memeCaption` | string | Legenda do meme (modo caption) | Sim (modo caption) |
+| `memeBarPos` | string | Posição da barra `top`/`bottom` | Default `'top'` |
+| `memeBarColor` | string\|null | Cor da barra | Default `'#F4F1EC'` |
+| `memeTop` | string | Texto de cima (modo impact) | — |
+| `memeBottom` | string | Texto de baixo (modo impact) | — |
+| `memeCredit` | string | Assinatura no canto | Default `'@gamerhut'` |
+| `image` | string (data-uri) | Imagem do meme | — |
+| `titleSize` | number | TIPOGRAFIA (slider) | Default 64 |
+
+> Sem selo de categoria e sem logo central (branding leve, meme-native). Reutiliza os controles de
+> imagem (zoom/blur/posição) e o drag-to-pan padrão via `s.image`.
+
 ### 3.5 BLOCK, REELS, ARRIVALS, THUMB
 
 > Sem formato JSON no wizard ainda. Mapeamento documentado para referência futura.
@@ -288,6 +310,26 @@ activeCat.id                  →   patch.tagId
 ─                             →   patch.rankCount = itens.length
 ```
 
+### 4.5 Meme
+
+A IA gera um objeto `studio` completo (caminho preferido de `buildStudioPatch`, que usa `v.studio`
+diretamente). Fallback quando vier em campos soltos (ex.: vindo do `copys.html`):
+
+```
+v.memeCaption | v.legenda | v.titulo  →   patch.memeCaption
+v.memeTop     | v.topo     → uppercase →   patch.memeTop
+v.memeBottom  | v.base     → uppercase →   patch.memeBottom
+v.memeLayout                          →   patch.memeLayout (default 'caption')
+─                                     →   patch.template = 'meme'
+─                                     →   patch.memeBarPos = 'top'
+─                                     →   patch.memeBarColor = '#F4F1EC'
+─                                     →   patch.memeCredit = '@gamerhut'
+─                                     →   patch.titleSize = 64
+─                                     →   patch.image = null
+```
+
+`memeBarPos` / `memeBarColor` / `memeCredit` ausentes no patch são preenchidos pelo `DEFAULT_STATE` do Studio.
+
 ---
 
 ## 5. Prompt Template-Aware
@@ -362,6 +404,28 @@ Responda SOMENTE com JSON válido, sem texto fora dele, neste formato exato:
   "hashtags":["5 a 7 hashtags sem #, sem espaços"]
 }]}
 IMPORTANTE: "itens" deve ter no mínimo 5 itens.
+```
+
+#### meme (3 variações, objeto studio + descrição)
+
+```
+Responda SOMENTE com JSON válido, neste formato exato:
+{"variacoes":[{
+  "studio":{
+    "memeLayout":"caption",
+    "memeCaption":"setup/punchline do meme (minúsculas ok)",
+    "memeTop":"TEXTO DE CIMA (CAIXA ALTA, curto)",
+    "memeBottom":"TEXTO DE BAIXO (CAIXA ALTA, curto)",
+    "titleSize":64
+  },
+  "descricao":{
+    "titulo":"título curto pro post",
+    "legenda":"legenda do feed no clima do meme",
+    "cta":"CTA de engajamento (marca o amigo)",
+    "hashtags":["5 a 7 hashtags sem #, sem espaços"]
+  }
+}]}
+IMPORTANTE: a imagem é do usuário — a IA só escreve o texto (os dois modos, pra alternar no editor).
 ```
 
 ### 5.2 Implementação
@@ -553,5 +617,9 @@ ARRIVALS:     tagId, pattern, fill, ink, format,
 
 THUMB:        tagId, pattern, fill, ink,
               eyebrow, title, accentWord, badge, priceLabel,
+              image, titleSize
+
+MEME:         template, tagId, memeLayout, memeBarPos, memeCaption,
+              memeBarColor, memeTop, memeBottom, memeCredit,
               image, titleSize
 ```

@@ -45,6 +45,10 @@ const DEFAULT_STATE = {
     { name:'', console:'', image:null },
     { name:'', console:'', image:null },
   ],
+  // MEME
+  memeLayout:'caption', memeBarPos:'top', memeBarColor:'#F4F1EC',
+  memeCaption:'quando você fala que só vai jogar UMA partida', memeTop:'', memeBottom:'',
+  memeCredit:'@gamerhut',
 };
 
 const PRESETS = {
@@ -53,6 +57,9 @@ const PRESETS = {
   image:    { template:'image', tagId:'lancamento', pattern:'solid', fill:false, eyebrow:'JÁ DISPONÍVEL',
               title:'METAL GEAR SOLID Δ: SNAKE EATER', subtitle:'Tactical espionage action de volta em mídia física, lacrado e em português.',
               priceLabel:'R$ 349 · LACRADO', titleSize:88 },
+  meme:     { template:'meme', memeLayout:'caption', memeBarPos:'top', memeBarColor:'#F4F1EC',
+              memeCaption:'quando você fala que só vai jogar UMA partida', memeTop:'', memeBottom:'',
+              memeCredit:'@gamerhut', titleSize:64, image:null },
   reels:    { template:'reels', tagId:'trailer', pattern:'8bit', fill:true, eyebrow:'NOVO TRAILER',
               title:'DRAGON QUEST XII', subtitle:'assiste já', badge:'BEYOND DREAMS', titleSize:128,
               footer:'GAMER HUT\nNEVER STOPS' },
