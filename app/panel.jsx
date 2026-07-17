@@ -560,7 +560,7 @@ function MemeFields({ s, set }){
         </Field>
       </>}
       <Field label="Assinatura (canto)">
-        <TextInput value={s.memeCredit!=null?s.memeCredit:''} placeholder="@gamerhut"
+        <TextInput value={s.memeCredit!=null?s.memeCredit:''} placeholder="@gamerhut.store"
           onChange={e=>set({ memeCredit:e.target.value })}/>
       </Field>
       <div style={{ display:'flex', gap:10, alignItems:'flex-start', background:GH.bg,

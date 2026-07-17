@@ -48,7 +48,7 @@ const DEFAULT_STATE = {
   // MEME
   memeLayout:'caption', memeBarPos:'top', memeBarColor:'#F4F1EC',
   memeCaption:'quando você fala que só vai jogar UMA partida', memeTop:'', memeBottom:'',
-  memeCredit:'@gamerhut',
+  memeCredit:'@gamerhut.store',
 };
 
 const PRESETS = {
@@ -59,7 +59,7 @@ const PRESETS = {
               priceLabel:'R$ 349 · LACRADO', titleSize:88 },
   meme:     { template:'meme', memeLayout:'caption', memeBarPos:'top', memeBarColor:'#F4F1EC',
               memeCaption:'quando você fala que só vai jogar UMA partida', memeTop:'', memeBottom:'',
-              memeCredit:'@gamerhut', titleSize:64, image:null },
+              memeCredit:'@gamerhut.store', titleSize:64, image:null },
   reels:    { template:'reels', tagId:'trailer', pattern:'8bit', fill:true, eyebrow:'NOVO TRAILER',
               title:'DRAGON QUEST XII', subtitle:'assiste já', badge:'BEYOND DREAMS', titleSize:128,
               footer:'GAMER HUT\nNEVER STOPS' },

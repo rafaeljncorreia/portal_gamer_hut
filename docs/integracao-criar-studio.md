@@ -207,7 +207,7 @@ Pages também pode ter type:'video' com `eyebrow`, `accent`, `footer`, `video`.
 | `memeBarColor` | string\|null | Cor da barra | Default `'#F4F1EC'` |
 | `memeTop` | string | Texto de cima (modo impact) | — |
 | `memeBottom` | string | Texto de baixo (modo impact) | — |
-| `memeCredit` | string | Assinatura no canto | Default `'@gamerhut'` |
+| `memeCredit` | string | Assinatura no canto | Default `'@gamerhut.store'` |
 | `image` | string (data-uri) | Imagem do meme | — |
 | `titleSize` | number | TIPOGRAFIA (slider) | Default 64 |
 
@@ -323,7 +323,7 @@ v.memeLayout                          →   patch.memeLayout (default 'caption')
 ─                                     →   patch.template = 'meme'
 ─                                     →   patch.memeBarPos = 'top'
 ─                                     →   patch.memeBarColor = '#F4F1EC'
-─                                     →   patch.memeCredit = '@gamerhut'
+─                                     →   patch.memeCredit = '@gamerhut.store'
 ─                                     →   patch.titleSize = 64
 ─                                     →   patch.image = null
 ```
