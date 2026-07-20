@@ -400,7 +400,15 @@ window.initCriar = function() {
         '  }\n' +
         '}]}\n' +
         'IMPORTANTE: o array cenas dentro de roteiro deve conter todas as cenas do roteiro (mínimo 3, máximo 8).',
-      reels: 'Cada variação deve incluir UM OBJETO "studio" com os campos visuais para capa de Reels, UM OBJETO "descricao" com o texto do post e UM OBJETO "roteiro" com as cenas.\n' +
+      reels: 'Cada variação é um roteiro de TikTok construído pelo framework V-CORE.\n' +
+        '\n' +
+        'ANTES DE ESCREVER, PASSE PELO PORTÃO "V": a pessoa termina o vídeo sabendo, sentindo ou sendo capaz de algo que não tinha antes?\n' +
+        'Se a resposta for vaga, ou "não, mas prende bem" — TROQUE O ÂNGULO até ter uma resposta específica. Retenção é consequência de entregar algo real, não técnica pra prender atenção.\n' +
+        '\n' +
+        'ESCOLHA EXATAMENTE 1 GATILHO da lista aprovada nas instruções de formato. Nunca use os banidos.\n' +
+        'O loop aberto no hook TEM que fechar no bloco RECOMPENSA. Abrir e não entregar é pior que não ter feito o vídeo.\n' +
+        'CTA só no terço final — nunca antes.\n' +
+        '\n' +
         'PENSE NO DESIGN — formato 9:16, pattern 8bit, fill=true, destaque visual.\n' +
         'Formato JSON exato:\n' +
         '{"variacoes":[{\n' +
@@ -419,12 +427,23 @@ window.initCriar = function() {
         '    "hashtags":["5 a 7 hashtags sem #, sem espaços"]\n' +
         '  },\n' +
         '  "roteiro":{\n' +
+        '    "valor":"1 frase ESPECÍFICA — o que a pessoa leva embora. Nada genérico.",\n' +
+        '    "tipoValor":"informacional | emocional | pratico",\n' +
+        '    "gatilho":"nome de 1 dos 10 gatilhos aprovados",\n' +
+        '    "pergunta":"a pergunta que o hook abre e a recompensa fecha",\n' +
+        '    "audio":"trilha sugerida, combinando com o gênero do jogo",\n' +
         '    "cenas":[\n' +
-        '      {"duracao":"0:00-0:05","visual":"descrição visual","narracao":"texto falado"}\n' +
+        '      {"duracao":"0:00-0:03","bloco":"HOOK","visual":"descrição visual","narracao":"texto na tela ou fala"},\n' +
+        '      {"duracao":"0:03-0:10","bloco":"CULTURA","visual":"...","narracao":"..."},\n' +
+        '      {"duracao":"0:10-0:16","bloco":"EVIDENCIA","visual":"...","narracao":"..."},\n' +
+        '      {"duracao":"0:16-0:21","bloco":"RECOMPENSA","visual":"...","narracao":"..."},\n' +
+        '      {"duracao":"0:21-0:25","bloco":"CTA","visual":"...","narracao":"..."}\n' +
         '    ]\n' +
         '  }\n' +
         '}]}\n' +
-        'IMPORTANTE: o array cenas deve ter mínimo 2, máximo 5 cenas (vídeo curto).'
+        'IMPORTANTE: os 5 blocos são obrigatórios e nesta ordem. "bloco" só aceita HOOK, CULTURA, EVIDENCIA, RECOMPENSA ou CTA.\n' +
+        'O HOOK ocupa no máximo os 3 primeiros segundos. O vídeo inteiro dura entre 15 e 30 segundos.\n' +
+        'O bloco CULTURA abre no assunto (jogo, indústria, comunidade) — o produto NÃO é o protagonista ainda.'
     };
     return schemas[tpl] || '';
   }
@@ -441,6 +460,25 @@ window.initCriar = function() {
         var idx2 = base.indexOf('Responda SOMENTE com JSON válido');
         if (idx2 > -1) base = base.substring(0, idx2);
         base += getRoteiroStudioSchema(template);
+      }
+      // TikTok (reels) roda no V-CORE: 15-30s e checagem própria. Thumb (YouTube) mantém a regra longa.
+      if (template === 'reels') {
+        return base + '\n\n---\nREGRAS:\n' +
+          '- Título curto e forte (máx ~8 palavras).\n' +
+          '- Vídeo entre 15 e 30 segundos no total.\n' +
+          '- Cada cena com visual descritivo e texto/narração direta.\n' +
+          '- Descrição com 1-2 frases + hashtags.\n' +
+          '- Variações com GATILHOS DIFERENTES entre si.\n' +
+          '- Português do Brasil. Use "sua/seu", nunca "tua/teu".\n' +
+          '- A marca é GAMER HUT. Nunca "Hut" sozinho. Nunca "Bora" como CTA.\n' +
+          '\nANTES DE FECHAR CADA VARIAÇÃO, CONFIRA:\n' +
+          '- O campo "valor" está específico, não genérico?\n' +
+          '- O loop aberto no HOOK fecha de verdade no bloco RECOMPENSA?\n' +
+          '- CTA/preço não aparece antes do terço final?\n' +
+          '- Sem menção a console, usado, pirata ou troca — nem em piada?\n' +
+          '- Sem crítica a concorrente ou marketplace, nem indireta?\n' +
+          '- Se usou escassez, ela é real?\n' +
+          '- O gatilho está entre os 10 aprovados?';
       }
       return base + '\n\n---\nREGRAS:\n- Título curto e forte (máx ~8 palavras).\n- Cada cena com visual descritivo e narração direta.\n- Vídeo entre 30 e 90 segundos.\n- Descrição com 2-3 frases + hashtags.\n- Variações com ângulos diferentes.\n- Português do Brasil.';
     }
@@ -685,8 +723,22 @@ window.initCriar = function() {
     var cenas = (r.cenas || v.cenas || []);
     var descText = [titulo, legenda, tags.join(' ')].filter(function(x) { return x; }).join('\n\n').trim();
     var cenasText = cenas.map(function(cena, ci) {
-      return 'Cena ' + (ci + 1) + ' (' + cena.duracao + '):\nVisual: ' + cena.visual + '\nNarração: ' + cena.narracao;
+      return 'Cena ' + (ci + 1) + ' (' + cena.duracao + ')' + (cena.bloco ? ' · ' + cena.bloco : '') +
+        ':\nVisual: ' + cena.visual + '\nNarração: ' + cena.narracao;
     }).join('\n\n');
+
+    // Brief V-CORE — só existe nos roteiros de TikTok (template reels)
+    var brief = [
+      { rot: 'VALOR',    val: r.valor, extra: r.tipoValor },
+      { rot: 'GATILHO',  val: r.gatilho },
+      { rot: 'PERGUNTA', val: r.pergunta },
+      { rot: 'ÁUDIO',    val: r.audio }
+    ].filter(function(x) { return x.val; });
+    if (brief.length) {
+      cenasText = brief.map(function(b) {
+        return b.rot + ': ' + b.val + (b.extra ? ' (' + b.extra + ')' : '');
+      }).join('\n') + '\n\n' + cenasText;
+    }
 
     var hasStudio = !!getStudioTemplate();
 
@@ -703,11 +755,22 @@ window.initCriar = function() {
       '<button class="cbtn desc-btn" style="margin-top:10px">📋 COPIAR DESCRIÇÃO</button>' +
       (hasStudio ? '<span class="rlabel">── ARTE ──</span><button class="artbtn">MONTAR CAPA →</button>' : '');
 
+    if (brief.length) {
+      html += '<span class="rlabel">── BRIEF V-CORE ──</span><div class="vcore">' +
+        brief.map(function(b) {
+          return '<div class="vcrow"><span class="vck">' + esc(b.rot) + '</span>' +
+            '<span class="vcv">' + esc(b.val) +
+            (b.extra ? ' <em class="vctipo">' + esc(b.extra) + '</em>' : '') + '</span></div>';
+        }).join('') +
+        '</div>';
+    }
+
     if (cenas.length) {
       html += '<span class="rlabel">── ROTEIRO ──</span>';
       cenas.forEach(function(cena) {
         html += '<div class="cena">' +
-          '<div class="dur">' + esc(cena.duracao) + '</div>' +
+          '<div class="dur">' + esc(cena.duracao) +
+          (cena.bloco ? '<span class="bloco">' + esc(cena.bloco) + '</span>' : '') + '</div>' +
           '<div class="vis">' + esc(cena.visual) + '</div>' +
           (cena.narracao ? '<div>' + esc(cena.narracao) + '</div>' : '') +
           '</div>';

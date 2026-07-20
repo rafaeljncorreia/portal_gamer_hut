@@ -64,8 +64,20 @@
   .card .rlabel:first-of-type{ border-top:none; padding-top:0; }
   .card .cena{ padding:8px 0; border-top:1px solid rgba(244,241,236,.06); font-size:13px; line-height:1.5; color:#cfc9c1; }
   .card .cena:first-of-type{ border-top:none; }
-  .card .cena .dur{ font-family:'Press Start 2P',monospace; font-size:9px; color:var(--ac,var(--orange)); }
+  .card .cena .dur{ font-family:'Press Start 2P',monospace; font-size:9px; color:var(--ac,var(--orange));
+    display:flex; align-items:center; gap:8px; }
+  .card .cena .dur .bloco{ font-family:'Space Mono',monospace; font-size:9px; font-weight:700;
+    letter-spacing:.1em; color:var(--acInk,#0B0B0A); background:var(--ac,var(--orange));
+    border-radius:4px; padding:2px 6px; }
   .card .cena .vis{ font-weight:600; color:#fff; margin:3px 0; }
+
+  .card .vcore{ border-left:2px solid var(--ac,var(--orange)); padding-left:10px; margin:2px 0 4px; }
+  .card .vcrow{ display:flex; gap:8px; font-size:12px; line-height:1.5; padding:3px 0; }
+  .card .vcrow .vck{ font-family:'Space Mono',monospace; font-size:9px; font-weight:700;
+    letter-spacing:.1em; color:var(--ac,var(--orange)); min-width:62px; padding-top:2px; }
+  .card .vcrow .vcv{ color:#cfc9c1; flex:1; }
+  .card .vcrow .vctipo{ font-family:'Space Mono',monospace; font-size:10px;
+    color:var(--ac,var(--orange)); opacity:.75; font-style:normal; }
 
   .card-actions{ display:flex; gap:8px; margin-top:14px; }
   .card-actions button{ flex:1; font-family:'Space Mono',monospace; font-size:10px; font-weight:700;

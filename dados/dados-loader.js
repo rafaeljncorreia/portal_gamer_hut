@@ -247,8 +247,10 @@
     var tipo = (fmt && fmt.tipoSaida) || 'copy';
     if (tipo === 'roteiro') {
       partes.push(
+        // A duração NÃO entra aqui: cada plataforma/formato define a sua (TikTok 15-30s, YouTube 30-90s).
+        // Esta linha sobrevive ao truncamento feito em buildFullPrompt, então duração aqui vira instrução contraditória.
         '\nEscreva 2 variações de roteiro de vídeo. Cada cena tem duração aproximada, descrição visual e narração. ' +
-        'O vídeo completo deve ter entre 30 e 90 segundos. Inclua título do vídeo, descrição e hashtags.\n' +
+        'Respeite a duração indicada nas instruções de plataforma e formato. Inclua título do vídeo, descrição e hashtags.\n' +
         'Responda SOMENTE com JSON válido, sem texto fora dele, neste formato exato:\n' +
         '{"variacoes":[{' +
         '"titulo":"título do vídeo",' +
