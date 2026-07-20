@@ -525,7 +525,7 @@ window.initCriar = function() {
     var tipoSaida = (fmt && fmt.tipoSaida) || 'copy';
 
     variacoes.forEach(function(v, i) {
-      if (tipoSaida === 'roteiro' && Array.isArray(v.cenas)) {
+      if (tipoSaida === 'roteiro' && (Array.isArray(v.cenas) || (v.roteiro && Array.isArray(v.roteiro.cenas)))) {
         renderRoteiro(v, i);
       } else {
         renderCopy(v, i);
