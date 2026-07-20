@@ -28,7 +28,7 @@ const TAGS = [
   { id:'trailer',    label:'TRAILER',    seal:'TRAILER',color:'#7B3FE4', ink:'#F4F1EC' },
   { id:'review',     label:'REVIEW',     seal:'REVIEW', color:'#2BB1C4', ink:'#0B0B0A' },
   { id:'quiz',       label:'QUIZ',       seal:'QUIZ',   color:'#E8643C', ink:'#0B0B0A' },
-  { id:'meme',       label:'MEME',       seal:'MEME',   color:'#B388FF', ink:'#0B0B0A' },
+  { id:'meme',       label:'MEME',       seal:'MEME',   color:'#E8643C', ink:'#0B0B0A' },
 ];
 
 const FALLBACK_TAG = { id:null, label:'', seal:'', color:'#5C5854', ink:'#F4F1EC' };
