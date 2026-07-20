@@ -25,12 +25,10 @@ window.initCriar = function() {
     'gameplay':       'thumb',
     'unboxing':       'thumb',
     'video-curto':    'reels',
-    'meme':           'meme'
+    'meme':           'block'
   };
 
-  // O mapa de campos por template (STUDIO_FIELDS) vive só em lib/utils.js
-  // (window.STUDIO_FIELDS). buildStudioPatch()/mergeStudioState() de lá são a
-  // fonte única — não duplicar aqui pra não divergir.
+  // STUDIO_FIELDS vive só em lib/utils.js — não duplicar aqui pra não divergir
 
   function getStudioTemplate() {
     var fmt = DADOS.formatos[fmtSelect.value];
@@ -92,6 +90,28 @@ window.initCriar = function() {
         '    "titulo":"título principal (normal, sem caixa alta)",\n' +
         '    "legenda":"texto de apoio 2-4 frases",\n' +
         '    "cta":"chamada final",\n' +
+        '    "hashtags":["5 a 7 hashtags sem #, sem espaços"]\n' +
+        '  }\n' +
+        '}]}',
+      block: 'Escreva 3 variações de MEME para Instagram.\n' +
+        'FORMATO: post tipográfico sem imagem — o TEXTO é o protagonista.\n' +
+        'Escolha pattern vibrante (8bit, caution, stars, chevron, grid, retro), fill=true.\n' +
+        'PENSE NO DESIGN — titleSize grande (110-150), frase curta de impacto.\n' +
+        'Responda SOMENTE com JSON válido, neste formato exato:\n' +
+        '{"variacoes":[{\n' +
+        '  "studio":{\n' +
+        '    "title":"FRASE DO MEME (CAIXA ALTA, máx 6 palavras)",\n' +
+        '    "eyebrow":"EYEBROW OPCIONAL (CAIXA ALTA): SITUAÇÃO / FATO / ATENÇÃO",\n' +
+        '    "subtitle":"COMPLEMENTO OPCIONAL (CAIXA ALTA, máx 3 palavras)",\n' +
+        '    "fill":true,\n' +
+        '    "ink":"auto",\n' +
+        '    "pattern":"8bit",\n' +
+        '    "titleSize":130\n' +
+        '  },\n' +
+        '  "descricao":{\n' +
+        '    "titulo":"frase do meme (normal, sem caixa alta)",\n' +
+        '    "legenda":"legenda do meme — irônica, divertida ou reflexiva, 2-3 frases",\n' +
+        '    "cta":"chamada pra engajamento: marca alguém, comenta, salva",\n' +
         '    "hashtags":["5 a 7 hashtags sem #, sem espaços"]\n' +
         '  }\n' +
         '}]}',
