@@ -856,7 +856,13 @@ window.initCriar = function() {
       var text = await aiComplete(prompt);
       var data = extractJSON(text);
       if (!data || !Array.isArray(data.variacoes) || !data.variacoes.length) {
-        showErr('A resposta veio em um formato inesperado. Tente de novo.');
+        // Sem isso a falha vira adivinhação — deixa a resposta crua acessível pra diagnóstico.
+        console.warn('[criar] extractJSON falhou. Resposta crua da IA abaixo:', text);
+        window.__ultimaRespostaIA = text;
+        var truncada = text && text.trim().slice(-1) !== '}';
+        showErr('A resposta veio em um formato inesperado.' +
+          (truncada ? ' Parece truncada — tente um briefing mais curto.' : '') +
+          ' Abra o console (F12) ou veja window.__ultimaRespostaIA para o texto cru.');
       } else {
         var genRecord = DADOS.registrarGeracao({
           plataformaId: opts.plataformaId,
