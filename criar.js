@@ -25,7 +25,7 @@ window.initCriar = function() {
     'gameplay':       'thumb',
     'unboxing':       'thumb',
     'video-curto':    'reels',
-    'meme':           'block'
+    'meme':           'meme'
   };
 
   // STUDIO_FIELDS vive só em lib/utils.js — não duplicar aqui pra não divergir
